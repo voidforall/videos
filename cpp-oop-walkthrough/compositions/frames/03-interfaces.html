@@ -1,0 +1,435 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "EB Garamond";
+      src: url("assets/fonts/EBGaramond-Regular.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/Inter-Regular.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/Inter-Bold.woff2") format("woff2");
+      font-weight: 700;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: "JetBrains Mono";
+      src: url("assets/fonts/JetBrainsMono-Regular.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: "JetBrains Mono";
+      src: url("assets/fonts/JetBrainsMono-Bold.woff2") format("woff2");
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    #root {
+      width: 1920px;
+      height: 1080px;
+      position: relative;
+      overflow: hidden;
+      container-type: size;
+      color: #141413;
+    }
+
+    #f03-interfaces-ground {
+      position: absolute;
+      inset: 0;
+      background: #faf9f5;
+      z-index: 0;
+    }
+
+    .f03-interfaces-kicker {
+      position: absolute;
+      left: 80px;
+      top: 52px;
+      margin: 0;
+      font: 500 26px/1 "JetBrains Mono", monospace;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      z-index: 4;
+    }
+
+    .f03-interfaces-kicker-mark { color: #cc785c; }
+
+    .f03-interfaces-title {
+      position: absolute;
+      left: 80px;
+      top: 91px;
+      margin: 0;
+      font: 400 66px/0.98 "EB Garamond", serif;
+      letter-spacing: -0.018em;
+      z-index: 4;
+    }
+
+    .f03-interfaces-rule {
+      position: absolute;
+      left: 80px;
+      right: 80px;
+      top: 178px;
+      height: 1px;
+      background: rgba(20, 20, 19, 0.12);
+      z-index: 2;
+    }
+
+    .f03-interfaces-connectors {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 900px;
+      overflow: visible;
+      z-index: 1;
+    }
+
+    .f03-interfaces-path {
+      fill: none;
+      stroke: rgba(20, 20, 19, 0.32);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .f03-interfaces-arrow {
+      fill: #faf9f5;
+      stroke: rgba(20, 20, 19, 0.42);
+      stroke-width: 2;
+      stroke-linejoin: round;
+    }
+
+    .f03-interfaces-code-card {
+      position: absolute;
+      left: 610px;
+      top: 215px;
+      width: 700px;
+      height: 350px;
+      border: 1px solid rgba(250, 249, 245, 0.14);
+      border-radius: 8px;
+      background: #181715;
+      color: #faf9f5;
+      box-shadow: 0 1px 3px rgba(20,20,19,.08), 0 4px 16px rgba(20,20,19,.04);
+      overflow: hidden;
+      z-index: 3;
+    }
+
+    .f03-interfaces-code-head {
+      height: 56px;
+      box-sizing: border-box;
+      padding: 17px 25px;
+      background: #252320;
+      border-bottom: 1px solid rgba(250, 249, 245, 0.14);
+      font: 500 23px/1 "JetBrains Mono", monospace;
+      letter-spacing: 0.02em;
+    }
+
+    .f03-interfaces-code {
+      padding: 27px 34px 21px;
+      font: 400 29px/1.62 "JetBrains Mono", monospace;
+      white-space: nowrap;
+    }
+
+    .f03-interfaces-code-line { display: block; }
+    .f03-interfaces-code-dim { color: rgba(250, 249, 245, 0.54); }
+    .f03-interfaces-code-key { color: #5db8a6; }
+
+    .f03-interfaces-pure {
+      display: inline-block;
+      padding: 0 9px;
+      margin-left: -9px;
+      border-radius: 6px;
+      background: #ece3d4;
+      color: #141413;
+    }
+
+    .f03-interfaces-badges {
+      position: absolute;
+      right: 26px;
+      bottom: 20px;
+      display: flex;
+      gap: 9px;
+    }
+
+    .f03-interfaces-badge {
+      border: 1px solid rgba(250,249,245,.18);
+      border-radius: 9999px;
+      padding: 7px 12px 6px;
+      color: rgba(250,249,245,.76);
+      font: 500 18px/1 "JetBrains Mono", monospace;
+      letter-spacing: .04em;
+    }
+
+    .f03-interfaces-node {
+      position: absolute;
+      width: 360px;
+      height: 146px;
+      box-sizing: border-box;
+      padding: 25px 28px;
+      border: 1px solid rgba(20,20,19,.12);
+      border-radius: 12px;
+      background: #efe9de;
+      box-shadow: 0 1px 3px rgba(20,20,19,.08), 0 4px 16px rgba(20,20,19,.04);
+      z-index: 3;
+    }
+
+    #f03-interfaces-circle { left: 230px; top: 672px; }
+    #f03-interfaces-rectangle { left: 1330px; top: 672px; }
+
+    .f03-interfaces-node-kind {
+      margin: 0 0 13px;
+      font: 500 18px/1 "JetBrains Mono", monospace;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+      opacity: .56;
+    }
+
+    .f03-interfaces-node-name {
+      margin: 0;
+      font: 400 50px/1 "EB Garamond", serif;
+      letter-spacing: -.018em;
+    }
+
+    .f03-interfaces-pointer {
+      position: absolute;
+      left: 80px;
+      top: 325px;
+      width: 330px;
+      padding: 20px 24px;
+      box-sizing: border-box;
+      border: 1px solid rgba(20,20,19,.12);
+      border-radius: 8px;
+      background: #faf9f5;
+      z-index: 3;
+    }
+
+    .f03-interfaces-pointer code {
+      font: 400 28px/1 "JetBrains Mono", monospace;
+    }
+
+    .f03-interfaces-pointer-label {
+      margin-top: 11px;
+      font: 400 20px/1.25 "Inter", sans-serif;
+      opacity: .6;
+    }
+
+    .f03-interfaces-seal {
+      position: absolute;
+      left: 674px;
+      top: 523px;
+      width: 572px;
+      height: 72px;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      border: 1px solid rgba(250,249,245,.2);
+      border-radius: 8px;
+      background: #252320;
+      color: #faf9f5;
+      font: 400 25px/1 "JetBrains Mono", monospace;
+      z-index: 4;
+    }
+
+    .f03-interfaces-seal-check {
+      width: 28px;
+      height: 28px;
+      border: 1px solid rgba(250,249,245,.44);
+      border-radius: 9999px;
+      display: grid;
+      place-items: center;
+      font: 700 17px/1 "Inter", sans-serif;
+    }
+
+    .f03-interfaces-contract-two {
+      position: absolute;
+      left: 1480px;
+      top: 257px;
+      width: 360px;
+      height: 174px;
+      box-sizing: border-box;
+      padding: 22px 25px;
+      border: 1px solid rgba(20,20,19,.16);
+      border-radius: 8px;
+      background: #faf9f5;
+      z-index: 3;
+    }
+
+    .f03-interfaces-contract-two-title {
+      margin: 0 0 17px;
+      font: 400 38px/1 "EB Garamond", serif;
+      letter-spacing: -.015em;
+    }
+
+    .f03-interfaces-contract-two-code {
+      margin: 0;
+      font: 400 21px/1.55 "JetBrains Mono", monospace;
+    }
+
+    .f03-interfaces-multi-tag {
+      position: absolute;
+      left: 719px;
+      top: 833px;
+      width: 482px;
+      box-sizing: border-box;
+      padding: 13px 20px;
+      border: 1px solid rgba(20,20,19,.16);
+      border-radius: 9999px;
+      background: #faf9f5;
+      text-align: center;
+      font: 500 20px/1 "JetBrains Mono", monospace;
+      letter-spacing: .03em;
+      z-index: 4;
+    }
+  </style>
+
+  <div data-hf-id="hf-1x48" id="root" data-composition-id="03-interfaces" data-width="1920" data-height="1080" data-duration="28.227">
+    <div data-hf-id="hf-z04b" id="f03-interfaces-ground" class="clip" data-start="0" data-duration="28.227" data-track-index="0"></div>
+
+    <p data-hf-id="hf-jw98" id="f03-interfaces-kicker" class="f03-interfaces-kicker"><span data-hf-id="hf-bdoa" class="f03-interfaces-kicker-mark">✱</span> Behavioral contract</p>
+    <h1 data-hf-id="hf-n4y4" id="f03-interfaces-title" class="f03-interfaces-title">Substitution, made explicit</h1>
+    <div data-hf-id="hf-smx8" id="f03-interfaces-rule" class="f03-interfaces-rule"></div>
+
+    <svg data-hf-id="hf-g82h" class="f03-interfaces-connectors" viewBox="0 0 1920 900" aria-hidden="true">
+      <path data-hf-id="hf-m09w" id="f03-interfaces-path-left" class="f03-interfaces-path" d="M 830 566 C 760 624, 600 625, 500 671" />
+      <path data-hf-id="hf-thi1" id="f03-interfaces-path-right" class="f03-interfaces-path" d="M 1090 566 C 1160 624, 1320 625, 1420 671" />
+      <path data-hf-id="hf-ozzz" id="f03-interfaces-path-pointer" class="f03-interfaces-path" d="M 410 374 C 500 374, 544 374, 610 374" />
+      <path data-hf-id="hf-6bc7" id="f03-interfaces-path-second" class="f03-interfaces-path" d="M 1480 390 C 1418 442, 1390 552, 1422 671" />
+      <path data-hf-id="hf-qi3b" id="f03-interfaces-path-multi" class="f03-interfaces-path" d="M 590 782 C 730 852, 1190 852, 1330 782" />
+      <path data-hf-id="hf-46c0" id="f03-interfaces-arrow-left" class="f03-interfaces-arrow" d="M 500 671 l 11 -23 l 12 20 z" />
+      <path data-hf-id="hf-q381" id="f03-interfaces-arrow-right" class="f03-interfaces-arrow" d="M 1420 671 l -23 -8 l 10 -17 z" />
+    </svg>
+
+    <section data-hf-id="hf-q8tq" id="f03-interfaces-shape" class="f03-interfaces-code-card" aria-label="Shape interface">
+      <div data-hf-id="hf-4ad6" class="f03-interfaces-code-head">shape.hpp</div>
+      <div data-hf-id="hf-adpw" class="f03-interfaces-code">
+        <span data-hf-id="hf-7kdq" class="f03-interfaces-code-line"><span data-hf-id="hf-g9c8" class="f03-interfaces-code-key">struct</span> Shape {</span>
+        <span data-hf-id="hf-pe9g" class="f03-interfaces-code-line f03-interfaces-code-dim"> public:</span>
+        <span data-hf-id="hf-wptr" id="f03-interfaces-draw" class="f03-interfaces-code-line f03-interfaces-pure">  virtual void draw() const = 0;</span>
+        <span data-hf-id="hf-mcrk" id="f03-interfaces-dtor" class="f03-interfaces-code-line">  virtual ~Shape() = default;</span>
+        <span data-hf-id="hf-5rmu" class="f03-interfaces-code-line">};</span>
+      </div>
+      <div data-hf-id="hf-cq83" class="f03-interfaces-badges">
+        <span data-hf-id="hf-7qvi" id="f03-interfaces-abstract" class="f03-interfaces-badge">abstract</span>
+        <span data-hf-id="hf-gens" id="f03-interfaces-stateless" class="f03-interfaces-badge">no state</span>
+      </div>
+    </section>
+
+    <article data-hf-id="hf-5ar5" id="f03-interfaces-circle" class="f03-interfaces-node">
+      <p data-hf-id="hf-4h2j" class="f03-interfaces-node-kind">implementation</p>
+      <p data-hf-id="hf-hue2" class="f03-interfaces-node-name">Circle</p>
+    </article>
+
+    <article data-hf-id="hf-szfk" id="f03-interfaces-rectangle" class="f03-interfaces-node">
+      <p data-hf-id="hf-g37v" class="f03-interfaces-node-kind">implementation</p>
+      <p data-hf-id="hf-h21v" class="f03-interfaces-node-name">Rectangle</p>
+    </article>
+
+    <div data-hf-id="hf-l1du" id="f03-interfaces-pointer" class="f03-interfaces-pointer">
+      <code data-hf-id="hf-gha0">Shape* object</code>
+      <div data-hf-id="hf-xpvj" class="f03-interfaces-pointer-label">base pointer</div>
+    </div>
+
+    <div data-hf-id="hf-2o9u" id="f03-interfaces-seal" class="f03-interfaces-seal">
+      <span data-hf-id="hf-gqvm" id="f03-interfaces-seal-check" class="f03-interfaces-seal-check">✓</span>
+      <span data-hf-id="hf-j25n">virtual ~Shape() = default;</span>
+    </div>
+
+    <article data-hf-id="hf-a121" id="f03-interfaces-printable" class="f03-interfaces-contract-two">
+      <p data-hf-id="hf-yw4n" class="f03-interfaces-contract-two-title">Printable</p>
+      <p data-hf-id="hf-d8on" class="f03-interfaces-contract-two-code">virtual void print() const = 0;<br data-hf-id="hf-x5px">virtual ~Printable() = default;</p>
+    </article>
+
+    <div data-hf-id="hf-uc6t" id="f03-interfaces-multi" class="f03-interfaces-multi-tag">Circle : Shape, Printable</div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script>
+    (() => {
+      const tl = gsap.timeline({ paused: true });
+      const el = (id) => document.getElementById(id);
+
+      tl.set([
+        el("f03-interfaces-circle"),
+        el("f03-interfaces-rectangle"),
+        el("f03-interfaces-pointer"),
+        el("f03-interfaces-seal"),
+        el("f03-interfaces-printable"),
+        el("f03-interfaces-multi"),
+        el("f03-interfaces-abstract"),
+        el("f03-interfaces-stateless")
+      ], { opacity: 0 }, 0);
+      tl.set([
+        el("f03-interfaces-path-left"),
+        el("f03-interfaces-path-right"),
+        el("f03-interfaces-path-pointer"),
+        el("f03-interfaces-path-second"),
+        el("f03-interfaces-path-multi")
+      ], { strokeDasharray: 900, strokeDashoffset: 900 }, 0);
+      tl.set([el("f03-interfaces-arrow-left"), el("f03-interfaces-arrow-right")], { opacity: 0 }, 0);
+      tl.set(el("f03-interfaces-dtor"), { opacity: 0.28 }, 0);
+      tl.set(el("f03-interfaces-draw"), { backgroundColor: "rgba(236,227,212,0)", color: "#FAF9F5" }, 0);
+
+      tl.fromTo(el("f03-interfaces-shape"),
+        { opacity: 0, y: -18, scale: 0.98 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.58, ease: "power3.out" }, 0.08);
+      tl.fromTo([el("f03-interfaces-kicker"), el("f03-interfaces-title"), el("f03-interfaces-rule")],
+        { opacity: 0, y: -12 },
+        { opacity: 1, y: 0, duration: 0.7, stagger: 0.11, ease: "power3.out" }, 0.18);
+      tl.fromTo(el("f03-interfaces-draw"),
+        { backgroundColor: "rgba(236,227,212,0)", color: "#FAF9F5", scale: 1 },
+        { backgroundColor: "#ECE3D4", color: "#141413", scale: 1.025, duration: 0.62, ease: "power2.out" }, 2.25);
+      tl.to(el("f03-interfaces-draw"), { scale: 1, duration: 0.48, ease: "power2.out" }, 3.02);
+
+      tl.fromTo(el("f03-interfaces-circle"),
+        { opacity: 0, x: 45, y: -24, scale: 0.96 },
+        { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.72, ease: "power3.out" }, 6.15);
+      tl.to(el("f03-interfaces-path-left"), { strokeDashoffset: 0, duration: 0.9, ease: "power2.out" }, 6.28);
+      tl.to(el("f03-interfaces-arrow-left"), { opacity: 1, duration: 0.22, ease: "none" }, 7.03);
+      tl.fromTo(el("f03-interfaces-rectangle"),
+        { opacity: 0, x: -45, y: -24, scale: 0.96 },
+        { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.72, ease: "power3.out" }, 8.35);
+      tl.to(el("f03-interfaces-path-right"), { strokeDashoffset: 0, duration: 0.9, ease: "power2.out" }, 8.48);
+      tl.to(el("f03-interfaces-arrow-right"), { opacity: 1, duration: 0.22, ease: "none" }, 9.23);
+      tl.fromTo(el("f03-interfaces-abstract"),
+        { opacity: 0, y: 10, scale: 0.94 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "power3.out" }, 11.05);
+      tl.fromTo(el("f03-interfaces-stateless"),
+        { opacity: 0, y: 10, scale: 0.94 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "power3.out" }, 12.65);
+
+      tl.fromTo(el("f03-interfaces-pointer"),
+        { opacity: 0, x: -36, scale: 0.97 },
+        { opacity: 1, x: 0, scale: 1, duration: 0.7, ease: "power3.out" }, 15.12);
+      tl.to(el("f03-interfaces-path-pointer"), { strokeDashoffset: 0, duration: 0.95, ease: "power2.out" }, 15.35);
+      tl.to(el("f03-interfaces-dtor"), { opacity: 1, duration: 0.48, ease: "power2.out" }, 17.15);
+      tl.fromTo(el("f03-interfaces-seal"),
+        { opacity: 0, y: -12, scale: 0.97 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: "power3.out" }, 18.15);
+      tl.fromTo(el("f03-interfaces-seal-check"),
+        { opacity: 0, scale: 0.82 },
+        { opacity: 1, scale: 1, duration: 0.55, ease: "power3.out" }, 19.05);
+
+      tl.fromTo(el("f03-interfaces-printable"),
+        { opacity: 0, x: 34, scale: 0.97 },
+        { opacity: 1, x: 0, scale: 1, duration: 0.72, ease: "power3.out" }, 23.05);
+      tl.to(el("f03-interfaces-path-second"), { strokeDashoffset: 0, duration: 0.85, ease: "power2.out" }, 23.4);
+      tl.to(el("f03-interfaces-path-multi"), { strokeDashoffset: 0, duration: 0.9, ease: "power2.out" }, 24.12);
+      tl.fromTo(el("f03-interfaces-multi"),
+        { opacity: 0, y: 14, scale: 0.97 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.72, ease: "power3.out" }, 25.05);
+      tl.to(el("f03-interfaces-shape"), { scale: 1.012, duration: 1.7, ease: "sine.inOut" }, 25.65);
+      tl.to({}, { duration: 0.377 });
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["03-interfaces"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,20 @@
+{
+  "name": "cpp-oop-walkthrough",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "PATH=\"$NVM_DIR/versions/node/v22.22.0/bin:$PATH\" HYPERFRAMES_PYTHON=../.venv/bin/python npx --yes hyperframes@0.8.138 preview",
+    "check": "PATH=\"$NVM_DIR/versions/node/v22.22.0/bin:$PATH\" HYPERFRAMES_PYTHON=../.venv/bin/python npx --yes hyperframes@0.8.138 check",
+    "render": "PATH=\"$NVM_DIR/versions/node/v22.22.0/bin:$PATH\" HYPERFRAMES_PYTHON=../.venv/bin/python npx --yes hyperframes@0.8.138 render",
+    "publish": "PATH=\"$NVM_DIR/versions/node/v22.22.0/bin:$PATH\" HYPERFRAMES_PYTHON=../.venv/bin/python npx --yes hyperframes@0.8.138 publish",
+    "tts": "PATH=\"$NVM_DIR/versions/node/v22.22.0/bin:$PATH\" HYPERFRAMES_PYTHON=../.venv/bin/python npx --yes hyperframes@0.8.138 tts"
+  },
+  "devDependencies": {
+    "@fontsource/eb-garamond": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.3.0"
+  }
+}

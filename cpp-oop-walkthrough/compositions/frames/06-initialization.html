@@ -1,0 +1,215 @@
+<template>
+  <style>
+    @font-face{font-family:"Inter";src:url("assets/fonts/Inter-Regular.woff2") format("woff2");font-weight:400;font-style:normal}
+    @font-face{font-family:"Inter";src:url("assets/fonts/Inter-Medium.woff2") format("woff2");font-weight:500;font-style:normal}
+    @font-face{font-family:"EB Garamond";src:url("assets/fonts/EBGaramond-Regular.woff2") format("woff2");font-weight:400;font-style:normal}
+    @font-face{font-family:"JetBrains Mono";src:url("assets/fonts/JetBrainsMono-Regular.woff2") format("woff2");font-weight:400;font-style:normal}
+    @font-face{font-family:"JetBrains Mono";src:url("assets/fonts/JetBrainsMono-Medium.woff2") format("woff2");font-weight:500;font-style:normal}
+
+    #root{position:relative;width:100%;height:100%;overflow:hidden;container-type:size;color:#141413}
+    .clip{position:absolute;inset:0;width:100%;height:100%}
+    .f06-initialization-ground{background:#FAF9F5}
+    .f06-initialization-paper-grid{position:absolute;inset:0;opacity:.32;background-image:linear-gradient(rgba(20,20,19,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(20,20,19,.035) 1px,transparent 1px);background-size:64px 64px;mask-image:linear-gradient(to bottom,#000 0%,#000 72%,transparent 90%)}
+    .f06-initialization-world{position:absolute;inset:0;padding:56px 80px 0;box-sizing:border-box}
+    .f06-initialization-kicker{font:500 26px/1 "JetBrains Mono";letter-spacing:.16em;text-transform:uppercase;color:#141413}
+    .f06-initialization-spike{color:#CC785C;margin-right:14px}
+    .f06-initialization-title{margin-top:20px;font:400 72px/1.02 "EB Garamond";letter-spacing:-.022em;max-width:900px}
+    .f06-initialization-index{position:absolute;right:80px;top:64px;font:500 24px/1 "JetBrains Mono";letter-spacing:.04em;color:rgba(20,20,19,.52)}
+    .f06-initialization-stage{position:absolute;left:80px;right:80px;top:236px;height:610px}
+    .f06-initialization-panel{position:absolute;background:#EFE9DE;border:1px solid rgba(20,20,19,.12);border-radius:12px;box-shadow:0 1px 3px rgba(20,20,19,.08),0 4px 16px rgba(20,20,19,.04);overflow:hidden}
+    .f06-initialization-panel-label{height:54px;box-sizing:border-box;padding:18px 24px;border-bottom:1px solid rgba(20,20,19,.12);font:500 22px/1 "JetBrains Mono";letter-spacing:.08em;text-transform:uppercase;color:rgba(20,20,19,.62)}
+    .f06-initialization-code{font:400 28px/1.45 "JetBrains Mono"}
+    .f06-initialization-code .kw{color:#CC785C}.f06-initialization-code .num{color:#E8A55A}.f06-initialization-code .type{color:#5DB8A6}
+    .f06-initialization-rail-panel{left:0;top:0;width:760px;height:540px}
+    .f06-initialization-result-panel{right:0;top:0;width:920px;height:540px;background:#FAF9F5}
+    .f06-initialization-rail{position:absolute;left:42px;right:42px;height:1px;background:rgba(20,20,19,.2)}
+    .f06-initialization-rail.one{top:176px}.f06-initialization-rail.two{top:348px}
+    .f06-initialization-code-row{position:absolute;left:42px;width:300px;padding:20px 22px;background:#181715;color:#FAF9F5;border:1px solid rgba(250,249,245,.14);border-radius:8px}
+    .f06-initialization-code-row.one{top:92px}.f06-initialization-code-row.two{top:264px}
+    .f06-initialization-gate{position:absolute;left:452px;top:99px;width:196px;height:92px;border:1px solid rgba(20,20,19,.2);border-radius:8px;background:#FAF9F5;text-align:center;font:500 22px/92px "JetBrains Mono"}
+    .f06-initialization-gate::before,.f06-initialization-gate::after{content:"";position:absolute;top:44px;width:30px;height:1px;background:rgba(20,20,19,.35)}
+    .f06-initialization-gate::before{left:-31px}.f06-initialization-gate::after{right:-31px}
+    .f06-initialization-traveller{position:absolute;left:346px;top:141px;width:24px;height:24px;border-radius:9999px;background:#141413;border:6px solid #FAF9F5;box-shadow:0 0 0 1px rgba(20,20,19,.22)}
+    .f06-initialization-traveller.copy{top:313px}
+    .f06-initialization-result{position:absolute;left:52px;right:52px;padding:28px 32px;border:1px solid rgba(20,20,19,.12);border-radius:8px;background:#EFE9DE}
+    .f06-initialization-result.direct{top:92px}.f06-initialization-result.copy{top:264px}
+    .f06-initialization-result strong{display:block;font:400 45px/1.05 "EB Garamond";letter-spacing:-.018em}
+    .f06-initialization-result span{display:block;margin-top:12px;font:400 24px/1.35 "Inter";color:rgba(20,20,19,.62)}
+    .f06-initialization-stop{position:absolute;left:657px;top:287px;width:50px;height:50px;border:1px solid rgba(20,20,19,.32);border-radius:9999px;background:#FAF9F5}
+    .f06-initialization-stop::after{content:"";position:absolute;left:12px;right:12px;top:24px;height:1px;background:#141413;rotate:-42deg}
+
+    .f06-initialization-brace-scene{position:absolute;inset:0}
+    .f06-initialization-brace-card{position:absolute;left:150px;top:55px;width:1460px;height:430px;background:#181715;color:#FAF9F5;border-radius:12px;border:1px solid rgba(250,249,245,.14);overflow:hidden}
+    .f06-initialization-brace-card .f06-initialization-panel-label{color:rgba(250,249,245,.72);border-bottom-color:rgba(250,249,245,.14)}
+    .f06-initialization-brace-code{position:absolute;left:70px;top:132px;font:400 44px/1.4 "JetBrains Mono"}
+    .f06-initialization-narrow-line{position:absolute;left:540px;top:213px;width:590px;height:1px;background:rgba(250,249,245,.25);transform-origin:left center}
+    .f06-initialization-narrow-token{position:absolute;left:546px;top:169px;padding:12px 16px;border-radius:6px;background:#252320;color:#E8A55A;font:400 27px/1 "JetBrains Mono"}
+    .f06-initialization-narrow-gate{position:absolute;left:1120px;top:142px;width:210px;height:145px;border-left:1px solid rgba(250,249,245,.45);border-right:1px solid rgba(250,249,245,.45);text-align:center;font:500 22px/145px "JetBrains Mono";letter-spacing:.06em}
+    .f06-initialization-reject{position:absolute;left:1125px;top:300px;width:200px;text-align:center;font:400 24px/1.2 "Inter"}
+    .f06-initialization-brace-note{position:absolute;left:70px;bottom:42px;font:400 italic 38px/1.1 "EB Garamond";letter-spacing:-.012em;color:#FAF9F5}
+
+    .f06-initialization-vector-scene{position:absolute;inset:0}
+    .f06-initialization-vector-head{position:absolute;left:0;top:-3px;width:100%;text-align:center;font:400 50px/1 "EB Garamond";letter-spacing:-.018em}
+    .f06-initialization-vector-card{position:absolute;top:80px;width:840px;height:430px;background:#181715;color:#FAF9F5;border:1px solid rgba(250,249,245,.14);border-radius:12px;overflow:hidden}
+    .f06-initialization-vector-card.paren{left:0}.f06-initialization-vector-card.braces{right:0}
+    .f06-initialization-vector-code{height:86px;box-sizing:border-box;padding:25px 34px;background:#252320;border-bottom:1px solid rgba(250,249,245,.14);font:400 29px/1.2 "JetBrains Mono"}
+    .f06-initialization-vector-caption{position:absolute;left:34px;bottom:28px;font:400 25px/1 "Inter";color:rgba(250,249,245,.64)}
+    .f06-initialization-slots{position:absolute;left:60px;right:60px;top:150px;display:flex;gap:24px;justify-content:center}
+    .f06-initialization-slot{width:104px;height:104px;border:1px solid rgba(250,249,245,.3);border-radius:8px;background:#1F1E1B}
+    .f06-initialization-value{position:absolute;left:300px;top:138px;width:240px;height:150px;border-radius:8px;background:#EFE9DE;color:#141413;text-align:center;font:400 86px/150px "EB Garamond"}
+    .f06-initialization-vector-tag{position:absolute;right:32px;bottom:26px;padding:10px 16px;border:1px solid rgba(250,249,245,.2);border-radius:9999px;font:500 20px/1 "JetBrains Mono";letter-spacing:.04em}
+
+    .f06-initialization-elision-scene{position:absolute;inset:0}
+    .f06-initialization-elision-title{position:absolute;left:0;top:5px;font:400 50px/1 "EB Garamond";letter-spacing:-.018em}
+    .f06-initialization-lane{position:absolute;left:0;right:0;top:105px;height:280px;background:#EFE9DE;border:1px solid rgba(20,20,19,.12);border-radius:12px}
+    .f06-initialization-object{position:absolute;top:79px;width:270px;height:122px;border-radius:8px;border:1px solid rgba(20,20,19,.16);background:#FAF9F5;text-align:center;font:500 24px/122px "JetBrains Mono"}
+    .f06-initialization-object.source{left:85px}.f06-initialization-object.dest{right:85px}
+    .f06-initialization-object.dest::after{content:"destination";position:absolute;left:0;right:0;top:85px;font:400 20px/1 "Inter";color:rgba(20,20,19,.55)}
+    .f06-initialization-arrow{position:absolute;left:390px;top:140px;width:940px;height:5px;overflow:visible}
+    .f06-initialization-arrow path{fill:none;stroke:#141413;stroke-width:1.5;stroke-dasharray:950;stroke-dashoffset:950}
+    .f06-initialization-moving-object{position:absolute;left:362px;top:119px;width:92px;height:50px;border-radius:6px;background:#141413;color:#FAF9F5;text-align:center;font:400 18px/50px "JetBrains Mono"}
+    .f06-initialization-ghost{position:absolute;left:720px;top:72px;width:260px;height:136px;border:1px dashed rgba(20,20,19,.3);border-radius:8px;text-align:center;font:400 21px/136px "JetBrains Mono";color:rgba(20,20,19,.45)}
+    .f06-initialization-slash{position:absolute;left:705px;top:138px;width:290px;height:1px;background:#141413;transform-origin:center}
+    .f06-initialization-guarantee{position:absolute;left:625px;top:222px;width:470px;text-align:center;font:400 italic 34px/1 "EB Garamond"}
+    .f06-initialization-nrvo{position:absolute;left:230px;right:230px;top:430px;height:104px;border-top:1px dashed rgba(20,20,19,.32);font:400 24px/1.4 "Inter";padding-top:22px;box-sizing:border-box}
+    .f06-initialization-nrvo code{font:500 22px/1 "JetBrains Mono";margin-right:32px}
+
+    .f06-initialization-summary{position:absolute;inset:0;background:#FAF9F5}
+    .f06-initialization-summary-title{position:absolute;left:0;top:70px;width:100%;text-align:center;font:400 86px/1 "EB Garamond";letter-spacing:-.022em}
+    .f06-initialization-summary-row{position:absolute;left:170px;right:170px;top:220px;display:flex;gap:26px}
+    .f06-initialization-summary-item{flex:1;height:170px;background:#EFE9DE;border:1px solid rgba(20,20,19,.12);border-radius:12px;text-align:center;font:500 24px/170px "JetBrains Mono";letter-spacing:.12em;text-transform:uppercase}
+    .f06-initialization-summary-rule{position:absolute;left:420px;right:420px;top:440px;height:1px;background:#141413;transform-origin:left center}
+  </style>
+
+  <div data-hf-id="hf-4jvo" id="root" data-composition-id="06-initialization" data-width="1920" data-height="1080" data-duration="35.31">
+    <div data-hf-id="hf-4v2z" id="initialization-ground" class="clip f06-initialization-ground" data-start="0" data-duration="35.31" data-track-index="0"></div>
+    <div data-hf-id="hf-fqrx" class="f06-initialization-paper-grid"></div>
+    <div data-hf-id="hf-on0y" class="f06-initialization-world">
+      <div data-hf-id="hf-mot1" class="f06-initialization-kicker"><span data-hf-id="hf-6gj0" class="f06-initialization-spike">✱</span>Initialization</div>
+      <div data-hf-id="hf-pdb0" class="f06-initialization-title">Same type. Different meaning.</div>
+      <div data-hf-id="hf-7wh0" class="f06-initialization-index">06 / SYNTAX RAIL</div>
+      <div data-hf-id="hf-qr0k" class="f06-initialization-stage">
+        <section data-hf-id="hf-k95w" class="f06-initialization-syntax-scene">
+          <div data-hf-id="hf-mbgj" class="f06-initialization-panel f06-initialization-rail-panel">
+            <div data-hf-id="hf-ccv3" class="f06-initialization-panel-label">spelling</div>
+            <div data-hf-id="hf-m1ac" class="f06-initialization-code f06-initialization-code-row one"><span data-hf-id="hf-th59" class="type">Widget</span> w(<span data-hf-id="hf-rg3t" class="num">42</span>);</div>
+            <div data-hf-id="hf-e2vk" class="f06-initialization-code f06-initialization-code-row two"><span data-hf-id="hf-rmm9" class="type">Widget</span> w = <span data-hf-id="hf-5g71" class="num">42</span>;</div>
+            <div data-hf-id="hf-skhi" class="f06-initialization-rail one"></div><div data-hf-id="hf-gy60" class="f06-initialization-rail two"></div>
+            <div data-hf-id="hf-wz27" class="f06-initialization-gate">explicit</div>
+            <div data-hf-id="hf-ycdq" class="f06-initialization-traveller direct"></div><div data-hf-id="hf-chgm" class="f06-initialization-traveller copy"></div>
+            <div data-hf-id="hf-k81y" class="f06-initialization-stop"></div>
+          </div>
+          <div data-hf-id="hf-0rc8" class="f06-initialization-panel f06-initialization-result-panel">
+            <div data-hf-id="hf-kgpe" class="f06-initialization-panel-label">semantic result</div>
+            <div data-hf-id="hf-n8jc" class="f06-initialization-result direct"><strong data-hf-id="hf-0ex1">Direct initialization</strong><span data-hf-id="hf-2h0m">explicit constructors participate</span></div>
+            <div data-hf-id="hf-bewg" class="f06-initialization-result copy"><strong data-hf-id="hf-eu2x">Copy initialization</strong><span data-hf-id="hf-4kdw">explicit constructors excluded</span></div>
+          </div>
+        </section>
+
+        <section data-hf-id="hf-edgc" class="f06-initialization-brace-scene">
+          <div data-hf-id="hf-a68q" class="f06-initialization-brace-card">
+            <div data-hf-id="hf-k1y4" class="f06-initialization-panel-label">brace initialization</div>
+            <div data-hf-id="hf-hco9" class="f06-initialization-code f06-initialization-brace-code"><span data-hf-id="hf-0oo4" class="kw">int</span> n{<span data-hf-id="hf-k463" class="num">3.14</span>};</div>
+            <div data-hf-id="hf-dvni" class="f06-initialization-narrow-line"></div><div data-hf-id="hf-m1ur" class="f06-initialization-narrow-token">3.14</div>
+            <div data-hf-id="hf-ssly" class="f06-initialization-narrow-gate">int</div>
+            <div data-hf-id="hf-b65a" class="f06-initialization-reject">narrowing rejected</div>
+            <div data-hf-id="hf-mctl" class="f06-initialization-brace-note">Braces make the unsafe conversion visible.</div>
+          </div>
+        </section>
+
+        <section data-hf-id="hf-ltsg" class="f06-initialization-vector-scene">
+          <div data-hf-id="hf-vphy" class="f06-initialization-vector-head">One character rewires the result.</div>
+          <div data-hf-id="hf-vscq" class="f06-initialization-vector-card paren">
+            <div data-hf-id="hf-pw7a" class="f06-initialization-vector-code"><span data-hf-id="hf-ow5m" class="type">vector</span>&lt;<span data-hf-id="hf-40ik" class="kw">int</span>&gt;(<span data-hf-id="hf-mfla" class="num">5</span>)</div>
+            <div data-hf-id="hf-7uv1" class="f06-initialization-slots"><div data-hf-id="hf-ms3u" class="f06-initialization-slot"></div><div data-hf-id="hf-ceby" class="f06-initialization-slot"></div><div data-hf-id="hf-csmz" class="f06-initialization-slot"></div><div data-hf-id="hf-d6y0" class="f06-initialization-slot"></div><div data-hf-id="hf-aest" class="f06-initialization-slot"></div></div>
+            <div data-hf-id="hf-oi1x" class="f06-initialization-vector-caption">five default-initialized elements</div><div data-hf-id="hf-n6x9" class="f06-initialization-vector-tag">size = 5</div>
+          </div>
+          <div data-hf-id="hf-x2aq" class="f06-initialization-vector-card braces">
+            <div data-hf-id="hf-npzd" class="f06-initialization-vector-code"><span data-hf-id="hf-nvda" class="type">vector</span>&lt;<span data-hf-id="hf-2tlh" class="kw">int</span>&gt;{<span data-hf-id="hf-zo1e" class="num">5</span>}</div>
+            <div data-hf-id="hf-r0i4" class="f06-initialization-value">5</div>
+            <div data-hf-id="hf-agys" class="f06-initialization-vector-caption">initializer-list constructor wins</div><div data-hf-id="hf-os5d" class="f06-initialization-vector-tag">size = 1</div>
+          </div>
+        </section>
+
+        <section data-hf-id="hf-19n6" class="f06-initialization-elision-scene">
+          <div data-hf-id="hf-34wr" class="f06-initialization-elision-title">A return can construct the destination directly.</div>
+          <div data-hf-id="hf-szbc" class="f06-initialization-lane">
+            <div data-hf-id="hf-wijd" class="f06-initialization-object source">return T{…};</div><div data-hf-id="hf-rc6t" class="f06-initialization-object dest"></div>
+            <svg data-hf-id="hf-dcwe" class="f06-initialization-arrow" viewBox="0 0 940 5" aria-hidden="true"><path data-hf-id="hf-teaz" d="M0 2.5 H920 l-14 -10 m14 10 l-14 10" /></svg>
+            <div data-hf-id="hf-zq5k" class="f06-initialization-moving-object">T{…}</div><div data-hf-id="hf-jgfn" class="f06-initialization-ghost">intermediate copy</div><div data-hf-id="hf-x8dh" class="f06-initialization-slash"></div>
+            <div data-hf-id="hf-sge3" class="f06-initialization-guarantee">guaranteed since C++17</div>
+          </div>
+          <div data-hf-id="hf-avu4" class="f06-initialization-nrvo"><code data-hf-id="hf-5ccj">NRVO</code> common in practice · not guaranteed by the language</div>
+        </section>
+
+        <section data-hf-id="hf-qgmm" class="f06-initialization-summary">
+          <div data-hf-id="hf-zd78" class="f06-initialization-summary-title">Spelling is semantics.</div>
+          <div data-hf-id="hf-6lv1" class="f06-initialization-summary-row"><div data-hf-id="hf-7svt" class="f06-initialization-summary-item">overloads</div><div data-hf-id="hf-06ys" class="f06-initialization-summary-item">safety</div><div data-hf-id="hf-zsmq" class="f06-initialization-summary-item">objects</div></div>
+          <div data-hf-id="hf-xmr9" class="f06-initialization-summary-rule"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script>
+    (() => {
+      const root = document.querySelector('[data-composition-id="06-initialization"]');
+      const q = (s) => root.querySelector(s);
+      const qa = (s) => root.querySelectorAll(s);
+      const tl = gsap.timeline({ paused: true });
+
+      tl.fromTo(q('.f06-initialization-kicker'), { opacity: 0, y: -14 }, { opacity: 1, y: 0, duration: .45, ease: 'power2.out' }, 0)
+        .fromTo(q('.f06-initialization-title'), { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: .65, ease: 'power2.out' }, .12)
+        .fromTo(qa('.f06-initialization-panel'), { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: .65, stagger: .12, ease: 'power2.out' }, .32)
+        .fromTo(q('.f06-initialization-code-row.one'), { opacity: 0, x: -26 }, { opacity: 1, x: 0, duration: .55, ease: 'power2.out' }, .75)
+        .fromTo(q('.f06-initialization-traveller.direct'), { opacity: 0, x: 0 }, { opacity: 1, x: 270, duration: 1.55, ease: 'power1.inOut' }, 1.35)
+        .fromTo(q('.f06-initialization-gate'), { opacity: 0, scale: .94 }, { opacity: 1, scale: 1, duration: .45, ease: 'power2.out' }, 2.05)
+        .fromTo(q('.f06-initialization-result.direct'), { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: .55, ease: 'power2.out' }, 2.72)
+        .fromTo(q('.f06-initialization-code-row.two'), { opacity: 0, x: -26 }, { opacity: 1, x: 0, duration: .5, ease: 'power2.out' }, 3.65)
+        .fromTo(q('.f06-initialization-traveller.copy'), { opacity: 0, x: 0 }, { opacity: 1, x: 270, duration: 1.45, ease: 'power1.inOut' }, 4.15)
+        .fromTo(q('.f06-initialization-stop'), { opacity: 0, scale: .65 }, { opacity: 1, scale: 1, duration: .45, ease: 'power2.out' }, 5.38)
+        .fromTo(q('.f06-initialization-result.copy'), { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: .5, ease: 'power2.out' }, 5.85)
+
+        .to(q('.f06-initialization-syntax-scene'), { opacity: 0, duration: .35, ease: 'power1.in' }, 7)
+        .fromTo(q('.f06-initialization-brace-scene'), { opacity: 0 }, { opacity: 1, duration: .4 }, 7.15)
+        .fromTo(q('.f06-initialization-brace-card'), { y: 24 }, { y: 0, duration: .55, ease: 'power2.out' }, 7.15)
+        .fromTo(q('.f06-initialization-brace-code'), { opacity: 0, x: -22 }, { opacity: 1, x: 0, duration: .55, ease: 'power2.out' }, 7.75)
+        .fromTo(q('.f06-initialization-narrow-line'), { scaleX: 0 }, { scaleX: 1, duration: .8, ease: 'power1.inOut' }, 8.55)
+        .fromTo(q('.f06-initialization-narrow-token'), { opacity: 0, x: 0 }, { opacity: 1, x: 528, duration: 2.1, ease: 'power1.inOut' }, 9.15)
+        .fromTo(q('.f06-initialization-narrow-gate'), { opacity: 0 }, { opacity: 1, duration: .35 }, 10.45)
+        .fromTo(q('.f06-initialization-reject'), { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: .45, ease: 'power2.out' }, 11.32)
+        .fromTo(q('.f06-initialization-brace-note'), { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: .55, ease: 'power2.out' }, 12.35)
+
+        .to(q('.f06-initialization-brace-scene'), { opacity: 0, duration: .35 }, 14)
+        .fromTo(q('.f06-initialization-vector-scene'), { opacity: 0 }, { opacity: 1, duration: .4 }, 14.15)
+        .fromTo(q('.f06-initialization-vector-head'), { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: .5, ease: 'power2.out' }, 14.15)
+        .fromTo(q('.f06-initialization-vector-card.paren'), { opacity: 0, x: -34 }, { opacity: 1, x: 0, duration: .6, ease: 'power2.out' }, 14.72)
+        .fromTo(q('.f06-initialization-vector-card.braces'), { opacity: 0, x: 34 }, { opacity: 1, x: 0, duration: .6, ease: 'power2.out' }, 15.25)
+        .fromTo(qa('.f06-initialization-slot'), { opacity: 0, y: 18, scale: .88 }, { opacity: 1, y: 0, scale: 1, duration: .45, stagger: .45, ease: 'power2.out' }, 16.2)
+        .fromTo(q('.f06-initialization-value'), { opacity: 0, scale: .75 }, { opacity: 1, scale: 1, duration: .55, ease: 'power2.out' }, 19.85)
+        .fromTo(qa('.f06-initialization-vector-caption'), { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: .45, stagger: .35 }, 20.5)
+        .fromTo(qa('.f06-initialization-vector-tag'), { opacity: 0, scale: .9 }, { opacity: 1, scale: 1, duration: .4, stagger: .35, ease: 'power2.out' }, 21.35)
+
+        .to(q('.f06-initialization-vector-scene'), { opacity: 0, duration: .35 }, 23)
+        .fromTo(q('.f06-initialization-elision-scene'), { opacity: 0 }, { opacity: 1, duration: .4 }, 23.12)
+        .fromTo(q('.f06-initialization-elision-title'), { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: .5 }, 23.2)
+        .fromTo(q('.f06-initialization-lane'), { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: .55, ease: 'power2.out' }, 23.72)
+        .to(q('.f06-initialization-arrow path'), { strokeDashoffset: 0, duration: 1.45, ease: 'power1.inOut' }, 24.45)
+        .fromTo(q('.f06-initialization-moving-object'), { opacity: 0, x: 0 }, { opacity: 1, x: 940, duration: 2.25, ease: 'power2.inOut' }, 24.65)
+        .fromTo(q('.f06-initialization-object.dest'), { backgroundColor: '#FAF9F5' }, { backgroundColor: '#ECE3D4', duration: 2.25, ease: 'power2.inOut' }, 24.65)
+        .fromTo(q('.f06-initialization-ghost'), { opacity: 0 }, { opacity: 1, duration: .35 }, 26.55)
+        .fromTo(q('.f06-initialization-slash'), { opacity: 0, scaleX: 0, rotation: -24 }, { opacity: 1, scaleX: 1, rotation: -24, duration: .45 }, 26.82)
+        .fromTo(q('.f06-initialization-guarantee'), { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: .55 }, 27.35)
+        .fromTo(q('.f06-initialization-nrvo'), { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: .6, ease: 'power2.out' }, 29.15)
+
+        .fromTo(q('.f06-initialization-summary'), { opacity: 0 }, { opacity: 1, duration: .5 }, 32)
+        .fromTo(q('.f06-initialization-summary-title'), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: .5 }, 32.05)
+        .fromTo(qa('.f06-initialization-summary-item'), { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: .42, stagger: .22, ease: 'power2.out' }, 32.4)
+        .fromTo(q('.f06-initialization-summary-rule'), { scaleX: 0 }, { scaleX: 1, duration: .75, ease: 'power2.inOut' }, 33.55);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines['06-initialization'] = tl;
+    })();
+  </script>
+</template>

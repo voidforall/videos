@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#faf9f5" />
+    <meta name="description" content="A concise animated walkthrough of eight practical C++ object-oriented programming interview topics." />
+    <title>C++ OOP interview walkthrough</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #141413;
+        --cream: #faf9f5;
+        --tile: #efe9de;
+        --coral: #cb785c;
+        --navy: #181715;
+      }
+
+      * { box-sizing: border-box; }
+
+      html { background: var(--cream); }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--ink);
+        background:
+          linear-gradient(rgba(20,20,19,.035) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(20,20,19,.035) 1px, transparent 1px),
+          var(--cream);
+        background-size: 64px 64px;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      main {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: clamp(32px, 7vw, 88px) 0 56px;
+      }
+
+      .eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 0 0 18px;
+        font: 600 12px/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        letter-spacing: .16em;
+        text-transform: uppercase;
+      }
+
+      .eyebrow::before { content: "✱"; color: var(--coral); font-size: 18px; }
+
+      h1 {
+        max-width: 880px;
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(44px, 7.2vw, 94px);
+        font-weight: 400;
+        line-height: .98;
+        letter-spacing: -.04em;
+      }
+
+      .lede {
+        max-width: 720px;
+        margin: 24px 0 36px;
+        color: rgba(20,20,19,.7);
+        font-size: clamp(17px, 2.2vw, 22px);
+        line-height: 1.55;
+      }
+
+      .player {
+        overflow: hidden;
+        border: 1px solid rgba(20,20,19,.16);
+        border-radius: 14px;
+        background: var(--navy);
+        box-shadow: 0 1px 3px rgba(20,20,19,.08), 0 16px 48px rgba(20,20,19,.10);
+      }
+
+      video {
+        display: block;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        background: var(--navy);
+      }
+
+      .meta {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        border-top: 1px solid rgba(250,249,245,.16);
+        color: var(--cream);
+      }
+
+      .meta div { padding: 18px 22px; }
+      .meta div + div { border-left: 1px solid rgba(250,249,245,.16); }
+
+      .meta small {
+        display: block;
+        margin-bottom: 6px;
+        color: rgba(250,249,245,.55);
+        font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        letter-spacing: .13em;
+        text-transform: uppercase;
+      }
+
+      .meta span { font-size: 15px; line-height: 1.4; }
+
+      footer {
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+        margin-top: 24px;
+        color: rgba(20,20,19,.62);
+        font-size: 14px;
+      }
+
+      a { color: inherit; text-underline-offset: 3px; }
+      a:hover { color: var(--coral); }
+
+      @media (max-width: 680px) {
+        main { width: min(100% - 20px, 1180px); padding-top: 28px; }
+        .lede { margin: 18px 0 26px; }
+        .player { border-radius: 9px; }
+        .meta { grid-template-columns: 1fr; }
+        .meta div + div { border-left: 0; border-top: 1px solid rgba(250,249,245,.16); }
+        footer { flex-direction: column; gap: 8px; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="eyebrow">Technical field notes · 01</p>
+      <h1>C++ OOP interview walkthrough</h1>
+      <p class="lede">Eight practical mental models—from resource ownership and interfaces to initialization and the object model—in one focused review.</p>
+
+      <section class="player" aria-label="Video player">
+        <video controls playsinline preload="metadata" poster="cpp-oop-walkthrough-poster.jpg">
+          <source src="cpp-oop-walkthrough.mp4" type="video/mp4" />
+          Your browser does not support HTML video. <a href="cpp-oop-walkthrough.mp4">Download the MP4</a>.
+        </video>
+        <div class="meta">
+          <div><small>Duration</small><span>3 minutes 27 seconds</span></div>
+          <div><small>Format</small><span>1080p · captions included</span></div>
+          <div><small>Narration</small><span>Local Kokoro TTS · Emma</span></div>
+        </div>
+      </section>
+
+      <footer>
+        <span>Based on the C++ OOP interview notes in <a href="https://github.com/voidforall/ai-docs/blob/main/interview/cpp-oop.md">ai-docs</a>.</span>
+        <a href="https://github.com/voidforall/videos">View source on GitHub</a>
+      </footer>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,340 @@
+<template>
+  <style>
+    #root {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      container-type: size;
+      color: #141413;
+    }
+
+    .f01-ground {
+      position: absolute;
+      inset: 0;
+      background: #FAF9F5;
+    }
+
+    .f01-paper-grid {
+      position: absolute;
+      inset: 0;
+      opacity: 0.28;
+      background-image:
+        linear-gradient(rgba(20, 20, 19, 0.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(20, 20, 19, 0.055) 1px, transparent 1px);
+      background-size: 80px 80px;
+    }
+
+    .f01-content {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .f01-folio {
+      position: absolute;
+      top: 64px;
+      left: 80px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      font-family: monospace;
+      font-size: 26px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .f01-folio::after {
+      content: "";
+      width: 1640px;
+      height: 1px;
+      background: rgba(20, 20, 19, 0.14);
+    }
+
+    .f01-hook {
+      position: absolute;
+      top: 214px;
+      left: 160px;
+      width: 1600px;
+      text-align: center;
+    }
+
+    .f01-hook-kicker {
+      margin-bottom: 36px;
+      font-family: monospace;
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .f01-hook-title {
+      margin: 0;
+      font-family: serif;
+      font-size: 142px;
+      font-weight: 400;
+      line-height: 0.98;
+      letter-spacing: -0.028em;
+    }
+
+    .f01-hook-rule {
+      width: 210px;
+      height: 1px;
+      margin: 58px auto 0;
+      background: rgba(20, 20, 19, 0.22);
+    }
+
+    .f01-map-stage {
+      position: absolute;
+      inset: 0;
+      transform-origin: 960px 485px;
+    }
+
+    .f01-map-heading {
+      position: absolute;
+      top: 146px;
+      left: 144px;
+      display: flex;
+      align-items: baseline;
+      gap: 30px;
+    }
+
+    .f01-map-heading strong {
+      font-family: serif;
+      font-size: 64px;
+      font-weight: 400;
+      line-height: 1;
+      letter-spacing: -0.022em;
+    }
+
+    .f01-map-heading span {
+      font-family: monospace;
+      font-size: 22px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      opacity: 0.62;
+    }
+
+    .f01-route {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      pointer-events: none;
+    }
+
+    .f01-route path {
+      fill: none;
+      stroke: #CC785C;
+      stroke-width: 5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .f01-card-grid {
+      position: absolute;
+      top: 264px;
+      left: 144px;
+      width: 1632px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 26px;
+    }
+
+    .f01-card {
+      position: relative;
+      height: 206px;
+      box-sizing: border-box;
+      padding: 28px 28px 26px;
+      overflow: hidden;
+      border: 1px solid rgba(20, 20, 19, 0.14);
+      border-radius: 12px;
+      background: #EFE9DE;
+      box-shadow: 0 1px 3px rgba(20, 20, 19, 0.08), 0 4px 16px rgba(20, 20, 19, 0.04);
+    }
+
+    .f01-card:nth-child(2n) {
+      background: #FAF9F5;
+    }
+
+    .f01-card::before {
+      content: "";
+      position: absolute;
+      left: 28px;
+      right: 28px;
+      bottom: 25px;
+      height: 1px;
+      background: rgba(20, 20, 19, 0.12);
+    }
+
+    .f01-card-index {
+      display: block;
+      margin-bottom: 30px;
+      font-family: monospace;
+      font-size: 22px;
+      line-height: 1;
+      letter-spacing: 0.06em;
+      opacity: 0.58;
+    }
+
+    .f01-card-title {
+      display: block;
+      max-width: 320px;
+      font-family: sans-serif;
+      font-size: 40px;
+      font-weight: 500;
+      line-height: 1.08;
+      letter-spacing: -0.015em;
+    }
+
+    .f01-footer {
+      position: absolute;
+      left: 144px;
+      top: 804px;
+      width: 1632px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 20px;
+      border-top: 1px solid rgba(20, 20, 19, 0.15);
+      font-family: monospace;
+      font-size: 21px;
+      line-height: 1;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .f01-footer span:last-child {
+      opacity: 0.55;
+    }
+  </style>
+
+  <div data-hf-id="hf-dyp1" id="root" data-composition-id="01-map" data-width="1920" data-height="1080" data-duration="15.327">
+    <div data-hf-id="hf-7djb" id="f01-map-ground" class="clip f01-ground" data-start="0" data-duration="15.327" data-track-index="0">
+      <div data-hf-id="hf-p3k3" class="f01-paper-grid"></div>
+    </div>
+
+    <div data-hf-id="hf-c6mw" id="f01-map-content" class="clip f01-content" data-start="0" data-duration="15.327" data-track-index="1">
+      <div data-hf-id="hf-ua7p" class="f01-folio">C++ / OOP</div>
+
+      <section data-hf-id="hf-2o0q" class="f01-hook" aria-label="Opening question">
+        <div data-hf-id="hf-2t51" class="f01-hook-kicker">Interview field notes</div>
+        <h1 data-hf-id="hf-r7i0" class="f01-hook-title">Eight topics—or one mental map?</h1>
+        <div data-hf-id="hf-wn7k" class="f01-hook-rule"></div>
+      </section>
+
+      <section data-hf-id="hf-20re" class="f01-map-stage" aria-label="Eight-topic object-oriented programming map">
+        <div data-hf-id="hf-bx8r" class="f01-map-heading">
+          <strong data-hf-id="hf-f9ad">One navigable map</strong>
+          <span data-hf-id="hf-u59t">Eight decision rules</span>
+        </div>
+
+        <svg data-hf-id="hf-npb3" class="f01-route" viewBox="0 0 1920 1080" aria-hidden="true">
+          <path data-hf-id="hf-8iwk" id="f01-route-path" d="M 336 367 H 752 H 1168 H 1584 V 673 H 1168 H 752 H 336" />
+        </svg>
+
+        <div data-hf-id="hf-42o7" class="f01-card-grid">
+          <article data-hf-id="hf-2zs3" class="f01-card"><span data-hf-id="hf-o7yz" class="f01-card-index">01</span><span data-hf-id="hf-vcyr" class="f01-card-title">Ownership</span></article>
+          <article data-hf-id="hf-18rn" class="f01-card"><span data-hf-id="hf-ntny" class="f01-card-index">02</span><span data-hf-id="hf-riq2" class="f01-card-title">Interfaces</span></article>
+          <article data-hf-id="hf-0ugm" class="f01-card"><span data-hf-id="hf-nfcx" class="f01-card-index">03</span><span data-hf-id="hf-9wva" class="f01-card-title">Inheritance</span></article>
+          <article data-hf-id="hf-0g5l" class="f01-card"><span data-hf-id="hf-n11w" class="f01-card-index">04</span><span data-hf-id="hf-0u90" class="f01-card-title">Composition</span></article>
+          <article data-hf-id="hf-01uk" class="f01-card"><span data-hf-id="hf-mmqv" class="f01-card-index">05</span><span data-hf-id="hf-fb6y" class="f01-card-title">Encapsulation</span></article>
+          <article data-hf-id="hf-znjj" class="f01-card"><span data-hf-id="hf-m8fu" class="f01-card-index">06</span><span data-hf-id="hf-k9wa" class="f01-card-title">Initialization</span></article>
+          <article data-hf-id="hf-z98i" class="f01-card"><span data-hf-id="hf-lu4t" class="f01-card-index">07</span><span data-hf-id="hf-ri9n" class="f01-card-title">Representation</span></article>
+          <article data-hf-id="hf-yuxh" class="f01-card"><span data-hf-id="hf-rsq8" class="f01-card-index">08</span><span data-hf-id="hf-nrh4" class="f01-card-title">Precise APIs</span></article>
+        </div>
+
+        <div data-hf-id="hf-3qt5" class="f01-footer">
+          <span data-hf-id="hf-8dy3">Source document · topic index</span>
+          <span data-hf-id="hf-8nc3">Read as decisions, not definitions</span>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script>
+    (() => {
+      const root = document.querySelector('[data-composition-id="01-map"]');
+      const q = (selector) => root.querySelector(selector);
+      const qa = (selector) => Array.from(root.querySelectorAll(selector));
+      const hook = q('.f01-hook');
+      const mapStage = q('.f01-map-stage');
+      const cards = qa('.f01-card');
+      const route = q('#f01-route-path');
+      const routeLength = route.getTotalLength();
+      const tl = gsap.timeline({ paused: true });
+
+      gsap.set(mapStage, { opacity: 0, x: 230, scale: 1.06, transformOrigin: '960px 485px' });
+      gsap.set(cards, { opacity: 0, y: 26, scale: 0.98 });
+      gsap.set(route, { strokeDasharray: routeLength, strokeDashoffset: routeLength, opacity: 0 });
+      gsap.set('.f01-map-heading, .f01-footer', { opacity: 0, y: 18 });
+
+      tl.fromTo('.f01-folio',
+        { opacity: 0, y: -12 },
+        { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out' },
+        0.08
+      );
+      tl.fromTo('.f01-hook-kicker',
+        { opacity: 0, y: 14 },
+        { opacity: 0.62, y: 0, duration: 0.45, ease: 'power3.out' },
+        0.14
+      );
+      tl.fromTo('.f01-hook-title',
+        { opacity: 0, y: 34, scale: 0.985 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.78, ease: 'power3.out' },
+        0.24
+      );
+      tl.fromTo('.f01-hook-rule',
+        { opacity: 0, scaleX: 0 },
+        { opacity: 1, scaleX: 1, duration: 0.7, ease: 'power2.out' },
+        0.74
+      );
+
+      tl.to(hook, { x: -230, duration: 0.34, ease: 'power4.in' }, 2.66);
+      tl.to(hook, { opacity: 0, duration: 0.30, ease: 'power1.in' }, 2.68);
+      tl.fromTo(mapStage,
+        { opacity: 0.35, x: 230, scale: 1.06 },
+        { opacity: 1, x: 0, scale: 1.06, duration: 0.34, ease: 'power4.out' },
+        3.0
+      );
+      tl.fromTo('.f01-map-heading',
+        { opacity: 0, y: 18 },
+        { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' },
+        3.12
+      );
+
+      const pairTimes = [3.35, 5.05, 6.75, 8.45];
+      pairTimes.forEach((time, pairIndex) => {
+        const pair = [cards[pairIndex * 2], cards[pairIndex * 2 + 1]];
+        tl.fromTo(pair,
+          { opacity: 0, y: 26, scale: 0.98 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.62, stagger: 0.11, ease: 'power3.out' },
+          time
+        );
+      });
+
+      tl.fromTo('.f01-footer',
+        { opacity: 0, y: 18 },
+        { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' },
+        9.18
+      );
+
+      tl.to(mapStage, { scale: 0.94, duration: 2.35, ease: 'power2.inOut' }, 10.0);
+      tl.set(route, { opacity: 1 }, 10.18);
+      tl.to(route, { strokeDashoffset: 0, duration: 2.65, ease: 'power2.inOut' }, 10.18);
+      tl.to(cards, {
+        y: (index) => index % 2 === 0 ? -4 : 4,
+        duration: 2.7,
+        stagger: 0.045,
+        ease: 'sine.inOut'
+      }, 10.0);
+      tl.to('.f01-map-heading', { y: -5, duration: 2.2, ease: 'sine.inOut' }, 10.25);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines['01-map'] = tl;
+    })();
+  </script>
+</template>

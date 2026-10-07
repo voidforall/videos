@@ -1,0 +1,492 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/Inter-Regular.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/Inter-Medium.woff2") format("woff2");
+      font-weight: 500;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: "EB Garamond";
+      src: url("assets/fonts/EBGaramond-Regular.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    #root {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      container-type: size;
+      color: #141413;
+    }
+
+    #f02-resource-ownership-ground {
+      position: absolute;
+      inset: 0;
+      background: #faf9f5;
+      overflow: hidden;
+    }
+
+    .f02-resource-ownership-paper-orbit {
+      position: absolute;
+      top: 20cqh;
+      width: 31cqw;
+      height: 58cqh;
+      border: 1px solid rgba(20, 20, 19, 0.06);
+      border-radius: 50%;
+      background: rgba(239, 233, 222, 0.62);
+    }
+
+    #f02-resource-ownership-orbit-left { left: 8cqw; }
+    #f02-resource-ownership-orbit-right { right: 8cqw; }
+
+    #f02-resource-ownership-stage {
+      position: absolute;
+      inset: 0;
+      padding: 6.3cqh 4.2cqw 0;
+      box-sizing: border-box;
+    }
+
+    #f02-resource-ownership-header {
+      position: relative;
+      z-index: 4;
+      text-align: center;
+    }
+
+    #f02-resource-ownership-kicker {
+      margin: 0 0 1.2cqh;
+      font-family: monospace;
+      font-size: 1.35cqw;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    #f02-resource-ownership-kicker .f02-resource-ownership-spike {
+      color: #cc785c;
+      display: inline-block;
+      margin-right: 0.55em;
+    }
+
+    #f02-resource-ownership-title {
+      margin: 0;
+      font-family: "EB Garamond";
+      font-size: 5.25cqw;
+      font-weight: 400;
+      line-height: 0.95;
+      letter-spacing: -0.022em;
+    }
+
+    #f02-resource-ownership-pair {
+      position: absolute;
+      z-index: 3;
+      top: 22.5cqh;
+      left: 4.2cqw;
+      right: 4.2cqw;
+      height: 39.8cqh;
+      display: grid;
+      grid-template-columns: 1fr 1.12fr;
+      gap: 2cqw;
+      perspective: 1400px;
+    }
+
+    .f02-resource-ownership-card-shell {
+      position: relative;
+      min-width: 0;
+      height: 100%;
+    }
+
+    .f02-resource-ownership-card-idle {
+      width: 100%;
+      height: 100%;
+    }
+
+    .f02-resource-ownership-card {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      padding: 2.3cqw 2.45cqw;
+      box-sizing: border-box;
+      border: 1px solid rgba(20, 20, 19, 0.13);
+      border-radius: 12px;
+      background: #efe9de;
+      overflow: hidden;
+    }
+
+    #f02-resource-ownership-manual-card {
+      box-shadow: 12px 5px 18px rgba(20, 20, 19, 0.045);
+      transform-origin: right center;
+    }
+
+    #f02-resource-ownership-raii-card {
+      background: #ece3d4;
+      box-shadow: -12px 5px 18px rgba(20, 20, 19, 0.045);
+      transform-origin: left center;
+    }
+
+    .f02-resource-ownership-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 1.7cqh;
+      border-bottom: 1px solid rgba(20, 20, 19, 0.13);
+    }
+
+    .f02-resource-ownership-card-label {
+      font-family: monospace;
+      font-size: 1.2cqw;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .f02-resource-ownership-type {
+      padding: 0.55cqh 0.75cqw;
+      border: 1px solid rgba(20, 20, 19, 0.18);
+      border-radius: 6px;
+      background: #faf9f5;
+      font-family: monospace;
+      font-size: 1.35cqw;
+    }
+
+    .f02-resource-ownership-rule-row {
+      display: grid;
+      grid-template-columns: 8.5cqw 1fr;
+      gap: 1.5cqw;
+      align-items: center;
+      height: calc(100% - 5.2cqh);
+    }
+
+    .f02-resource-ownership-rule-number {
+      position: relative;
+      height: 12cqw;
+    }
+
+    .f02-resource-ownership-rule-number span {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-family: "EB Garamond";
+      font-size: 11.5cqw;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .f02-resource-ownership-ops {
+      display: grid;
+      gap: 1.05cqh;
+    }
+
+    .f02-resource-ownership-op {
+      display: flex;
+      align-items: center;
+      gap: 0.8cqw;
+      min-height: 4.2cqh;
+      padding: 0.6cqh 0.8cqw;
+      border: 1px solid rgba(20, 20, 19, 0.11);
+      border-radius: 6px;
+      background: rgba(250, 249, 245, 0.7);
+      box-sizing: border-box;
+      font-family: "Inter";
+      font-size: 1.15cqw;
+      line-height: 1.1;
+    }
+
+    .f02-resource-ownership-op::before {
+      content: "";
+      width: 0.48cqw;
+      height: 0.48cqw;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: #141413;
+      opacity: 0.65;
+    }
+
+    #f02-resource-ownership-raii-body {
+      display: grid;
+      grid-template-columns: 1fr 8.7cqw;
+      gap: 1.5cqw;
+      align-items: center;
+      height: calc(100% - 5.2cqh);
+    }
+
+    .f02-resource-ownership-types {
+      display: grid;
+      gap: 1.15cqh;
+    }
+
+    .f02-resource-ownership-owner {
+      position: relative;
+      padding: 1.3cqh 1.05cqw 1.3cqh 2.2cqw;
+      border: 1px solid rgba(20, 20, 19, 0.12);
+      border-radius: 8px;
+      background: #faf9f5;
+      font-family: monospace;
+      font-size: 1.23cqw;
+      line-height: 1;
+    }
+
+    .f02-resource-ownership-owner::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0.9cqw;
+      width: 0.5cqw;
+      height: 0.5cqw;
+      margin-top: -0.25cqw;
+      border-radius: 50%;
+      background: #141413;
+    }
+
+    #f02-resource-ownership-zero-wrap {
+      text-align: center;
+    }
+
+    #f02-resource-ownership-zero {
+      font-family: "EB Garamond";
+      font-size: 11.5cqw;
+      line-height: 0.75;
+      letter-spacing: -0.04em;
+    }
+
+    #f02-resource-ownership-zero-label {
+      margin-top: 1.5cqh;
+      font-family: monospace;
+      font-size: 1.05cqw;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .f02-resource-ownership-badge {
+      position: absolute;
+      z-index: 8;
+      top: -1.6cqh;
+      padding: 0.7cqh 0.95cqw;
+      border: 1px solid rgba(250, 249, 245, 0.18);
+      border-radius: 9999px;
+      background: #181715;
+      color: #faf9f5;
+      font-family: monospace;
+      font-size: 1.02cqw;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    #f02-resource-ownership-five-badge { right: -1.5cqw; }
+    #f02-resource-ownership-zero-badge { left: -1.5cqw; }
+
+    #f02-resource-ownership-decision {
+      position: absolute;
+      z-index: 12;
+      left: 8.2cqw;
+      right: 8.2cqw;
+      top: 66.5cqh;
+      height: 14.5cqh;
+      display: grid;
+      grid-template-columns: 0.82fr 1.18fr;
+      border: 1px solid rgba(20, 20, 19, 0.18);
+      border-radius: 12px;
+      background: #faf9f5;
+      box-shadow: 0 1px 3px rgba(20, 20, 19, 0.08), 0 4px 16px rgba(20, 20, 19, 0.04);
+      overflow: hidden;
+    }
+
+    .f02-resource-ownership-choice {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      padding: 1.7cqh 2.1cqw;
+    }
+
+    .f02-resource-ownership-choice:first-child {
+      border-right: 1px solid rgba(20, 20, 19, 0.16);
+      background: #efe9de;
+    }
+
+    .f02-resource-ownership-choice-copy {
+      display: grid;
+      gap: 0.65cqh;
+    }
+
+    .f02-resource-ownership-choice-label {
+      font-family: monospace;
+      font-size: 1.05cqw;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .f02-resource-ownership-choice-arrow {
+      font-family: "Inter";
+      font-size: 1.5cqw;
+    }
+
+    .f02-resource-ownership-choice-word {
+      font-family: "EB Garamond";
+      font-size: 5.3cqw;
+      line-height: 0.8;
+      letter-spacing: -0.025em;
+    }
+
+    #f02-resource-ownership-choice-zero .f02-resource-ownership-choice-word {
+      font-size: 6.7cqw;
+    }
+  </style>
+
+  <div data-hf-id="hf-2ewl" id="root" data-composition-id="02-resource-ownership" data-width="1920" data-height="1080" data-duration="29.422">
+    <div data-hf-id="hf-9nkg" id="f02-resource-ownership-ground" class="clip" data-start="0" data-duration="29.422" data-track-index="0">
+      <div data-hf-id="hf-7xvv" id="f02-resource-ownership-orbit-left" class="f02-resource-ownership-paper-orbit"></div>
+      <div data-hf-id="hf-0oeu" id="f02-resource-ownership-orbit-right" class="f02-resource-ownership-paper-orbit"></div>
+    </div>
+
+    <main data-hf-id="hf-121o" id="f02-resource-ownership-stage" class="clip" data-start="0" data-duration="29.422" data-track-index="1">
+      <header data-hf-id="hf-cc46" id="f02-resource-ownership-header" data-layout-allow-overlap="">
+        <p data-hf-id="hf-o60i" id="f02-resource-ownership-kicker" data-layout-allow-overlap=""><span data-hf-id="hf-z00w" class="f02-resource-ownership-spike" data-layout-allow-overlap="">✱</span>Resource ownership</p>
+        <h1 data-hf-id="hf-wqxc" id="f02-resource-ownership-title" data-layout-allow-overlap="">Own resources deliberately</h1>
+      </header>
+
+      <section data-hf-id="hf-2hl8" id="f02-resource-ownership-pair" aria-label="Manual ownership compared with RAII ownership">
+        <div data-hf-id="hf-sn44" id="f02-resource-ownership-manual-shell" class="f02-resource-ownership-card-shell" data-layout-allow-overlap="">
+          <div data-hf-id="hf-57nq" id="f02-resource-ownership-manual-idle" class="f02-resource-ownership-card-idle">
+            <article data-hf-id="hf-obwe" id="f02-resource-ownership-manual-card" class="f02-resource-ownership-card">
+              <div data-hf-id="hf-63z3" class="f02-resource-ownership-card-head">
+                <span data-hf-id="hf-uqzh" class="f02-resource-ownership-card-label">Manual ownership</span>
+                <code data-hf-id="hf-s07m" class="f02-resource-ownership-type">T* ptr</code>
+              </div>
+              <div data-hf-id="hf-8pyr" class="f02-resource-ownership-rule-row">
+                <div data-hf-id="hf-y0e4" class="f02-resource-ownership-rule-number" aria-label="Rule count">
+                  <span data-hf-id="hf-7qzd" id="f02-resource-ownership-three">3</span>
+                  <span data-hf-id="hf-1igv" id="f02-resource-ownership-five">5</span>
+                </div>
+                <div data-hf-id="hf-lh1i" class="f02-resource-ownership-ops">
+                  <div data-hf-id="hf-aegx" id="f02-resource-ownership-op-dtor" class="f02-resource-ownership-op">destructor</div>
+                  <div data-hf-id="hf-lkaj" id="f02-resource-ownership-op-copy" class="f02-resource-ownership-op">copy constructor</div>
+                  <div data-hf-id="hf-3ruk" id="f02-resource-ownership-op-assign" class="f02-resource-ownership-op">copy assignment</div>
+                  <div data-hf-id="hf-v8ga" id="f02-resource-ownership-op-move" class="f02-resource-ownership-op f02-resource-ownership-move-op">move constructor</div>
+                  <div data-hf-id="hf-nn17" id="f02-resource-ownership-op-move-assign" class="f02-resource-ownership-op f02-resource-ownership-move-op">move assignment</div>
+                </div>
+              </div>
+            </article>
+          </div>
+          <div data-hf-id="hf-tk42" id="f02-resource-ownership-five-badge" class="f02-resource-ownership-badge">Rule of Five</div>
+        </div>
+
+        <div data-hf-id="hf-1tcj" id="f02-resource-ownership-raii-shell" class="f02-resource-ownership-card-shell" data-layout-allow-overlap="">
+          <div data-hf-id="hf-7imb" id="f02-resource-ownership-raii-idle" class="f02-resource-ownership-card-idle">
+            <article data-hf-id="hf-kg17" id="f02-resource-ownership-raii-card" class="f02-resource-ownership-card">
+              <div data-hf-id="hf-4kyn" class="f02-resource-ownership-card-head">
+                <span data-hf-id="hf-9ovq" class="f02-resource-ownership-card-label">RAII members</span>
+                <span data-hf-id="hf-xnk4" class="f02-resource-ownership-type">compiler</span>
+              </div>
+              <div data-hf-id="hf-zfel" id="f02-resource-ownership-raii-body">
+                <div data-hf-id="hf-j2jl" class="f02-resource-ownership-types">
+                  <div data-hf-id="hf-afda" id="f02-resource-ownership-vector" class="f02-resource-ownership-owner">std::vector</div>
+                  <div data-hf-id="hf-pw2m" id="f02-resource-ownership-string" class="f02-resource-ownership-owner">std::string</div>
+                  <div data-hf-id="hf-33xv" id="f02-resource-ownership-unique" class="f02-resource-ownership-owner">std::unique_ptr</div>
+                </div>
+                <div data-hf-id="hf-hdl4" id="f02-resource-ownership-zero-wrap">
+                  <div data-hf-id="hf-suex" id="f02-resource-ownership-zero">0</div>
+                  <div data-hf-id="hf-boja" id="f02-resource-ownership-zero-label">handwritten</div>
+                </div>
+              </div>
+            </article>
+          </div>
+          <div data-hf-id="hf-cyib" id="f02-resource-ownership-zero-badge" class="f02-resource-ownership-badge">Generated correctly</div>
+        </div>
+      </section>
+
+      <section data-hf-id="hf-4k8p" id="f02-resource-ownership-decision" aria-label="Ownership decision rule">
+        <div data-hf-id="hf-wgrn" class="f02-resource-ownership-choice">
+          <div data-hf-id="hf-brf7" class="f02-resource-ownership-choice-copy">
+            <span data-hf-id="hf-5zyd" class="f02-resource-ownership-choice-label">Manual resource</span>
+            <span data-hf-id="hf-xfu9" class="f02-resource-ownership-choice-arrow">Choose</span>
+          </div>
+          <strong data-hf-id="hf-uy8q" class="f02-resource-ownership-choice-word">Five</strong>
+        </div>
+        <div data-hf-id="hf-2otr" id="f02-resource-ownership-choice-zero" class="f02-resource-ownership-choice">
+          <div data-hf-id="hf-abqr" class="f02-resource-ownership-choice-copy">
+            <span data-hf-id="hf-tnb1" class="f02-resource-ownership-choice-label">RAII members</span>
+            <span data-hf-id="hf-bio6" class="f02-resource-ownership-choice-arrow">Prefer</span>
+          </div>
+          <strong data-hf-id="hf-jq1s" class="f02-resource-ownership-choice-word">Zero</strong>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script>
+    (() => {
+      const tl = gsap.timeline({ paused: true });
+
+      gsap.set([
+        "#f02-resource-ownership-five",
+        ".f02-resource-ownership-move-op",
+        ".f02-resource-ownership-owner",
+        ".f02-resource-ownership-badge",
+        "#f02-resource-ownership-decision"
+      ], { opacity: 0 });
+
+      tl.fromTo("#f02-resource-ownership-kicker", { y: -28, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55, ease: "power3.out" }, 0)
+        .fromTo("#f02-resource-ownership-title", { y: -42, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }, 0.16)
+        .fromTo("#f02-resource-ownership-manual-shell", { x: -620, scale: 0.85, opacity: 0, rotationY: 13 }, { x: 0, scale: 1, opacity: 1, rotationY: 4, duration: 1.3, ease: "power3.out" }, 0.38)
+        .fromTo("#f02-resource-ownership-raii-shell", { x: 620, scale: 0.85, opacity: 0, rotationY: -13 }, { x: 0, scale: 1, opacity: 1, rotationY: -4, duration: 1.3, ease: "power3.out" }, 0.58)
+        .fromTo("#f02-resource-ownership-op-dtor", { x: -48, opacity: 0 }, { x: 0, opacity: 1, duration: 0.55, ease: "power3.out" }, 1.75)
+        .fromTo("#f02-resource-ownership-op-copy", { x: -48, opacity: 0 }, { x: 0, opacity: 1, duration: 0.55, ease: "power3.out" }, 2.9)
+        .fromTo("#f02-resource-ownership-op-assign", { x: -48, opacity: 0 }, { x: 0, opacity: 1, duration: 0.55, ease: "power3.out" }, 4.05)
+        .fromTo("#f02-resource-ownership-three", { scale: 0.78, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.62, ease: "back.out(1.15)" }, 4.85)
+        .to("#f02-resource-ownership-manual-idle", { y: -3, duration: 2.6, ease: "sine.inOut" }, 2.3)
+        .to("#f02-resource-ownership-raii-idle", { y: 3, duration: 2.6, ease: "sine.inOut" }, 2.3)
+        .to("#f02-resource-ownership-manual-idle", { y: 3, duration: 2.6, ease: "sine.inOut" }, 4.9)
+        .to("#f02-resource-ownership-raii-idle", { y: -3, duration: 2.6, ease: "sine.inOut" }, 4.9)
+
+        .fromTo("#f02-resource-ownership-op-move", { x: -70, opacity: 0 }, { x: 0, opacity: 1, duration: 0.65, ease: "power3.out" }, 6.5)
+        .fromTo("#f02-resource-ownership-op-move-assign", { x: -70, opacity: 0 }, { x: 0, opacity: 1, duration: 0.65, ease: "power3.out" }, 8.3)
+        .to("#f02-resource-ownership-three", { scale: 0.82, opacity: 0, filter: "blur(10px)", duration: 0.2, ease: "power3.in" }, 9.65)
+        .set("#f02-resource-ownership-five", { opacity: 0.15, scale: 1.25, filter: "blur(10px)" }, 9.85)
+        .to("#f02-resource-ownership-five", { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, 9.85)
+        .fromTo("#f02-resource-ownership-five-badge", { scale: 0.72, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.6, ease: "back.out(1.45)" }, 11.0)
+        .to("#f02-resource-ownership-manual-idle", { y: -3, duration: 3.2, ease: "sine.inOut" }, 7.5)
+        .to("#f02-resource-ownership-raii-idle", { y: 3, duration: 3.2, ease: "sine.inOut" }, 7.5)
+        .to("#f02-resource-ownership-manual-idle", { y: 3, duration: 3.2, ease: "sine.inOut" }, 10.7)
+        .to("#f02-resource-ownership-raii-idle", { y: -3, duration: 3.2, ease: "sine.inOut" }, 10.7)
+
+        .to("#f02-resource-ownership-manual-idle", { x: -72, opacity: 0.52, duration: 0.34, ease: "power4.in" }, 14.72)
+        .fromTo("#f02-resource-ownership-raii-shell", { x: 72, opacity: 0.72 }, { x: 0, opacity: 1, rotationY: 0, scale: 1.035, duration: 0.45, ease: "power4.out", immediateRender: false }, 15.06)
+        .fromTo("#f02-resource-ownership-vector", { x: 86, opacity: 0 }, { x: 0, opacity: 1, duration: 0.62, ease: "power3.out" }, 15.55)
+        .fromTo("#f02-resource-ownership-string", { x: 86, opacity: 0 }, { x: 0, opacity: 1, duration: 0.62, ease: "power3.out" }, 17.25)
+        .fromTo("#f02-resource-ownership-unique", { x: 86, opacity: 0 }, { x: 0, opacity: 1, duration: 0.62, ease: "power3.out" }, 19.15)
+        .fromTo("#f02-resource-ownership-zero", { scale: 0.72, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.72, ease: "power3.out" }, 20.0)
+        .fromTo("#f02-resource-ownership-zero-label", { y: 22, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 20.55)
+        .fromTo("#f02-resource-ownership-zero-badge", { scale: 0.7, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.62, ease: "back.out(1.45)" }, 22.0)
+        .to("#f02-resource-ownership-manual-idle", { y: -3, duration: 3.2, ease: "sine.inOut" }, 13.9)
+        .to("#f02-resource-ownership-raii-idle", { y: 3, duration: 3.2, ease: "sine.inOut" }, 13.9)
+        .to("#f02-resource-ownership-manual-idle", { y: 3, duration: 3.2, ease: "sine.inOut" }, 17.1)
+        .to("#f02-resource-ownership-raii-idle", { y: -3, duration: 3.2, ease: "sine.inOut" }, 17.1)
+        .to("#f02-resource-ownership-manual-idle", { y: -3, duration: 3.2, ease: "sine.inOut" }, 20.3)
+        .to("#f02-resource-ownership-raii-idle", { y: 3, duration: 3.2, ease: "sine.inOut" }, 20.3)
+
+        .to("#f02-resource-ownership-pair", { y: -34, opacity: 0.22, duration: 0.28, ease: "power4.in" }, 23.72)
+        .set("#f02-resource-ownership-decision", { opacity: 0.15, scale: 1.16, filter: "blur(18px)" }, 24.0)
+        .to("#f02-resource-ownership-decision", { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.62, ease: "expo.out" }, 24.0)
+        .fromTo("#f02-resource-ownership-decision .f02-resource-ownership-choice:first-child", { x: -80, opacity: 0.35 }, { x: 0, opacity: 1, duration: 0.6, ease: "power4.out" }, 24.28)
+        .fromTo("#f02-resource-ownership-choice-zero", { x: 80, opacity: 0.35 }, { x: 0, opacity: 1, duration: 0.68, ease: "power4.out" }, 24.52)
+        .fromTo("#f02-resource-ownership-choice-zero .f02-resource-ownership-choice-word", { scale: 0.82 }, { scale: 1, duration: 0.68, ease: "back.out(1.2)" }, 25.35)
+        .to("#f02-resource-ownership-manual-idle", { y: -3, duration: 2.4, ease: "sine.inOut" }, 26.0)
+        .to("#f02-resource-ownership-raii-idle", { y: 3, duration: 2.4, ease: "sine.inOut" }, 26.0)
+        .to({}, { duration: 0.522 });
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["02-resource-ownership"] = tl;
+    })();
+  </script>
+</template>

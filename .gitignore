@@ -1,0 +1,10 @@
+.venv/
+.DS_Store
+**/node_modules/
+**/snapshots/
+**/.hyperframes/
+**/.media/
+**/renders/
+**/.thumbnails/
+**/.waveform-cache/
+**/capture/

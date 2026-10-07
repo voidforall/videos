@@ -1,0 +1,409 @@
+<template>
+  <style>
+    #root {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      container-type: size;
+      color: #141413;
+      font-family: sans-serif;
+    }
+
+    #f05-pimpl-ground {
+      position: absolute;
+      inset: 0;
+      background: #faf9f5;
+    }
+
+    #f05-pimpl-stage {
+      position: absolute;
+      inset: 0;
+      padding: 55px 80px 0;
+      box-sizing: border-box;
+    }
+
+    .\30 5-pimpl-kicker {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      height: 30px;
+      font-family: monospace;
+      font-size: 24px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .\30 5-pimpl-spike {
+      color: #cc785c;
+      font-size: 26px;
+      line-height: 1;
+    }
+
+    .\30 5-pimpl-title {
+      margin-top: 19px;
+      font-family: serif;
+      font-size: 82px;
+      line-height: 0.96;
+      font-weight: 400;
+      letter-spacing: -0.025em;
+    }
+
+    .\30 5-pimpl-title em {
+      font-weight: 400;
+    }
+
+    #f05-pimpl-workbench {
+      position: absolute;
+      left: 80px;
+      top: 203px;
+      width: 1760px;
+      height: 630px;
+    }
+
+    .\30 5-pimpl-code-card {
+      position: absolute;
+      overflow: hidden;
+      box-sizing: border-box;
+      border: 1px solid rgba(250,249,245,0.14);
+      border-radius: 8px;
+      background: #181715;
+      color: #faf9f5;
+      box-shadow: 0 1px 3px rgba(20,20,19,0.08), 0 4px 16px rgba(20,20,19,0.04);
+      font-family: monospace;
+    }
+
+    .\30 5-pimpl-code-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 51px;
+      padding: 0 23px;
+      box-sizing: border-box;
+      background: #252320;
+      border-bottom: 1px solid rgba(250,249,245,0.12);
+      font-size: 20px;
+      letter-spacing: 0.025em;
+    }
+
+    .\30 5-pimpl-chip {
+      color: rgba(250,249,245,0.57);
+      font-size: 17px;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+    }
+
+    .\30 5-pimpl-code-body {
+      padding: 22px 27px 24px;
+      font-size: 26px;
+      line-height: 1.53;
+      white-space: nowrap;
+    }
+
+    .\30 5-pimpl-line {
+      display: block;
+    }
+
+    .\30 5-pimpl-muted { color: rgba(250,249,245,0.53); }
+    .\30 5-pimpl-keyword { color: #cc785c; }
+    .\30 5-pimpl-type { color: #5db8a6; }
+    .\30 5-pimpl-number { color: #e8a55a; }
+    .\30 5-pimpl-indent { padding-left: 31px; }
+
+    #f05-pimpl-before {
+      left: 217px;
+      top: 31px;
+      width: 1326px;
+      height: 511px;
+      transform-origin: 50% 50%;
+    }
+
+    #f05-pimpl-after {
+      left: 0;
+      top: 62px;
+      width: 666px;
+      height: 386px;
+      opacity: 0;
+    }
+
+    #f05-pimpl-source {
+      left: 1094px;
+      top: 62px;
+      width: 666px;
+      height: 386px;
+      opacity: 0;
+    }
+
+    #f05-pimpl-boundary {
+      position: absolute;
+      left: 751px;
+      top: 147px;
+      width: 258px;
+      height: 222px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      border: 1px solid rgba(20,20,19,0.2);
+      border-radius: 12px;
+      background: #ece3d4;
+      color: #141413;
+      opacity: 0;
+      transform-origin: 50% 50%;
+    }
+
+    .\30 5-pimpl-boundary-mark {
+      font-family: serif;
+      font-size: 78px;
+      line-height: 0.9;
+      letter-spacing: -0.025em;
+    }
+
+    .\30 5-pimpl-boundary-label {
+      font-family: monospace;
+      font-size: 17px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .\30 5-pimpl-wire {
+      position: absolute;
+      top: 256px;
+      height: 1px;
+      background: rgba(20,20,19,0.22);
+      opacity: 0;
+      transform-origin: 50% 50%;
+    }
+
+    #f05-pimpl-wire-left { left: 666px; width: 85px; }
+    #f05-pimpl-wire-right { left: 1009px; width: 85px; }
+
+    #f05-pimpl-ledger {
+      position: absolute;
+      left: 0;
+      top: 28px;
+      width: 1760px;
+      height: 516px;
+      display: grid;
+      grid-template-columns: 1fr 1px 1fr;
+      gap: 52px;
+      box-sizing: border-box;
+      padding: 42px 54px;
+      border: 1px solid rgba(20,20,19,0.12);
+      border-radius: 12px;
+      background: #efe9de;
+      opacity: 0;
+    }
+
+    .\30 5-pimpl-ledger-rule { background: rgba(20,20,19,0.14); }
+
+    .\30 5-pimpl-ledger-col {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .\30 5-pimpl-ledger-label {
+      margin-bottom: 26px;
+      font-family: monospace;
+      font-size: 21px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: rgba(20,20,19,0.62);
+    }
+
+    .\30 5-pimpl-ledger-item {
+      display: flex;
+      align-items: baseline;
+      gap: 18px;
+      padding: 21px 0;
+      border-top: 1px solid rgba(20,20,19,0.12);
+      font-family: serif;
+      font-size: 45px;
+      line-height: 1;
+      letter-spacing: -0.015em;
+      opacity: 0;
+    }
+
+    .\30 5-pimpl-ledger-index {
+      min-width: 35px;
+      font-family: monospace;
+      font-size: 17px;
+      color: rgba(20,20,19,0.5);
+      letter-spacing: 0.04em;
+    }
+
+    #f05-pimpl-rule {
+      position: absolute;
+      left: 214px;
+      top: 103px;
+      width: 1332px;
+      height: 385px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      border: 1px solid rgba(20,20,19,0.14);
+      border-radius: 12px;
+      background: #faf9f5;
+      opacity: 0;
+    }
+
+    .\30 5-pimpl-rule-eyebrow {
+      margin-bottom: 21px;
+      font-family: monospace;
+      font-size: 20px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(20,20,19,0.58);
+    }
+
+    .\30 5-pimpl-rule-main {
+      font-family: serif;
+      font-size: 87px;
+      line-height: 0.98;
+      font-weight: 400;
+      letter-spacing: -0.026em;
+    }
+
+    .\30 5-pimpl-rule-sub {
+      margin-top: 14px;
+      font-family: serif;
+      font-size: 50px;
+      font-style: italic;
+      line-height: 1;
+      letter-spacing: -0.014em;
+    }
+
+    #f05-pimpl-rule-line {
+      position: absolute;
+      left: 480px;
+      bottom: 57px;
+      width: 372px;
+      height: 1px;
+      background: #141413;
+      transform-origin: left center;
+    }
+  </style>
+
+  <div data-hf-id="hf-pf4r" id="root" data-composition-id="05-pimpl" data-width="1920" data-height="1080" data-duration="28.035">
+    <div data-hf-id="hf-4ytm" id="f05-pimpl-ground" class="clip" data-start="0" data-duration="28.035" data-track-index="0"></div>
+
+    <div data-hf-id="hf-urkk" id="f05-pimpl-stage">
+      <div data-hf-id="hf-ou8i" class="05-pimpl-kicker"><span data-hf-id="hf-xos3" class="05-pimpl-spike">✱</span><span data-hf-id="hf-fqcf">Pattern 05 · PImpl</span></div>
+      <div data-hf-id="hf-5n1h" class="05-pimpl-title">A boundary with a <em data-hf-id="hf-1cuo">price</em></div>
+
+      <div data-hf-id="hf-ytyh" id="f05-pimpl-workbench">
+        <div data-hf-id="hf-94ll" id="f05-pimpl-before" class="05-pimpl-code-card">
+          <div data-hf-id="hf-rky5" class="05-pimpl-code-head"><span data-hf-id="hf-l8fj">widget.hpp</span><span data-hf-id="hf-rrcu" class="05-pimpl-chip">public header · before</span></div>
+          <div data-hf-id="hf-u4p7" class="05-pimpl-code-body">
+            <span data-hf-id="hf-c5ij" class="05-pimpl-line"><span data-hf-id="hf-2chk" class="05-pimpl-keyword">#include</span> &lt;vector&gt;</span>
+            <span data-hf-id="hf-h5f1" class="05-pimpl-line"><span data-hf-id="hf-8nf4" class="05-pimpl-keyword">#include</span> &lt;string&gt;</span>
+            <span data-hf-id="hf-4utf" class="05-pimpl-line"><span data-hf-id="hf-7gi1" class="05-pimpl-keyword">#include</span> &lt;filesystem&gt;</span>
+            <span data-hf-id="hf-21ix" class="05-pimpl-line"><span data-hf-id="hf-w8hd" class="05-pimpl-keyword">class</span> Widget {</span>
+            <span data-hf-id="hf-0iv3" class="05-pimpl-line 05-pimpl-indent"><span data-hf-id="hf-2x1z" class="05-pimpl-type">std::vector&lt;Item&gt;</span> items_;</span>
+            <span data-hf-id="hf-5bg9" class="05-pimpl-line 05-pimpl-indent"><span data-hf-id="hf-rlzz" class="05-pimpl-type">std::filesystem::path</span> cache_;</span>
+            <span data-hf-id="hf-tm74" class="05-pimpl-line 05-pimpl-indent"><span data-hf-id="hf-ausz" class="05-pimpl-type">Strategy</span> strategy_;</span>
+            <span data-hf-id="hf-ddn4" class="05-pimpl-line">};</span>
+          </div>
+        </div>
+
+        <div data-hf-id="hf-0exy" id="f05-pimpl-after" class="05-pimpl-code-card">
+          <div data-hf-id="hf-ozr5" class="05-pimpl-code-head"><span data-hf-id="hf-737z">widget.hpp</span><span data-hf-id="hf-mwnx" class="05-pimpl-chip">public</span></div>
+          <div data-hf-id="hf-nicr" class="05-pimpl-code-body">
+            <span data-hf-id="hf-mjgt" class="05-pimpl-line"><span data-hf-id="hf-tr6t" class="05-pimpl-keyword">class</span> Widget {</span>
+            <span data-hf-id="hf-np2i" class="05-pimpl-line 05-pimpl-indent"><span data-hf-id="hf-soum" class="05-pimpl-keyword">struct</span> Impl;</span>
+            <span data-hf-id="hf-aqdh" class="05-pimpl-line 05-pimpl-indent"><span data-hf-id="hf-5n9l" class="05-pimpl-type">std::unique_ptr</span>&lt;Impl&gt; p_;</span>
+            <span data-hf-id="hf-6tyg" class="05-pimpl-line">};</span>
+          </div>
+        </div>
+
+        <div data-hf-id="hf-bzuf" id="f05-pimpl-source" class="05-pimpl-code-card">
+          <div data-hf-id="hf-q6o8" class="05-pimpl-code-head"><span data-hf-id="hf-elnm">widget.cpp</span><span data-hf-id="hf-xddj" class="05-pimpl-chip">private</span></div>
+          <div data-hf-id="hf-n41q" class="05-pimpl-code-body">
+            <span data-hf-id="hf-8rd3" class="05-pimpl-line"><span data-hf-id="hf-2m6q" class="05-pimpl-keyword">struct</span> Widget::Impl {</span>
+            <span data-hf-id="hf-4y6i" class="05-pimpl-line 05-pimpl-indent"><span data-hf-id="hf-m0gn" class="05-pimpl-type">std::vector&lt;Item&gt;</span> items;</span>
+            <span data-hf-id="hf-cjj8" class="05-pimpl-line 05-pimpl-indent"><span data-hf-id="hf-8fxb" class="05-pimpl-type">std::filesystem::path</span> cache;</span>
+            <span data-hf-id="hf-6893" class="05-pimpl-line 05-pimpl-indent"><span data-hf-id="hf-dz2r" class="05-pimpl-type">Strategy</span> strategy;</span>
+            <span data-hf-id="hf-5n1d" class="05-pimpl-line">};</span>
+          </div>
+        </div>
+
+        <div data-hf-id="hf-zgg6" id="f05-pimpl-wire-left" class="05-pimpl-wire"></div>
+        <div data-hf-id="hf-dzww" id="f05-pimpl-boundary"><div data-hf-id="hf-esht" class="05-pimpl-boundary-mark">Impl</div><div data-hf-id="hf-7n89" class="05-pimpl-boundary-label">opaque boundary</div></div>
+        <div data-hf-id="hf-kf31" id="f05-pimpl-wire-right" class="05-pimpl-wire"></div>
+
+        <div data-hf-id="hf-4ly1" id="f05-pimpl-ledger">
+          <div data-hf-id="hf-zwtb" class="05-pimpl-ledger-col">
+            <div data-hf-id="hf-vglt" class="05-pimpl-ledger-label">What the boundary buys</div>
+            <div data-hf-id="hf-kt9i" class="05-pimpl-ledger-item"><span data-hf-id="hf-y5dl" class="05-pimpl-ledger-index">01</span><span data-hf-id="hf-q7ia">Compile isolation</span></div>
+            <div data-hf-id="hf-gzoq" class="05-pimpl-ledger-item"><span data-hf-id="hf-zcao" class="05-pimpl-ledger-index">02</span><span data-hf-id="hf-b8zy">ABI stability</span></div>
+          </div>
+          <div data-hf-id="hf-t6o5" class="05-pimpl-ledger-rule"></div>
+          <div data-hf-id="hf-twf3" class="05-pimpl-ledger-col">
+            <div data-hf-id="hf-0ncq" class="05-pimpl-ledger-label">What the boundary costs</div>
+            <div data-hf-id="hf-hdzr" class="05-pimpl-ledger-item"><span data-hf-id="hf-m4y5" class="05-pimpl-ledger-index">01</span><span data-hf-id="hf-p5te">Allocation + indirection</span></div>
+            <div data-hf-id="hf-hsas" class="05-pimpl-ledger-item"><span data-hf-id="hf-ghdk" class="05-pimpl-ledger-index">02</span><span data-hf-id="hf-urru">Less inlining</span></div>
+            <div data-hf-id="hf-i6lt" class="05-pimpl-ledger-item"><span data-hf-id="hf-yxzn" class="05-pimpl-ledger-index">03</span><span data-hf-id="hf-gf6t">Copy work</span></div>
+          </div>
+        </div>
+
+        <div data-hf-id="hf-vkl0" id="f05-pimpl-rule">
+          <div data-hf-id="hf-g50j" class="05-pimpl-rule-eyebrow">Public library boundary</div>
+          <div data-hf-id="hf-6vrs" class="05-pimpl-rule-main">Buy the boundary</div>
+          <div data-hf-id="hf-dlb3" class="05-pimpl-rule-sub">only when it matters.</div>
+          <div data-hf-id="hf-7o9n" id="f05-pimpl-rule-line"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script>
+    (() => {
+      const tl = gsap.timeline({ paused: true });
+
+      gsap.set('[id="f05-pimpl-after"], [id="f05-pimpl-source"], [id="f05-pimpl-boundary"], [id="f05-pimpl-ledger"], [id="f05-pimpl-rule"]', { opacity: 0 });
+      gsap.set('[class~="05-pimpl-wire"]', { opacity: 0, scaleX: 0 });
+      gsap.set('[id="f05-pimpl-rule-line"]', { scaleX: 0 });
+      gsap.set('[class~="05-pimpl-rule-sub"]', { opacity: 0, y: 16 });
+
+      tl.fromTo('[class~="05-pimpl-kicker"]', { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.42, ease: "power3.out" }, 0)
+        .fromTo('[class~="05-pimpl-title"]', { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.16)
+        .fromTo('[id="f05-pimpl-before"]', { opacity: 0, scale: 0.96, y: 24 }, { opacity: 1, scale: 1, y: 0, duration: 0.72, ease: "power3.out" }, 0.34)
+        .fromTo('[id="f05-pimpl-before"] [class~="05-pimpl-line"]', { opacity: 0, x: -18 }, { opacity: 1, x: 0, duration: 0.34, stagger: 0.48, ease: "power2.out" }, 1.05);
+
+      tl.to('[id="f05-pimpl-before"]', { x: -230, scale: 0.83, opacity: 0, duration: 0.32, ease: "power4.in" }, 5.68)
+        .set('[id="f05-pimpl-after"]', { x: 230, opacity: 0 }, 6)
+        .fromTo('[id="f05-pimpl-after"]', { x: 230, opacity: 0.35 }, { x: 0, opacity: 1, duration: 0.42, ease: "power4.out", immediateRender: false }, 6)
+        .fromTo('[id="f05-pimpl-boundary"]', { opacity: 0, scale: 0.58, rotationX: -38 }, { opacity: 1, scale: 1, rotationX: 0, duration: 0.72, ease: "expo.out", immediateRender: false }, 6.22)
+        .fromTo('[id="f05-pimpl-wire-left"]', { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.38, ease: "power3.out", immediateRender: false }, 6.65)
+        .fromTo('[id="f05-pimpl-wire-right"]', { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.38, ease: "power3.out", immediateRender: false }, 7.0)
+        .fromTo('[id="f05-pimpl-source"]', { opacity: 0, x: 230 }, { opacity: 1, x: 0, duration: 0.62, ease: "power4.out", immediateRender: false }, 7.0)
+        .fromTo('[id="f05-pimpl-source"] [class~="05-pimpl-line"]', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.28, stagger: 0.68, ease: "power2.out", immediateRender: false }, 8.1)
+        .to('[id="f05-pimpl-boundary"]', { y: -5, duration: 1.29, ease: "sine.inOut" }, 11.8)
+        .to('[id="f05-pimpl-boundary"]', { y: 0, duration: 1.3, ease: "sine.inOut" }, 13.1);
+
+      tl.to('[id="f05-pimpl-after"], [id="f05-pimpl-source"], [id="f05-pimpl-boundary"], [class~="05-pimpl-wire"]', { x: -230, opacity: 0, duration: 0.32, ease: "power4.in" }, 13.68)
+        .set('[id="f05-pimpl-ledger"]', { x: 230, opacity: 0 }, 14)
+        .fromTo('[id="f05-pimpl-ledger"]', { x: 230, opacity: 0.35 }, { x: 0, opacity: 1, duration: 0.42, ease: "power4.out", immediateRender: false }, 14)
+        .fromTo('[id="f05-pimpl-ledger"] [class~="05-pimpl-ledger-item"]', { opacity: 0, x: 34 }, { opacity: 1, x: 0, duration: 0.55, stagger: 1.42, ease: "power3.out", immediateRender: false }, 14.62);
+
+      tl.to('[id="f05-pimpl-ledger"]', { scale: 0.8, filter: "blur(10px)", opacity: 0.15, duration: 0.2, ease: "power3.in" }, 22.8)
+        .set('[id="f05-pimpl-ledger"]', { opacity: 0 }, 23)
+        .set('[id="f05-pimpl-rule"]', { opacity: 0.15, scale: 1.25, filter: "blur(10px)" }, 23)
+        .to('[id="f05-pimpl-rule"]', { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, 23)
+        .fromTo('[id="f05-pimpl-rule-line"]', { scaleX: 0 }, { scaleX: 1, duration: 0.58, ease: "power3.out", immediateRender: false }, 23.58)
+        .fromTo('[class~="05-pimpl-rule-sub"]', { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", immediateRender: false }, 24.05)
+        .to('[id="f05-pimpl-rule-line"]', { scaleX: 0.84, duration: 1.25, ease: "sine.inOut" }, 25.1)
+        .to('[id="f05-pimpl-rule-line"]', { scaleX: 1, duration: 1.18, ease: "sine.inOut" }, 26.35);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["05-pimpl"] = tl;
+    })();
+  </script>
+</template>

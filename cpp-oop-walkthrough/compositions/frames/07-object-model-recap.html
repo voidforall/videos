@@ -1,0 +1,499 @@
+<template>
+  <style>
+    #root {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      container-type: size;
+      color: #141413;
+    }
+
+    .clip {
+      position: absolute;
+      inset: 0;
+    }
+
+    .frame-07-object-model-recap-ground {
+      background: #faf9f5;
+      z-index: 0;
+    }
+
+    .frame-07-object-model-recap-ground::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: 0.16;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Cpath d='M0 95.5H96' stroke='%23141413' stroke-opacity='.06'/%3E%3C/svg%3E");
+    }
+
+    .frame-07-object-model-recap-folio {
+      position: absolute;
+      z-index: 8;
+      top: 5.4cqh;
+      left: 4.2cqw;
+      right: 4.2cqw;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: monospace;
+      font-size: 1.35cqw;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .frame-07-object-model-recap-folio-mark { color: #cc785c; }
+    .frame-07-object-model-recap-folio-index { opacity: 0.5; }
+
+    .frame-07-object-model-recap-stage {
+      position: absolute;
+      z-index: 2;
+      inset: 11.5cqh 4.2cqw 17cqh;
+    }
+
+    .frame-07-object-model-recap-scene {
+      position: absolute;
+      inset: 0;
+    }
+
+    .frame-07-object-model-recap-kicker {
+      margin: 0 0 2.3cqh;
+      font-family: monospace;
+      font-size: 1.35cqw;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      opacity: 0.58;
+    }
+
+    .frame-07-object-model-recap-title {
+      margin: 0;
+      font-family: serif;
+      font-size: 4.6cqw;
+      line-height: 0.98;
+      font-weight: 400;
+      letter-spacing: -0.022em;
+    }
+
+    .frame-07-object-model-recap-object-layout {
+      display: grid;
+      grid-template-columns: 0.88fr 1.12fr;
+      gap: 4.2cqw;
+      align-items: center;
+      height: 100%;
+    }
+
+    .frame-07-object-model-recap-object-copy {
+      align-self: start;
+      padding-top: 5cqh;
+    }
+
+    .frame-07-object-model-recap-object-copy .frame-07-object-model-recap-title {
+      max-width: 37cqw;
+    }
+
+    .frame-07-object-model-recap-venn {
+      position: relative;
+      height: 58cqh;
+      max-height: 620px;
+    }
+
+    .frame-07-object-model-recap-circle {
+      position: absolute;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(20,20,19,0.2);
+      border-radius: 50%;
+      background: rgba(239,233,222,0.7);
+      text-align: center;
+      box-sizing: border-box;
+    }
+
+    .frame-07-object-model-recap-copyable {
+      width: 29cqw;
+      height: 29cqw;
+      max-width: 540px;
+      max-height: 540px;
+      right: 1cqw;
+      top: 0;
+    }
+
+    .frame-07-object-model-recap-copyable > div {
+      position: absolute;
+      top: 5.2cqh;
+      left: 0;
+      right: 0;
+    }
+
+    .frame-07-object-model-recap-trivial {
+      width: 17cqw;
+      height: 17cqw;
+      max-width: 320px;
+      max-height: 320px;
+      right: 7cqw;
+      top: 15.5cqh;
+      background: #ece3d4;
+      border-color: rgba(20,20,19,0.32);
+    }
+
+    .frame-07-object-model-recap-circle-label {
+      font-family: sans-serif;
+      font-size: 2.05cqw;
+      line-height: 1.18;
+      font-weight: 500;
+    }
+
+    .frame-07-object-model-recap-circle-note {
+      display: block;
+      margin-top: 1cqh;
+      font-family: monospace;
+      font-size: 1.2cqw;
+      line-height: 1.35;
+      opacity: 0.58;
+    }
+
+    .frame-07-object-model-recap-axis {
+      position: absolute;
+      left: 0;
+      bottom: 2cqh;
+      width: 21cqw;
+      padding: 2.2cqh 1.4cqw;
+      border: 1px solid rgba(20,20,19,0.16);
+      border-radius: 8px;
+      background: #faf9f5;
+      box-shadow: 0 1px 3px rgba(20,20,19,0.08), 0 4px 16px rgba(20,20,19,0.04);
+      font-family: sans-serif;
+      font-size: 1.55cqw;
+      line-height: 1.2;
+    }
+
+    .frame-07-object-model-recap-axis small,
+    .frame-07-object-model-recap-pod small {
+      display: block;
+      margin-top: 0.8cqh;
+      font-family: monospace;
+      font-size: 1.08cqw;
+      opacity: 0.58;
+    }
+
+    .frame-07-object-model-recap-pod {
+      position: absolute;
+      left: 17cqw;
+      bottom: 11cqh;
+      width: 14cqw;
+      padding: 2cqh 1.3cqw;
+      border-radius: 8px;
+      background: #181715;
+      color: #faf9f5;
+      font-family: sans-serif;
+      font-size: 1.55cqw;
+      line-height: 1.2;
+    }
+
+    .frame-07-object-model-recap-covariance {
+      display: grid;
+      grid-template-columns: 0.76fr 1.24fr;
+      gap: 4.2cqw;
+      align-items: center;
+      height: 100%;
+    }
+
+    .frame-07-object-model-recap-covariance-copy .frame-07-object-model-recap-title {
+      max-width: 31cqw;
+    }
+
+    .frame-07-object-model-recap-code {
+      overflow: hidden;
+      border: 1px solid rgba(250,249,245,0.14);
+      border-radius: 8px;
+      background: #181715;
+      color: #faf9f5;
+      box-shadow: 0 1px 3px rgba(20,20,19,0.08), 0 4px 16px rgba(20,20,19,0.04);
+    }
+
+    .frame-07-object-model-recap-codebar {
+      display: flex;
+      justify-content: space-between;
+      padding: 1.5cqh 1.5cqw;
+      background: #252320;
+      font-family: monospace;
+      font-size: 1.15cqw;
+      letter-spacing: 0.03em;
+      opacity: 0.82;
+    }
+
+    .frame-07-object-model-recap-code pre {
+      margin: 0;
+      padding: 3.4cqh 2.2cqw 4cqh;
+      font-family: monospace;
+      font-size: 1.55cqw;
+      line-height: 1.72;
+      white-space: pre-wrap;
+    }
+
+    .frame-07-object-model-recap-code .kw { color: #cc785c; }
+    .frame-07-object-model-recap-code .type { color: #5db8a6; }
+    .frame-07-object-model-recap-code .return { color: #e8a55a; }
+    .frame-07-object-model-recap-arrow {
+      display: inline-block;
+      margin: 0 0.7cqw;
+      opacity: 0.45;
+    }
+
+    .frame-07-object-model-recap-checklist {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      height: 100%;
+    }
+
+    .frame-07-object-model-recap-check-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      margin: 4cqh 0 3.2cqh;
+    }
+
+    .frame-07-object-model-recap-check-head .frame-07-object-model-recap-title {
+      font-size: 4.1cqw;
+    }
+
+    .frame-07-object-model-recap-count {
+      font-family: monospace;
+      font-size: 1.25cqw;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      opacity: 0.5;
+    }
+
+    .frame-07-object-model-recap-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 1.35cqw;
+      height: 43cqh;
+    }
+
+    .frame-07-object-model-recap-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-width: 0;
+      padding: 2.2cqh 1.35cqw;
+      border: 1px solid rgba(20,20,19,0.12);
+      border-radius: 12px;
+      background: #efe9de;
+      box-sizing: border-box;
+    }
+
+    .frame-07-object-model-recap-card-number {
+      font-family: monospace;
+      font-size: 1.05cqw;
+      letter-spacing: 0.12em;
+      opacity: 0.42;
+    }
+
+    .frame-07-object-model-recap-card-title {
+      font-family: sans-serif;
+      font-size: 1.7cqw;
+      line-height: 1.08;
+      font-weight: 500;
+      letter-spacing: -0.005em;
+    }
+
+    .frame-07-object-model-recap-close {
+      position: absolute;
+      z-index: 12;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .frame-07-object-model-recap-close-inner {
+      width: 70cqw;
+      padding: 4cqh 2cqw 4.6cqh;
+      border-top: 1px solid rgba(20,20,19,0.2);
+      border-bottom: 1px solid rgba(20,20,19,0.2);
+      background: rgba(250,249,245,0.94);
+    }
+
+    .frame-07-object-model-recap-close-line {
+      margin: 0;
+      font-family: serif;
+      font-size: 7.3cqw;
+      line-height: 1;
+      font-weight: 400;
+      font-style: italic;
+      letter-spacing: -0.022em;
+    }
+  </style>
+
+  <div data-hf-id="hf-tkc8" id="root" data-composition-id="07-object-model-recap" data-width="1920" data-height="1080">
+    <div data-hf-id="hf-ekny" id="f07-object-model-recap-ground" class="clip frame-07-object-model-recap-ground" data-start="0" data-duration="40.037" data-track-index="0"></div>
+
+    <div data-hf-id="hf-cfnb" class="frame-07-object-model-recap-folio">
+      <span data-hf-id="hf-8u47"><span data-hf-id="hf-jwqh" class="frame-07-object-model-recap-folio-mark">✱</span> object model</span>
+      <span data-hf-id="hf-xnv5" class="frame-07-object-model-recap-folio-index">07 / 08</span>
+    </div>
+
+    <div data-hf-id="hf-m0oa" class="frame-07-object-model-recap-stage">
+      <section data-hf-id="hf-1ee8" class="frame-07-object-model-recap-scene frame-07-object-model-recap-scene-object">
+        <div data-hf-id="hf-njig" class="frame-07-object-model-recap-object-layout">
+          <div data-hf-id="hf-vptt" class="frame-07-object-model-recap-object-copy">
+            <p data-hf-id="hf-nee3" class="frame-07-object-model-recap-kicker">Rule seven</p>
+            <h2 data-hf-id="hf-wehg" class="frame-07-object-model-recap-title">Related.<br data-hf-id="hf-x5px">Not identical.</h2>
+          </div>
+          <div data-hf-id="hf-97h3" class="frame-07-object-model-recap-venn">
+            <div data-hf-id="hf-1q03" class="frame-07-object-model-recap-circle frame-07-object-model-recap-copyable">
+              <div data-hf-id="hf-yeow">
+                <span data-hf-id="hf-3k8j" class="frame-07-object-model-recap-circle-label">Trivially copyable</span>
+                <span data-hf-id="hf-avv4" class="frame-07-object-model-recap-circle-note">byte-wise copy</span>
+              </div>
+            </div>
+            <div data-hf-id="hf-kwzr" class="frame-07-object-model-recap-circle frame-07-object-model-recap-trivial">
+              <div data-hf-id="hf-y7yw">
+                <span data-hf-id="hf-1pod" class="frame-07-object-model-recap-circle-label">Trivial</span>
+                <span data-hf-id="hf-803r" class="frame-07-object-model-recap-circle-note">+ default construction</span>
+              </div>
+            </div>
+            <div data-hf-id="hf-pgqw" class="frame-07-object-model-recap-axis">
+              Standard layout
+              <small data-hf-id="hf-yi3v">independent axis</small>
+            </div>
+            <div data-hf-id="hf-buuo" class="frame-07-object-model-recap-pod">
+              POD
+              <small data-hf-id="hf-59e4">older intersection · C++20 deprecated</small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section data-hf-id="hf-ljey" class="frame-07-object-model-recap-scene frame-07-object-model-recap-scene-covariance">
+        <div data-hf-id="hf-s9sf" class="frame-07-object-model-recap-covariance">
+          <div data-hf-id="hf-62nr" class="frame-07-object-model-recap-covariance-copy">
+            <p data-hf-id="hf-e29l" class="frame-07-object-model-recap-kicker">Rule eight</p>
+            <h2 data-hf-id="hf-lj35" class="frame-07-object-model-recap-title">Covariant<br data-hf-id="hf-rsrt">returns</h2>
+          </div>
+          <div data-hf-id="hf-c6t3" class="frame-07-object-model-recap-code">
+            <div data-hf-id="hf-jh8m" class="frame-07-object-model-recap-codebar">
+              <span data-hf-id="hf-sc1s">clone.hpp</span>
+              <span data-hf-id="hf-pzxp">override contract</span>
+            </div>
+            <pre data-hf-id="hf-9kgl"><span data-hf-id="hf-56lu" class="kw">struct</span> <span data-hf-id="hf-o6c0" class="type">Base</span> {
+  <span data-hf-id="hf-h8fi" class="kw">virtual</span> <span data-hf-id="hf-ou2g" class="return">Base*</span> clone() <span data-hf-id="hf-qjvq" class="kw">const</span> = 0;
+};
+
+<span data-hf-id="hf-83na" class="kw">struct</span> <span data-hf-id="hf-t0z2" class="type">Derived</span> : <span data-hf-id="hf-8gdk" class="type">Base</span> {
+  <span data-hf-id="hf-qvtm" class="return">Derived*</span> clone() <span data-hf-id="hf-9ccq" class="kw">const override</span>;
+};
+
+<span data-hf-id="hf-xo9c" class="return">Base*</span> <span data-hf-id="hf-ycxm" class="frame-07-object-model-recap-arrow">→</span> <span data-hf-id="hf-nxz2" class="return">Derived*</span></pre>
+          </div>
+        </div>
+      </section>
+
+      <section data-hf-id="hf-95df" class="frame-07-object-model-recap-scene frame-07-object-model-recap-scene-checklist">
+        <div data-hf-id="hf-bins" class="frame-07-object-model-recap-checklist">
+          <div data-hf-id="hf-myen" class="frame-07-object-model-recap-check-head">
+            <div data-hf-id="hf-x11t">
+              <p data-hf-id="hf-amov" class="frame-07-object-model-recap-kicker">Interview checklist</p>
+              <h2 data-hf-id="hf-6q1d" class="frame-07-object-model-recap-title">Eight rules, one map.</h2>
+            </div>
+            <div data-hf-id="hf-v7z6" class="frame-07-object-model-recap-count">01 — 08</div>
+          </div>
+          <div data-hf-id="hf-2g7c" class="frame-07-object-model-recap-grid">
+            <div data-hf-id="hf-97aq" class="frame-07-object-model-recap-card"><span data-hf-id="hf-x9us" class="frame-07-object-model-recap-card-number">01</span><span data-hf-id="hf-f81v" class="frame-07-object-model-recap-card-title">Ownership</span></div>
+            <div data-hf-id="hf-nq46" class="frame-07-object-model-recap-card"><span data-hf-id="hf-w2xp" class="frame-07-object-model-recap-card-number">02</span><span data-hf-id="hf-t9uy" class="frame-07-object-model-recap-card-title">Interfaces</span></div>
+            <div data-hf-id="hf-o4f7" class="frame-07-object-model-recap-card"><span data-hf-id="hf-wh8q" class="frame-07-object-model-recap-card-number">03</span><span data-hf-id="hf-qcjg" class="frame-07-object-model-recap-card-title">Is-a</span></div>
+            <div data-hf-id="hf-oiq8" class="frame-07-object-model-recap-card"><span data-hf-id="hf-ygrv" class="frame-07-object-model-recap-card-number">04</span><span data-hf-id="hf-0dau" class="frame-07-object-model-recap-card-title">Compose</span></div>
+            <div data-hf-id="hf-lql1" class="frame-07-object-model-recap-card"><span data-hf-id="hf-yv2w" class="frame-07-object-model-recap-card-number">05</span><span data-hf-id="hf-9vlc" class="frame-07-object-model-recap-card-title">Pimpl</span></div>
+            <div data-hf-id="hf-m4w2" class="frame-07-object-model-recap-card"><span data-hf-id="hf-xo5t" class="frame-07-object-model-recap-card-number">06</span><span data-hf-id="hf-72gz" class="frame-07-object-model-recap-card-title">Init forms</span></div>
+            <div data-hf-id="hf-mj73" class="frame-07-object-model-recap-card"><span data-hf-id="hf-y2gu" class="frame-07-object-model-recap-card-number">07</span><span data-hf-id="hf-jt1u" class="frame-07-object-model-recap-card-title">Object traits</span></div>
+            <div data-hf-id="hf-mxi4" class="frame-07-object-model-recap-card"><span data-hf-id="hf-01zz" class="frame-07-object-model-recap-card-number">08</span><span data-hf-id="hf-2rfn" class="frame-07-object-model-recap-card-title">Covariance</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section data-hf-id="hf-uyo8" class="frame-07-object-model-recap-close">
+        <div data-hf-id="hf-gzr3" class="frame-07-object-model-recap-close-inner">
+          <p data-hf-id="hf-84ax" class="frame-07-object-model-recap-close-line">Know the rule.<br data-hf-id="hf-szow">Know when.</p>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const root = document.querySelector('[data-composition-id="07-object-model-recap"]');
+      const q = (selector) => root.querySelector(selector);
+      const qa = (selector) => Array.from(root.querySelectorAll(selector));
+      const objectScene = q('.frame-07-object-model-recap-scene-object');
+      const covarianceScene = q('.frame-07-object-model-recap-scene-covariance');
+      const checklistScene = q('.frame-07-object-model-recap-scene-checklist');
+      const closeScene = q('.frame-07-object-model-recap-close');
+      const cards = qa('.frame-07-object-model-recap-card');
+      const tl = gsap.timeline({ paused: true });
+
+      gsap.set([covarianceScene, checklistScene, closeScene], { autoAlpha: 0 });
+      gsap.set(q('.frame-07-object-model-recap-trivial'), { autoAlpha: 0 });
+      gsap.set([q('.frame-07-object-model-recap-axis'), q('.frame-07-object-model-recap-pod')], { autoAlpha: 0 });
+      gsap.set(cards, { autoAlpha: 0 });
+
+      tl.fromTo(q('.frame-07-object-model-recap-copyable'),
+        { autoAlpha: 0, scale: 1.12, filter: 'blur(10px)' },
+        { autoAlpha: 1, scale: 1, filter: 'blur(0px)', duration: 0.5, ease: 'expo.out' }, 0)
+        .fromTo(q('.frame-07-object-model-recap-object-copy'),
+          { autoAlpha: 0, x: 70 },
+          { autoAlpha: 1, x: 0, duration: 0.5, ease: 'power4.out' }, 0)
+        .fromTo(q('.frame-07-object-model-recap-trivial'),
+          { autoAlpha: 0, scale: 1.25, filter: 'blur(10px)' },
+          { autoAlpha: 1, scale: 1, filter: 'blur(0px)', duration: 0.62, ease: 'expo.out', immediateRender: false }, 4.65)
+        .fromTo(q('.frame-07-object-model-recap-axis'),
+          { autoAlpha: 0, x: 230 },
+          { autoAlpha: 1, x: 0, duration: 0.42, ease: 'power4.out', immediateRender: false }, 9.1)
+        .fromTo(q('.frame-07-object-model-recap-pod'),
+          { autoAlpha: 0, y: 90 },
+          { autoAlpha: 1, y: 0, duration: 0.48, ease: 'power4.out', immediateRender: false }, 13.1)
+        .to(objectScene, { x: -230, duration: 0.34, ease: 'power4.in' }, 16.66)
+        .to(objectScene, { autoAlpha: 0, duration: 0.2, ease: 'power1.in' }, 16.8)
+        .fromTo(covarianceScene,
+          { autoAlpha: 0.35, x: 230 },
+          { autoAlpha: 1, x: 0, duration: 0.34, ease: 'power4.out', immediateRender: false }, 17)
+        .fromTo(q('.frame-07-object-model-recap-code'),
+          { scale: 1.04, filter: 'blur(10px)' },
+          { scale: 1, filter: 'blur(0px)', duration: 0.52, ease: 'expo.out', immediateRender: false }, 17)
+        .fromTo(qa('.frame-07-object-model-recap-code pre > span'),
+          { autoAlpha: 0.2 },
+          { autoAlpha: 1, duration: 0.24, stagger: 0.16, ease: 'power2.out', immediateRender: false }, 19.4)
+        .to(covarianceScene, { x: -230, duration: 0.34, ease: 'power4.in' }, 24.66)
+        .to(covarianceScene, { autoAlpha: 0, duration: 0.2, ease: 'power1.in' }, 24.8)
+        .fromTo(checklistScene,
+          { autoAlpha: 0.35, x: 230 },
+          { autoAlpha: 1, x: 0, duration: 0.34, ease: 'power4.out', immediateRender: false }, 25)
+        .fromTo(q('.frame-07-object-model-recap-check-head'),
+          { autoAlpha: 0, y: 44 },
+          { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power4.out', immediateRender: false }, 25.25);
+
+      cards.forEach((card, index) => {
+        const at = 26.2 + index * 1.28;
+        tl.fromTo(card,
+          { autoAlpha: 0, scale: 1.18, filter: 'blur(10px)' },
+          { autoAlpha: 1, scale: 1, filter: 'blur(0px)', duration: 0.56, ease: 'expo.out', immediateRender: false }, at);
+      });
+
+      tl.to(checklistScene, { opacity: 0.16, duration: 0.34, ease: 'power2.out' }, 36.8)
+        .fromTo(closeScene,
+          { autoAlpha: 0.15, scale: 1.25, filter: 'blur(10px)' },
+          { autoAlpha: 1, scale: 1, filter: 'blur(0px)', duration: 0.55, ease: 'expo.out', immediateRender: false }, 37.0)
+        .fromTo(q('.frame-07-object-model-recap-close-inner'),
+          { clipPath: 'inset(48% 0 48% 0)' },
+          { clipPath: 'inset(0% 0 0% 0)', duration: 0.48, ease: 'power4.out', immediateRender: false }, 37.0);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines['07-object-model-recap'] = tl;
+    })();
+  </script>
+</template>
