@@ -1,8 +1,21 @@
 {
   "release": "https://github.com/voidforall/videos/releases",
+  "series": [
+    {
+      "id": "algorithm",
+      "title": "Algorithms",
+      "blurb": "Patterns that turn brute force into linear or logarithmic passes—each step animated on real arrays."
+    },
+    {
+      "id": "cpp",
+      "title": "C++",
+      "blurb": "Language design questions interviewers probe: ownership, interfaces, lambdas, and the object model."
+    }
+  ],
   "episodes": [
     {
       "slug": "algorithm-sliding-window",
+      "series": "algorithm",
       "title": "Sliding window",
       "kicker": "Algorithm · Sliding window",
       "summary": "Turn nested loops into one linear pass: expand right, shrink left, update the answer.",
@@ -43,6 +56,7 @@
       ]
     },
     {
+      "series": "cpp",
       "slug": "cpp-functional-walkthrough",
       "title": "C++ functional programming walkthrough",
       "kicker": "C++ · Functional programming",
@@ -60,6 +74,7 @@
       ]
     },
     {
+      "series": "cpp",
       "slug": "cpp-oop-walkthrough",
       "title": "C++ OOP interview walkthrough",
       "kicker": "C++ · Object-oriented design",
@@ -73,6 +88,74 @@
           "duration": 207,
           "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-oop-walkthrough/cpp-oop-walkthrough-01.mp4",
           "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-oop-walkthrough/cpp-oop-walkthrough-01.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "algorithm-binary-search",
+      "series": "algorithm",
+      "title": "Binary search",
+      "kicker": "Algorithm · Binary search",
+      "summary": "One closed interval, three outcomes: exact match, left bound, right bound—and searching on the answer.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/binary-search.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "The search interval",
+          "question": "In closed-interval binary search, what do left and right mean, and when does the loop stop?",
+          "duration": 57,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-binary-search/algorithm-binary-search-01.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-binary-search/algorithm-binary-search-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "First and last occurrence",
+          "question": "With duplicates, how do you find the first and the last occurrence of a target?",
+          "duration": 58,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-binary-search/algorithm-binary-search-02.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-binary-search/algorithm-binary-search-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Search on the answer",
+          "question": "When can you binary search something that is not a sorted array?",
+          "duration": 62,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-binary-search/algorithm-binary-search-03.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-binary-search/algorithm-binary-search-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "algorithm-monotonic-stack",
+      "series": "algorithm",
+      "title": "Monotonic stack",
+      "kicker": "Algorithm · Monotonic stack",
+      "summary": "Nearest greater or smaller element for every index in one pass—and the stack order behind histograms and rain water.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/monotonic-stack.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "When to reach for it",
+          "question": "What problem shape tells you to use a monotonic stack?",
+          "duration": 36,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-monotonic-stack/algorithm-monotonic-stack-01.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-monotonic-stack/algorithm-monotonic-stack-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Next greater element",
+          "question": "Find the next greater element for every value in a single pass.",
+          "duration": 58,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-monotonic-stack/algorithm-monotonic-stack-02.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-monotonic-stack/algorithm-monotonic-stack-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Pick the order",
+          "question": "Next smaller, largest rectangle, trapping rain water: increasing or decreasing stack?",
+          "duration": 62,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-monotonic-stack/algorithm-monotonic-stack-03.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-monotonic-stack/algorithm-monotonic-stack-03.jpg"
         }
       ]
     }

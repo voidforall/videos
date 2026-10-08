@@ -6,6 +6,8 @@ word timings. Media is published to GitHub Releases — **never commit MP4s or p
 
 ## Workflow
 
+New series: add `{ id, title, blurb }` to `docs/catalog.json` → `series` first.
+
 ```bash
 npm run build   -- <slug> [clip ...]        # TTS (cached per line) + whisper → build/<clip>/timing.json, narration.wav
 npm run dev                                 # http://127.0.0.1:4410/engine/player.html?ep=<slug>&clip=01  (audio + scrubber, &t=12 jumps)
@@ -21,6 +23,7 @@ Then commit the spec + `docs/catalog.json`. `episodes/*/build/` is gitignored an
 ```jsonc
 {
   "slug": "algorithm-sliding-window",
+  "series": "algorithm",                          // must exist in docs/catalog.json "series"
   "title": "Sliding window",
   "kicker": "Algorithm · Sliding window",          // top-left label on every scene
   "source": "https://github.com/voidforall/ai-docs/blob/main/…",
@@ -51,7 +54,8 @@ Global fixes live in `engine/caption-fixes.json`.
 | `points` | `title`, `items[{ at, label?, title, body?, code? }]` (1–4) | Definitions, steps, options |
 | `compare` | `title`, `left`/`right` `{ at, label, title, tone?, code?, body? }`, `verdict?{ at, text, code? }` | Before/after, A vs B |
 | `code` | `title`, `file`, `tag?`, `code`, `size?`, `width?`, `highlights[{ at, lines: "2-3" \| "2,6", note }]` | Walking through an implementation |
-| `array` | `title`, `problem?`, `values`, `stateLabel`, `resultLabel`, `steps[{ at, l?, r?, mark?: ok\|bad, state?, note?, result? }]` | Two pointers / sliding window over an array; steps ≥ 0.5 s apart |
+| `array` | `title`, `problem?`, `values`, `stateLabel`, `resultLabel`, `pointers?{ l, r, m }` (labels), `steps[{ at, l?, r?, m?, mark?: ok\|bad, state?, note?, result? }]` | Sliding window, two pointers, binary search (`m` = mid; `l = r + 1` shows crossed pointers). Steps ≥ 0.5 s apart |
+| `stack` | `title`, `problem?`, `values`, `resultMode: value\|distance`, `resultDefault?`, `stackLabel?`, `steps[{ at, i?, ops?: [push\|pop…], note? }]` | Monotonic stack: the template simulates pushes/pops and fills results on each pop |
 | `recap` | `title`, `items[{ at, text, code? }]` (≤ 5) | Clip or episode close |
 
 Titles accept inline `<em>` for the italic accent. Add a template by registering it in

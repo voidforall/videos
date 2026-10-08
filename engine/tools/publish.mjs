@@ -16,6 +16,12 @@ if (!slug) {
 }
 const epDir = `${ROOT}/episodes/${slug}`;
 const episode = JSON.parse(await readFile(`${epDir}/episode.json`, "utf8"));
+if (!episode.series) throw new Error(`${slug}/episode.json: missing "series"`);
+const catalogPath = `${ROOT}/docs/catalog.json`;
+const catalog = JSON.parse(await readFile(catalogPath, "utf8"));
+if (!catalog.series.some((s) => s.id === episode.series)) {
+  throw new Error(`episode.series "${episode.series}" is not in docs/catalog.json series: ${catalog.series.map((s) => s.id).join(", ")}`);
+}
 const tag = `ep-${slug}`;
 const repo = await gh("repo", "view", "--json", "nameWithOwner", "-q", ".nameWithOwner");
 const assetUrl = (name) => `https://github.com/${repo}/releases/download/${tag}/${name}`;
@@ -50,11 +56,9 @@ const files = clips.flatMap((c) => [`${stage}/${slug}-${c.id}.mp4`, `${stage}/${
 await gh("release", "upload", tag, ...files, "--clobber");
 console.log(`uploaded ${files.length} assets to ${tag}`);
 
-const catalogPath = `${ROOT}/docs/catalog.json`;
-const catalog = JSON.parse(await readFile(catalogPath, "utf8"));
-const entry = { slug, title: episode.title, kicker: episode.kicker, summary: episode.summary, source: episode.source, clips };
+const entry = { slug, series: episode.series, title: episode.title, kicker: episode.kicker, summary: episode.summary, source: episode.source, clips };
 const index = catalog.episodes.findIndex((e) => e.slug === slug);
-const episodes = index >= 0 ? catalog.episodes.map((e, i) => (i === index ? entry : e)) : [entry, ...catalog.episodes];
+const episodes = index >= 0 ? catalog.episodes.map((e, i) => (i === index ? entry : e)) : [...catalog.episodes, entry];
 await writeFile(catalogPath, `${JSON.stringify({ ...catalog, episodes }, null, 2)}\n`);
 await rm(stage, { recursive: true, force: true });
 console.log(`updated docs/catalog.json (${clips.length} clips)`);

@@ -1,0 +1,351 @@
+{
+  "slug": "algorithm-monotonic-stack",
+  "series": "algorithm",
+  "title": "Monotonic stack",
+  "kicker": "Algorithm · Monotonic stack",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/monotonic-stack.md",
+  "summary": "Nearest greater or smaller element for every index in one pass—and the stack order behind histograms and rain water.",
+  "captionFixes": [
+    {
+      "match": [
+        "minus",
+        "one"
+      ],
+      "display": "−1"
+    },
+    {
+      "match": [
+        "grater"
+      ],
+      "display": "greater"
+    },
+    {
+      "match": [
+        "trapez"
+      ],
+      "display": "traps"
+    },
+    {
+      "match": [
+        "waits",
+        "2"
+      ],
+      "display": "waits too"
+    },
+    {
+      "match": [
+        "reach"
+      ],
+      "display": "Reach"
+    },
+    {
+      "match": [
+        "I",
+        "minus"
+      ],
+      "display": "i minus"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "When to reach for it",
+      "question": "What problem shape tells you to use a monotonic stack?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Monotonic stack, question one. What problem shape tells you to use a monotonic stack? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What problem shape says <em>monotonic stack</em>?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Reach for it when every element needs its nearest greater or smaller neighbor, on the left or the right. It also finds the range where an element is the minimum or maximum, which powers subarray sums. And it measures widths, as in the largest rectangle in a histogram.",
+          "props": {
+            "title": "Three <em>signals</em>",
+            "items": [
+              {
+                "at": "nearest",
+                "label": "Next / previous",
+                "title": "Nearest greater or smaller",
+                "body": "For each element, the first one to its right or left that beats it.",
+                "code": "LC 496 · LC 739"
+              },
+              {
+                "at": "range",
+                "label": "Contribution",
+                "title": "Range where it is min or max",
+                "body": "Count the subarrays an element dominates.",
+                "code": "LC 907"
+              },
+              {
+                "at": "widths",
+                "label": "Intervals",
+                "title": "Widths and areas",
+                "body": "How far a bar extends before a shorter one.",
+                "code": "LC 84 · LC 42"
+              }
+            ]
+          }
+        },
+        {
+          "type": "statement",
+          "say": "The cost argument is amortized. Each index is pushed once and popped at most once, so the whole pass is linear, even with a while loop inside the for loop.",
+          "props": {
+            "text": "Pushed once, popped <em>at most once</em>.",
+            "sub": "N elements → at most 2N stack operations: O(N) despite the inner while loop.",
+            "subAt": "linear"
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Next greater element",
+      "question": "Find the next greater element for every value in a single pass.",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. Find the next greater element for every value in an array, in a single pass. Pause and think it through.",
+          "pauseAfter": 4,
+          "props": {
+            "question": "Next greater element for every value, in <em>one pass</em>."
+          }
+        },
+        {
+          "type": "stack",
+          "say": "Walk left to right, keeping a stack of indices whose values decrease. Four goes on the stack. Five is bigger than four, so five is its next greater element: pop it, record five, then push. Two is smaller, so it simply waits. Ten is bigger than two and bigger than five: pop both, recording ten each time, then push ten. Eight waits too. Whatever remains on the stack never found a greater element, so it keeps minus one.",
+          "props": {
+            "title": "A <em>decreasing</em> stack",
+            "problem": "nums = [4, 5, 2, 10, 8] → next greater to the right",
+            "values": [
+              4,
+              5,
+              2,
+              10,
+              8
+            ],
+            "resultMode": "value",
+            "resultDefault": -1,
+            "stackLabel": "Decreasing stack ↑",
+            "steps": [
+              {
+                "at": "goes",
+                "i": 0,
+                "ops": [
+                  "push"
+                ],
+                "note": "Empty stack: push 4"
+              },
+              {
+                "at": "five",
+                "i": 1,
+                "note": "5 is bigger than the top (4)"
+              },
+              {
+                "at": "pop",
+                "ops": [
+                  "pop"
+                ],
+                "note": "Pop 4: its next greater is 5"
+              },
+              {
+                "at": "push",
+                "ops": [
+                  "push"
+                ],
+                "note": "Push 5"
+              },
+              {
+                "at": "two",
+                "i": 2,
+                "ops": [
+                  "push"
+                ],
+                "note": "2 < 5: push it and wait"
+              },
+              {
+                "at": "ten",
+                "i": 3,
+                "note": "10 beats the top (2) and then 5"
+              },
+              {
+                "at": "both",
+                "ops": [
+                  "pop",
+                  "pop"
+                ],
+                "note": "Pop both: each gets 10"
+              },
+              {
+                "at": "push#2",
+                "ops": [
+                  "push"
+                ],
+                "note": "Push 10"
+              },
+              {
+                "at": "eight",
+                "i": 4,
+                "ops": [
+                  "push"
+                ],
+                "note": "8 < 10: push it and wait"
+              },
+              {
+                "at": "never",
+                "note": "Still on the stack → no greater element: −1"
+              }
+            ]
+          }
+        },
+        {
+          "type": "code",
+          "say": "The code is short. Keep a result array filled with minus one, and a stack of indices. For each index, while the stack is not empty and the top value is smaller than the current one, record the answer for the top and pop it. Then push the current index. Every index is pushed once and popped at most once, so the pass is linear.",
+          "props": {
+            "title": "Next greater, <em>in code</em>",
+            "file": "next_greater.cpp",
+            "tag": "decreasing stack",
+            "size": 22,
+            "width": 1080,
+            "code": "std::vector<int> nextGreater(const std::vector<int>& nums) {\n    std::vector<int> result(nums.size(), -1);\n    std::stack<int> s;  // indices, values decreasing\n    for (int i = 0; i < (int)nums.size(); ++i) {\n        while (!s.empty() && nums[s.top()] < nums[i]) {\n            result[s.top()] = nums[i];\n            s.pop();\n        }\n        s.push(i);\n    }\n    return result;\n}",
+            "highlights": [
+              {
+                "at": "result",
+                "lines": "2-3",
+                "note": "Default −1; the stack holds indices"
+              },
+              {
+                "at": "while",
+                "lines": "5",
+                "note": "Pop while the top is smaller than nums[i]"
+              },
+              {
+                "at": "record",
+                "lines": "6-7",
+                "note": "nums[i] is the top's next greater"
+              },
+              {
+                "at": "push",
+                "lines": "9",
+                "note": "Push i: the stack stays decreasing"
+              },
+              {
+                "at": "linear",
+                "lines": "4,9",
+                "note": "Each index pushed once, popped ≤ once: O(N)"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Pick the order",
+      "question": "Next smaller, largest rectangle, trapping rain water: increasing or decreasing stack?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. For next smaller element, largest rectangle, and trapping rain water: do you keep an increasing or a decreasing stack? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Next smaller, largest rectangle, rain water: <em>increasing</em> or <em>decreasing</em>?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Match the order to the question. Next greater keeps a decreasing stack and pops smaller tops. Next smaller flips it, with an increasing stack that pops larger tops. Largest rectangle uses an increasing stack, and rain water uses a decreasing one.",
+          "props": {
+            "title": "Order follows the <em>question</em>",
+            "items": [
+              {
+                "at": "greater",
+                "label": "Next greater",
+                "title": "Decreasing",
+                "body": "Pop while top < current.",
+                "code": "LC 496"
+              },
+              {
+                "at": "smaller#2",
+                "label": "Next smaller",
+                "title": "Increasing",
+                "body": "Pop while top > current.",
+                "code": "LC 1475"
+              },
+              {
+                "at": "rectangle",
+                "label": "Largest rectangle",
+                "title": "Increasing",
+                "body": "A shorter bar ends the taller ones.",
+                "code": "LC 84"
+              },
+              {
+                "at": "rainwater",
+                "label": "Rain water",
+                "title": "Decreasing",
+                "body": "A taller bar closes a valley.",
+                "code": "LC 42"
+              }
+            ]
+          }
+        },
+        {
+          "type": "compare",
+          "say": "When a bar is popped in the histogram, it is the shortest bar between its neighbors. Its width is i minus the new top minus one. For rain water, the popped bar is a valley floor. Water fills up to the lower of the two walls, across the same width.",
+          "props": {
+            "title": "What a <em>pop</em> means",
+            "left": {
+              "at": "histogram",
+              "label": "Largest rectangle · LC 84",
+              "title": "Popped bar is the shortest",
+              "code": "int h = heights[s.top()]; s.pop();\nint left = s.empty() ? -1 : s.top();\nint width = i - left - 1;\nbest = std::max(best, h * width);"
+            },
+            "right": {
+              "at": "rainwater",
+              "label": "Rain water · LC 42",
+              "title": "Popped bar is the floor",
+              "code": "int floor = heights[s.top()]; s.pop();\nif (s.empty()) break;  // no left wall\nint width = i - s.top() - 1;\nint h = std::min(heights[s.top()], heights[i]) - floor;\nwater += h * width;"
+            },
+            "verdict": {
+              "at": "same",
+              "text": "Same width rule: i − left − 1.",
+              "code": "exclusive bounds"
+            }
+          }
+        },
+        {
+          "type": "recap",
+          "say": "Watch the classic traps. Width is i minus left minus one, because both boundaries are exclusive. An empty stack means the left boundary is minus one. A sentinel zero at the end flushes every remaining bar. And with duplicate heights, choose strict or non-strict comparison on purpose.",
+          "props": {
+            "title": "Four <em>traps</em>",
+            "items": [
+              {
+                "at": "width",
+                "text": "Width = i − left − 1: both bounds exclusive.",
+                "code": "off-by-one"
+              },
+              {
+                "at": "empty",
+                "text": "Empty stack → the left boundary is −1.",
+                "code": "width = i"
+              },
+              {
+                "at": "sentinel",
+                "text": "A sentinel 0 at the end flushes the stack.",
+                "code": "i <= n"
+              },
+              {
+                "at": "duplicate",
+                "text": "Duplicates: pick < or ≤ on purpose.",
+                "code": "no double count"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

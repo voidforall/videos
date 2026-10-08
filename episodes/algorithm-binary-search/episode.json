@@ -1,0 +1,436 @@
+{
+  "slug": "algorithm-binary-search",
+  "series": "algorithm",
+  "title": "Binary search",
+  "kicker": "Algorithm · Binary search",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/binary-search.md",
+  "summary": "One closed interval, three outcomes: exact match, left bound, right bound—and searching on the answer.",
+  "captionFixes": [
+    {
+      "match": [
+        "O",
+        "of",
+        "log",
+        "n"
+      ],
+      "display": "O(log N)"
+    },
+    {
+      "match": [
+        "n",
+        "minus",
+        "one"
+      ],
+      "display": "n − 1"
+    },
+    {
+      "match": [
+        "whenever"
+      ],
+      "display": "Whenever"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "The search interval",
+      "question": "In closed-interval binary search, what do left and right mean, and when does the loop stop?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Binary search, question one. In a closed-interval binary search, what do left and right mean, and when does the loop stop? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Closed interval: what do <em>left</em> and <em>right</em> mean, and when does the loop stop?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Treat the search space as a closed interval: both ends are inclusive, so right starts at the last index. The loop runs while left is less than or equal to right, and stops when the interval is empty. Every update excludes mid, because mid has already been checked.",
+          "props": {
+            "title": "One interval, <em>three rules</em>",
+            "items": [
+              {
+                "at": "closed",
+                "label": "Bounds",
+                "title": "Both ends inclusive",
+                "body": "The interval is [left, right].",
+                "code": "right = nums.size() - 1"
+              },
+              {
+                "at": "loop",
+                "label": "Loop",
+                "title": "Run while non-empty",
+                "body": "Stops when left passes right.",
+                "code": "while (left <= right)"
+              },
+              {
+                "at": "excludes",
+                "label": "Update",
+                "title": "Always exclude mid",
+                "body": "Mid is already checked.",
+                "code": "left = mid + 1 / right = mid - 1"
+              }
+            ]
+          }
+        },
+        {
+          "type": "array",
+          "say": "Search for nine. The interval starts as the whole array. Mid is index three, holding seven, which is too small, so left jumps to mid plus one. Now mid holds eleven, which is too big, so right drops to mid minus one. The interval is a single cell. Mid holds nine, so we return its index. Three probes instead of eight.",
+          "props": {
+            "title": "Exact match, <em>three probes</em>",
+            "problem": "nums = [1, 3, 5, 7, 9, 11, 13, 15], target = 9",
+            "values": [
+              1,
+              3,
+              5,
+              7,
+              9,
+              11,
+              13,
+              15
+            ],
+            "pointers": {
+              "l": "left",
+              "r": "right",
+              "m": "mid"
+            },
+            "stateLabel": "Interval",
+            "resultLabel": "Return",
+            "steps": [
+              {
+                "at": "whole",
+                "l": 0,
+                "r": 7,
+                "state": "[0, 7]",
+                "note": "Start with the whole array"
+              },
+              {
+                "at": "three",
+                "m": 3,
+                "note": "nums[3] = 7 < 9"
+              },
+              {
+                "at": "jumps",
+                "l": 4,
+                "state": "[4, 7]",
+                "note": "left = mid + 1"
+              },
+              {
+                "at": "eleven",
+                "m": 5,
+                "note": "nums[5] = 11 > 9"
+              },
+              {
+                "at": "drops",
+                "r": 4,
+                "state": "[4, 4]",
+                "note": "right = mid − 1"
+              },
+              {
+                "at": "single",
+                "m": 4,
+                "note": "nums[4] = 9 == target"
+              },
+              {
+                "at": "return",
+                "mark": "ok",
+                "note": "Found after 3 probes",
+                "result": "4"
+              }
+            ]
+          }
+        },
+        {
+          "type": "statement",
+          "say": "One more habit: compute mid as left plus half the distance to right. Adding left and right first can overflow an int on large arrays.",
+          "props": {
+            "text": "mid = left + (right − left) / 2",
+            "sub": "Not (left + right) / 2 — the sum can overflow an int on large arrays.",
+            "subAt": "overflow"
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "First and last occurrence",
+      "question": "With duplicates, how do you find the first and the last occurrence of a target?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. With duplicates, how do you find the first and the last occurrence of a target? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "With duplicates, how do you find the <em>first</em> and <em>last</em> occurrence?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "The template stays the same. Only the equal branch changes. For the left bound, when mid equals the target, keep searching left with right equals mid minus one, and return left after the loop. For the right bound, search right with left equals mid plus one, and return right.",
+          "props": {
+            "title": "Only the <em>equal branch</em> changes",
+            "left": {
+              "at": "left",
+              "label": "Left bound · first occurrence",
+              "title": "Lock the left edge",
+              "code": "} else if (nums[mid] == target) {\n  right = mid - 1;  // keep searching left\n}\n// after the loop: answer is left",
+              "body": "Returns left (check it is in range and equal)."
+            },
+            "right": {
+              "at": "right#2",
+              "label": "Right bound · last occurrence",
+              "title": "Lock the right edge",
+              "code": "} else if (nums[mid] == target) {\n  left = mid + 1;   // keep searching right\n}\n// after the loop: answer is right",
+              "body": "Returns right (check it is in range and equal)."
+            }
+          }
+        },
+        {
+          "type": "array",
+          "say": "Find the first two in this array. Mid lands on a two, but instead of returning, right moves to mid minus one. Mid lands on the one, which is too small, so left steps forward. Mid lands on a two again, and right moves once more. Now left has crossed right, and the loop ends. Left sits on index one, the first two.",
+          "props": {
+            "title": "Left bound, <em>step by step</em>",
+            "problem": "nums = [1, 2, 2, 2, 3], target = 2",
+            "values": [
+              1,
+              2,
+              2,
+              2,
+              3
+            ],
+            "stateLabel": "Interval",
+            "resultLabel": "First at",
+            "steps": [
+              {
+                "at": "find",
+                "l": 0,
+                "r": 4,
+                "state": "[0, 4]",
+                "note": "Search the whole array"
+              },
+              {
+                "at": "lands",
+                "m": 2,
+                "note": "nums[2] == 2: don't return"
+              },
+              {
+                "at": "instead",
+                "r": 1,
+                "state": "[0, 1]",
+                "note": "right = mid − 1, keep looking left"
+              },
+              {
+                "at": "lands#2",
+                "m": 0,
+                "note": "nums[0] = 1 < 2"
+              },
+              {
+                "at": "forward",
+                "l": 1,
+                "state": "[1, 1]",
+                "note": "left = mid + 1"
+              },
+              {
+                "at": "lands#3",
+                "m": 1,
+                "note": "nums[1] == 2 again"
+              },
+              {
+                "at": "more",
+                "r": 0,
+                "state": "empty",
+                "note": "right = mid − 1 → left > right"
+              },
+              {
+                "at": "sits",
+                "mark": "ok",
+                "note": "Loop ends: left is the first 2",
+                "result": "1"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "So all three searches share one skeleton. Exact match returns mid. Left bound shrinks right on a match and returns left. Right bound shrinks left on a match and returns right.",
+          "props": {
+            "title": "Three searches, <em>one skeleton</em>",
+            "items": [
+              {
+                "at": "exact",
+                "label": "Exact match",
+                "title": "return mid",
+                "body": "Stop on the first hit.",
+                "code": "LC 704"
+              },
+              {
+                "at": "left",
+                "label": "Left bound",
+                "title": "right = mid − 1",
+                "body": "Then return left.",
+                "code": "LC 34 · LC 35"
+              },
+              {
+                "at": "right#2",
+                "label": "Right bound",
+                "title": "left = mid + 1",
+                "body": "Then return right.",
+                "code": "LC 34"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Search on the answer",
+      "question": "When can you binary search something that is not a sorted array?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. When can you binary search something that is not a sorted array? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "When can you binary search something that is <em>not</em> a sorted array?"
+          }
+        },
+        {
+          "type": "statement",
+          "say": "Whenever a yes or no check is monotonic. False, false, false, then true from some point on. Binary search finds that boundary, the first true.",
+          "props": {
+            "text": "F F F <em>T</em> T T T",
+            "sub": "If check(x) flips from false to true exactly once, binary search finds the first true.",
+            "subAt": "boundary"
+          }
+        },
+        {
+          "type": "array",
+          "say": "Mid is true, so the answer is here or earlier, and right moves to mid minus one. Next, mid is false, so left moves past it. False again, and left moves again. Now left has crossed right, and it rests on the first true. Return left.",
+          "props": {
+            "title": "Finding the <em>first true</em>",
+            "problem": "check(x) over the search space [0, 6]",
+            "values": [
+              "F",
+              "F",
+              "F",
+              "T",
+              "T",
+              "T",
+              "T"
+            ],
+            "stateLabel": "Interval",
+            "resultLabel": "Answer",
+            "steps": [
+              {
+                "at": "start",
+                "l": 0,
+                "r": 6,
+                "m": 3,
+                "state": "[0, 6]",
+                "note": "check(3) is true"
+              },
+              {
+                "at": "earlier",
+                "r": 2,
+                "state": "[0, 2]",
+                "note": "Answer is here or earlier: right = mid − 1"
+              },
+              {
+                "at": "next",
+                "m": 1,
+                "note": "check(1) is false"
+              },
+              {
+                "at": "past",
+                "l": 2,
+                "state": "[2, 2]",
+                "note": "left = mid + 1"
+              },
+              {
+                "at": "again",
+                "m": 2,
+                "note": "check(2) is false"
+              },
+              {
+                "at": "again#2",
+                "l": 3,
+                "state": "empty",
+                "note": "left = mid + 1 → left > right"
+              },
+              {
+                "at": "rests",
+                "mark": "ok",
+                "note": "left rests on the first true",
+                "result": "3"
+              }
+            ]
+          }
+        },
+        {
+          "type": "code",
+          "say": "In code, the shape is familiar. Search between the lowest and highest possible answers. If mid satisfies the check, try smaller by moving right. Otherwise, try larger by moving left. When the loop ends, left is the smallest value that passes.",
+          "props": {
+            "title": "Binary search <em>on the answer</em>",
+            "file": "search_answer.cpp",
+            "tag": "monotonic check",
+            "width": 1000,
+            "code": "int searchAnswer(int lo, int hi) {\n    int left = lo, right = hi;\n    while (left <= right) {\n        int mid = left + (right - left) / 2;\n        if (check(mid)) {\n            right = mid - 1;  // satisfies: try smaller\n        } else {\n            left = mid + 1;   // fails: try larger\n        }\n    }\n    return left;  // first value where check() is true\n}",
+            "highlights": [
+              {
+                "at": "between",
+                "lines": "1-2",
+                "note": "lo / hi must cover every possible answer"
+              },
+              {
+                "at": "satisfies",
+                "lines": "5-6",
+                "note": "Passes: the answer is mid or smaller"
+              },
+              {
+                "at": "otherwise",
+                "lines": "7-8",
+                "note": "Fails: the answer is larger"
+              },
+              {
+                "at": "ends",
+                "lines": "11",
+                "note": "left is the first passing value"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Use a closed interval and loop while left is at most right. Compute mid without overflow. The equal branch decides exact, left, or right bound. And any monotonic check can be searched the same way.",
+          "props": {
+            "title": "Binary search, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "closed",
+                "text": "Closed interval, loop while left ≤ right.",
+                "code": "[left, right]"
+              },
+              {
+                "at": "overflow",
+                "text": "mid = left + (right − left) / 2.",
+                "code": "no overflow"
+              },
+              {
+                "at": "equal",
+                "text": "The equal branch picks exact, left, or right bound.",
+                "code": "LC 34"
+              },
+              {
+                "at": "monotonic",
+                "text": "Any monotonic check can be searched.",
+                "code": "LC 410"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
