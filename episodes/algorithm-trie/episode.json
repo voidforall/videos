@@ -1,0 +1,460 @@
+{
+  "slug": "algorithm-trie",
+  "series": "algorithm",
+  "title": "Trie",
+  "kicker": "Algorithm · Trie",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/trie.md",
+  "summary": "A prefix tree: words share paths from the root, an end flag marks whole words, and every operation costs O(L).",
+  "captionFixes": [
+    {
+      "match": [
+        "Try",
+        "Question"
+      ],
+      "display": "Trie, question"
+    },
+    {
+      "match": [
+        "try"
+      ],
+      "display": "trie"
+    },
+    {
+      "match": [
+        "starts",
+        "with"
+      ],
+      "display": "startsWith"
+    },
+    {
+      "match": [
+        "whenever"
+      ],
+      "display": "Whenever"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Prefixes share paths",
+      "question": "How does a trie store words, and how do search and startsWith differ?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Trie, question one. How does a trie store words, and how do search and starts-with differ? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How does a trie store words, and how do <em>search</em> and <em>startsWith</em> differ?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Insert car. Each letter becomes a node below the root, and the last one is marked as the end of a word. Insert cat. The first two letters already exist, so only one node is new. Insert do, then dog. Dog reuses the path, and the o stays marked, because do is a word too. Now search for c a. Follow c, and then a. The path exists, so it is a valid prefix. But that node is not marked, so c a is not a word.",
+          "props": {
+            "title": "Words that share a prefix <em>share a path</em>",
+            "nodes": [
+              {
+                "id": "root",
+                "label": "·",
+                "x": 620,
+                "y": 260
+              },
+              {
+                "id": "c",
+                "x": 400,
+                "y": 400,
+                "hidden": true
+              },
+              {
+                "id": "a",
+                "x": 400,
+                "y": 540,
+                "hidden": true
+              },
+              {
+                "id": "r",
+                "x": 290,
+                "y": 680,
+                "hidden": true
+              },
+              {
+                "id": "t",
+                "x": 510,
+                "y": 680,
+                "hidden": true
+              },
+              {
+                "id": "d",
+                "x": 840,
+                "y": 400,
+                "hidden": true
+              },
+              {
+                "id": "o",
+                "x": 840,
+                "y": 540,
+                "hidden": true
+              },
+              {
+                "id": "g",
+                "x": 840,
+                "y": 680,
+                "hidden": true
+              }
+            ],
+            "edges": [],
+            "panels": [
+              {
+                "key": "words",
+                "label": "Inserted words",
+                "type": "list",
+                "initial": []
+              },
+              {
+                "key": "query",
+                "label": "Query",
+                "type": "list",
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "insert",
+                "show": [
+                  "c"
+                ],
+                "add": [
+                  {
+                    "from": "root",
+                    "to": "c"
+                  }
+                ],
+                "nodes": {
+                  "c": "active"
+                },
+                "panels": {
+                  "words": [
+                    "car"
+                  ]
+                },
+                "note": "insert(\"car\"): c"
+              },
+              {
+                "at": "letter",
+                "show": [
+                  "a"
+                ],
+                "add": [
+                  {
+                    "from": "c",
+                    "to": "a"
+                  }
+                ],
+                "nodes": {
+                  "c": "base",
+                  "a": "active"
+                },
+                "note": "… a"
+              },
+              {
+                "at": "below",
+                "show": [
+                  "r"
+                ],
+                "add": [
+                  {
+                    "from": "a",
+                    "to": "r"
+                  }
+                ],
+                "nodes": {
+                  "a": "base",
+                  "r": "active"
+                },
+                "note": "… r"
+              },
+              {
+                "at": "marked",
+                "nodes": {
+                  "r": "done"
+                },
+                "note": "r.isEndOfWord = true"
+              },
+              {
+                "at": "insert#2",
+                "edges": {
+                  "root-c": "relax",
+                  "c-a": "relax"
+                },
+                "panels": {
+                  "words": [
+                    "car",
+                    "cat"
+                  ]
+                },
+                "note": "insert(\"cat\"): c, a already exist"
+              },
+              {
+                "at": "new",
+                "show": [
+                  "t"
+                ],
+                "add": [
+                  {
+                    "from": "a",
+                    "to": "t"
+                  }
+                ],
+                "nodes": {
+                  "t": "done"
+                },
+                "edges": {
+                  "root-c": "base",
+                  "c-a": "base"
+                },
+                "note": "Only t is new (and marked)"
+              },
+              {
+                "at": "insert#3",
+                "show": [
+                  "d",
+                  "o"
+                ],
+                "add": [
+                  {
+                    "from": "root",
+                    "to": "d"
+                  },
+                  {
+                    "from": "d",
+                    "to": "o"
+                  }
+                ],
+                "nodes": {
+                  "o": "done"
+                },
+                "panels": {
+                  "words": [
+                    "car",
+                    "cat",
+                    "do"
+                  ]
+                },
+                "note": "insert(\"do\"): o marked"
+              },
+              {
+                "at": "dog#2",
+                "show": [
+                  "g"
+                ],
+                "add": [
+                  {
+                    "from": "o",
+                    "to": "g"
+                  }
+                ],
+                "nodes": {
+                  "g": "done"
+                },
+                "edges": {
+                  "root-d": "relax",
+                  "d-o": "relax"
+                },
+                "panels": {
+                  "words": [
+                    "car",
+                    "cat",
+                    "do",
+                    "dog"
+                  ]
+                },
+                "note": "insert(\"dog\"): reuses d → o, only g is new"
+              },
+              {
+                "at": "stays",
+                "edges": {
+                  "root-d": "base",
+                  "d-o": "base"
+                },
+                "note": "o stays marked: \"do\" is a word too"
+              },
+              {
+                "at": "search",
+                "panels": {
+                  "query": [
+                    "search(\"ca\")"
+                  ]
+                },
+                "note": "Walk from the root, one letter at a time"
+              },
+              {
+                "at": "follow",
+                "nodes": {
+                  "c": "active"
+                },
+                "edges": {
+                  "root-c": "relax"
+                },
+                "note": "c exists"
+              },
+              {
+                "at": "then#2",
+                "nodes": {
+                  "c": "base",
+                  "a": "active"
+                },
+                "edges": {
+                  "c-a": "relax"
+                },
+                "note": "a exists"
+              },
+              {
+                "at": "prefix",
+                "panels": {
+                  "query": [
+                    "search(\"ca\")",
+                    "startsWith → true"
+                  ]
+                },
+                "note": "The path exists → valid prefix"
+              },
+              {
+                "at": "not",
+                "nodes": {
+                  "a": "queued"
+                },
+                "panels": {
+                  "query": [
+                    "search → false",
+                    "startsWith → true"
+                  ]
+                },
+                "note": "a is not marked → \"ca\" is not a word"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "The code",
+      "question": "Implement insert, search, and startsWith.",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. Implement insert, search, and starts-with. Pause and sketch it out.",
+          "pauseAfter": 4,
+          "props": {
+            "question": "Implement <em>insert</em>, <em>search</em>, and <em>startsWith</em>."
+          }
+        },
+        {
+          "type": "code",
+          "say": "Each node holds twenty-six child pointers and an end flag. Insert walks the word, creating a child whenever one is missing, then sets the flag on the last node. Search walks the same way and fails as soon as a child is missing. At the end, search returns the flag. Starts-with is identical, except it returns true without checking the flag.",
+          "props": {
+            "title": "A trie <em>in code</em>",
+            "file": "trie.cpp",
+            "tag": "O(L) per operation",
+            "size": 20,
+            "width": 1060,
+            "code": "struct Node {\n    Node* child[26] = {};\n    bool end = false;\n};\nvoid insert(Node* root, const string& w) {\n    Node* cur = root;\n    for (char c : w) {\n        int i = c - 'a';\n        if (!cur->child[i]) cur->child[i] = new Node();\n        cur = cur->child[i];\n    }\n    cur->end = true;\n}\nNode* walk(Node* root, const string& s) {\n    Node* cur = root;\n    for (char c : s)\n        if (!(cur = cur->child[c - 'a'])) return nullptr;\n    return cur;\n}\nbool search(Node* r, const string& w) { auto n = walk(r, w); return n && n->end; }\nbool startsWith(Node* r, const string& p) { return walk(r, p) != nullptr; }",
+            "highlights": [
+              {
+                "at": "holds",
+                "lines": "1-4",
+                "note": "26 children + an end-of-word flag"
+              },
+              {
+                "at": "creating",
+                "lines": "9-10",
+                "note": "Create missing children while walking"
+              },
+              {
+                "at": "sets",
+                "lines": "12",
+                "note": "Mark the last node as a word"
+              },
+              {
+                "at": "fails",
+                "lines": "17",
+                "note": "A missing child means no match"
+              },
+              {
+                "at": "returns",
+                "lines": "20",
+                "note": "search: the path must end on a word"
+              },
+              {
+                "at": "identical",
+                "lines": "21",
+                "note": "startsWith: the path alone is enough"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "When a trie wins",
+      "question": "When would you choose a trie over a hash set of strings?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. When would you choose a trie over a hash set of strings? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "When does a trie beat a <em>hash set</em> of strings?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Whenever prefixes matter. Autocomplete collects every word below a prefix node. A spell checker or word game prunes a search the moment a prefix dies. The longest common prefix is the path before the first branch. And a bitwise trie over zeros and ones answers maximum XOR queries greedily, bit by bit.",
+          "props": {
+            "title": "When <em>prefixes</em> matter",
+            "items": [
+              {
+                "at": "autocomplete",
+                "label": "Typeahead",
+                "title": "Autocomplete",
+                "body": "Every word below a prefix node.",
+                "code": "LC 642"
+              },
+              {
+                "at": "prunes",
+                "label": "Pruning",
+                "title": "Word search",
+                "body": "Stop as soon as no word has the prefix.",
+                "code": "LC 212"
+              },
+              {
+                "at": "longest",
+                "label": "Shared prefix",
+                "title": "Longest common prefix",
+                "body": "The path before the first branch.",
+                "code": "LC 14"
+              },
+              {
+                "at": "bitwise",
+                "label": "0/1 trie",
+                "title": "Maximum XOR",
+                "body": "Prefer the opposite bit at each level.",
+                "code": "LC 421"
+              }
+            ]
+          }
+        },
+        {
+          "type": "statement",
+          "say": "Every operation costs O of L, the length of the word, no matter how many words are stored. The price is memory: up to twenty-six pointers per node.",
+          "props": {
+            "text": "O(L), <em>independent of N</em>.",
+            "sub": "Insert, search, and prefix checks cost the word length, not the dictionary size. The trade-off is memory: up to 26 child pointers per node.",
+            "subAt": "memory"
+          }
+        }
+      ]
+    }
+  ]
+}

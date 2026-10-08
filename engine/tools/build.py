@@ -68,8 +68,8 @@ def transcribe(wav: Path) -> list[dict]:
 
 
 def apply_fixes(words: list[dict], fixes: list[dict]) -> list[dict]:
-    """Each fix replaces a run of words. A display with the same word count is applied word for
-    word (timings kept); otherwise the run collapses into one display word. Matching ignores case
+    """Each fix replaces a run of words. A display with at least as many words is applied word for
+    word (timings kept; surplus words split the last word's time span); otherwise the run collapses into one. Matching ignores case
     and surrounding punctuation; the last matched word's trailing punctuation is kept."""
     def core(text: str) -> str:
         return re.sub(r"^[^\w+]+|[^\w+]+$", "", text).lower()
@@ -82,8 +82,12 @@ def apply_fixes(words: list[dict], fixes: list[dict]) -> list[dict]:
             if len(run) == n and [core(w["text"]) for w in run] == [core(m) for m in fix["match"]]:
                 tail = re.search(r"[^\w+)]*$", run[-1]["text"]).group(0)
                 shown = fix["display"].split(" ")
-                if len(shown) == n:  # word-for-word: keep each word's own timing for cues and karaoke
-                    result += [{**w, "text": t} for w, t in zip(run, shown)]
+                if len(shown) >= n:  # keep per-word timing; surplus words split the last word's span
+                    result += [{**w, "text": t} for w, t in zip(run[:-1], shown[:n - 1])]
+                    last, extra = run[-1], shown[n - 1:]
+                    span = (last["end"] - last["start"]) / len(extra)
+                    result += [{"text": t, "start": round(last["start"] + k * span, 3), "end": round(last["start"] + (k + 1) * span, 3)}
+                               for k, t in enumerate(extra)]
                     result[-1]["text"] += tail
                 else:
                     result.append({"text": fix["display"] + tail, "start": run[0]["start"], "end": run[-1]["end"]})

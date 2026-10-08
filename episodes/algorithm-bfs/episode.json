@@ -1,0 +1,463 @@
+{
+  "slug": "algorithm-bfs",
+  "series": "algorithm",
+  "title": "Breadth-first search",
+  "kicker": "Algorithm · BFS",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/bfs.md",
+  "summary": "Explore level by level with a queue and a visited set: the first time you reach the target is the shortest path.",
+  "captionFixes": [
+    {
+      "match": [
+        "away",
+        "And",
+        "B"
+      ],
+      "display": "away, A and B"
+    },
+    {
+      "match": [
+        "cue"
+      ],
+      "display": "queue"
+    },
+    {
+      "match": [
+        "Cedar"
+      ],
+      "display": "Seed a"
+    },
+    {
+      "match": [
+        "market"
+      ],
+      "display": "mark it"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Level by level",
+      "question": "Why does BFS find the shortest path in an unweighted graph?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Breadth-first search, question one. Why does BFS find the shortest path in an unweighted graph? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Why does BFS find the <em>shortest path</em> in an unweighted graph?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Start at S, at step zero. Everything one edge away, A and B, joins the queue and is marked visited. Now process that whole level. A reaches C. B also sees C, but C is already visited, so it is skipped. B reaches D. That completes level two. From C, we reach T, at step three. The first time BFS touches the target is along a shortest path, because every closer vertex was explored first.",
+          "props": {
+            "title": "One <em>level</em> at a time",
+            "directed": false,
+            "nodes": [
+              {
+                "id": "S",
+                "x": 200,
+                "y": 490
+              },
+              {
+                "id": "A",
+                "x": 480,
+                "y": 320
+              },
+              {
+                "id": "B",
+                "x": 480,
+                "y": 660
+              },
+              {
+                "id": "C",
+                "x": 780,
+                "y": 320
+              },
+              {
+                "id": "D",
+                "x": 780,
+                "y": 660
+              },
+              {
+                "id": "T",
+                "x": 1060,
+                "y": 490
+              }
+            ],
+            "edges": [
+              {
+                "from": "S",
+                "to": "A"
+              },
+              {
+                "from": "S",
+                "to": "B"
+              },
+              {
+                "from": "A",
+                "to": "C"
+              },
+              {
+                "from": "B",
+                "to": "C"
+              },
+              {
+                "from": "B",
+                "to": "D"
+              },
+              {
+                "from": "C",
+                "to": "T"
+              },
+              {
+                "from": "D",
+                "to": "T"
+              }
+            ],
+            "panels": [
+              {
+                "key": "step",
+                "label": "steps from S",
+                "type": "table",
+                "initial": {
+                  "S": "–",
+                  "A": "–",
+                  "B": "–",
+                  "C": "–",
+                  "D": "–",
+                  "T": "–"
+                },
+                "columns": [
+                  "S",
+                  "A",
+                  "B",
+                  "C",
+                  "D",
+                  "T"
+                ]
+              },
+              {
+                "key": "queue",
+                "label": "Queue",
+                "type": "list",
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "start",
+                "nodes": {
+                  "S": "active"
+                },
+                "panels": {
+                  "step": {
+                    "S": "0"
+                  },
+                  "queue": [
+                    "S"
+                  ]
+                },
+                "note": "Level 0: S"
+              },
+              {
+                "at": "joins",
+                "nodes": {
+                  "S": "done",
+                  "A": "queued",
+                  "B": "queued"
+                },
+                "edges": {
+                  "S-A": "tree",
+                  "S-B": "tree"
+                },
+                "panels": {
+                  "step": {
+                    "A": "1",
+                    "B": "1"
+                  },
+                  "queue": [
+                    "A",
+                    "B"
+                  ]
+                },
+                "note": "Level 1: A, B (marked visited)"
+              },
+              {
+                "at": "process",
+                "note": "Process level 1: exactly 2 nodes"
+              },
+              {
+                "at": "reaches",
+                "nodes": {
+                  "A": "active",
+                  "C": "queued"
+                },
+                "edges": {
+                  "A-C": "tree"
+                },
+                "panels": {
+                  "step": {
+                    "C": "2"
+                  },
+                  "queue": [
+                    "B",
+                    "C"
+                  ]
+                },
+                "note": "A → C (step 2)"
+              },
+              {
+                "at": "sees",
+                "nodes": {
+                  "A": "done",
+                  "B": "active"
+                },
+                "edges": {
+                  "B-C": "relax"
+                },
+                "note": "B → C: already visited"
+              },
+              {
+                "at": "skipped",
+                "edges": {
+                  "B-C": "dim"
+                },
+                "note": "Skip it"
+              },
+              {
+                "at": "reaches#2",
+                "nodes": {
+                  "D": "queued"
+                },
+                "edges": {
+                  "B-D": "tree"
+                },
+                "panels": {
+                  "step": {
+                    "D": "2"
+                  },
+                  "queue": [
+                    "C",
+                    "D"
+                  ]
+                },
+                "note": "B → D (step 2)"
+              },
+              {
+                "at": "completes",
+                "nodes": {
+                  "B": "done"
+                },
+                "note": "Level 2: C, D"
+              },
+              {
+                "at": "reach",
+                "nodes": {
+                  "C": "active",
+                  "T": "queued"
+                },
+                "edges": {
+                  "C-T": "tree"
+                },
+                "panels": {
+                  "step": {
+                    "T": "3"
+                  },
+                  "queue": [
+                    "D",
+                    "T"
+                  ]
+                },
+                "note": "C → T (step 3)"
+              },
+              {
+                "at": "first",
+                "nodes": {
+                  "C": "done",
+                  "T": "done"
+                },
+                "edges": {
+                  "D-T": "dim"
+                },
+                "note": "Target reached at step 3: a shortest path"
+              },
+              {
+                "at": "closer",
+                "note": "Every vertex at step < 3 was explored first"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "The framework",
+      "question": "Write BFS that returns the minimum number of steps to a target.",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. Write BFS that returns the minimum number of steps to a target. Pause and sketch it out.",
+          "pauseAfter": 4,
+          "props": {
+            "question": "Write BFS that returns the <em>minimum steps</em> to a target."
+          }
+        },
+        {
+          "type": "code",
+          "say": "The framework is short. Seed a queue with the source and mark it visited, at the moment you push, not when you pop. Each round, snapshot the queue size, so you process exactly one level. Return the step count when you pop the target. Push each unvisited vertex, and increase the step once the level ends.",
+          "props": {
+            "title": "BFS, <em>level by level</em>",
+            "file": "bfs.cpp",
+            "tag": "O(V + E)",
+            "size": 21,
+            "width": 1060,
+            "code": "int bfs(const Graph& g, int s, int target) {\n    vector<bool> visited(g.size(), false);\n    queue<int> q;\n    q.push(s);\n    visited[s] = true;\n    int step = 0;\n    while (!q.empty()) {\n        int sz = q.size();  // one level\n        for (int i = 0; i < sz; ++i) {\n            int cur = q.front(); q.pop();\n            if (cur == target) return step;\n            for (int nb : g[cur])\n                if (!visited[nb]) { visited[nb] = true; q.push(nb); }\n        }\n        ++step;\n    }\n    return -1;\n}",
+            "highlights": [
+              {
+                "at": "seed",
+                "lines": "3-5",
+                "note": "Queue + visited, seeded with the source"
+              },
+              {
+                "at": "moment",
+                "lines": "13",
+                "note": "Mark on push, so nothing is queued twice"
+              },
+              {
+                "at": "snapshot",
+                "lines": "8-9",
+                "note": "Snapshot the size: exactly one level"
+              },
+              {
+                "at": "return",
+                "lines": "11",
+                "note": "First pop of the target = fewest steps"
+              },
+              {
+                "at": "increase",
+                "lines": "15",
+                "note": "One level done → one more step"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "Interview problems rarely hand you a graph. Define a node as a state, like a lock combination. An edge is one legal move, like turning one wheel. Fix the source and the target states. And keep visited as a set of serialized states. Pre-loading the dead ends into it handles forbidden states for free.",
+          "props": {
+            "title": "Find the <em>hidden graph</em>",
+            "items": [
+              {
+                "at": "state",
+                "label": "Node",
+                "title": "A state",
+                "body": "A lock combination, a board, a word.",
+                "code": "\"0000\""
+              },
+              {
+                "at": "legal",
+                "label": "Edge",
+                "title": "One legal move",
+                "body": "Turn one wheel ±1: eight moves.",
+                "code": "LC 752"
+              },
+              {
+                "at": "fix",
+                "label": "Endpoints",
+                "title": "Source and target",
+                "body": "Initial state → goal state.",
+                "code": "\"0000\" → target"
+              },
+              {
+                "at": "serialized",
+                "label": "Visited",
+                "title": "Set of strings",
+                "body": "Seed it with dead ends.",
+                "code": "unordered_set<string>"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Bidirectional BFS",
+      "question": "When the target is known, how can you make BFS dramatically faster?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. When the target is known, how can you make BFS dramatically faster? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "The target is known. How do you make BFS <em>dramatically faster</em>?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Search from both ends at once. A one-sided search with branching factor b and depth d explores about b to the d nodes. Two searches that meet in the middle each go only half as deep. Keep each frontier as a hash set, stop when they intersect, and always expand the smaller side.",
+          "props": {
+            "title": "Meet in the <em>middle</em>",
+            "left": {
+              "at": "branching",
+              "label": "One-sided BFS",
+              "title": "≈ b^d nodes",
+              "tone": "bad",
+              "code": "q.push(start);\nwhile (!q.empty()) {\n  // expand the whole frontier\n}",
+              "body": "The frontier grows by a factor of b each level."
+            },
+            "right": {
+              "at": "middle",
+              "label": "Bidirectional BFS",
+              "title": "≈ 2 · b^(d/2) nodes",
+              "tone": "good",
+              "code": "for (auto& cur : q1)\n  for (auto& nb : next(cur))\n    if (q2.count(nb)) return step;  // met\nif (q1.size() > q2.size()) swap(q1, q2);",
+              "body": "Each side searches only half the depth."
+            },
+            "verdict": {
+              "at": "smaller",
+              "text": "Hash-set frontiers; expand the smaller side.",
+              "code": "LC 127 · LC 752"
+            }
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. A queue explores level by level, and visited prevents repeats. Mark nodes when you push them. Snapshot the size to count levels. BFS gives shortest paths only when edges are unweighted; with weights, use Dijkstra. And with a known target, go bidirectional.",
+          "props": {
+            "title": "BFS, <em>in five lines</em>",
+            "items": [
+              {
+                "at": "queue",
+                "text": "A queue explores level by level; visited prevents repeats.",
+                "code": "O(V + E)"
+              },
+              {
+                "at": "mark",
+                "text": "Mark visited when you push, not when you pop.",
+                "code": "no duplicates"
+              },
+              {
+                "at": "snapshot",
+                "text": "Snapshot the queue size to count levels.",
+                "code": "sz = q.size()"
+              },
+              {
+                "at": "unweighted",
+                "text": "Shortest only for unweighted edges.",
+                "code": "else Dijkstra"
+              },
+              {
+                "at": "bidirectional",
+                "text": "Known target? Search from both ends.",
+                "code": "b^(d/2)"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

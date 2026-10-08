@@ -100,7 +100,7 @@
 .tpl-graph .gr-th { display: block; padding: 8px 0; background: var(--tile); font: 400 26px/1 var(--serif); }
 .tpl-graph .gr-td { position: relative; display: block; height: 52px; }
 .tpl-graph .gr-v { position: absolute; inset: 0; display: grid; place-items: center; font: 500 26px/1 var(--mono); opacity: 0; visibility: hidden; }
-.tpl-graph .gr-lists { position: relative; height: 56px; margin-top: 14px; }
+.tpl-graph .gr-lists { position: relative; margin-top: 14px; }
 .tpl-graph .gr-list { position: absolute; inset: 0; display: flex; flex-wrap: wrap; gap: 10px; align-content: flex-start; opacity: 0; visibility: hidden; }
 .tpl-graph .gr-chip { padding: 9px 14px 8px; border: 1px solid var(--hair-strong); border-radius: 8px; background: var(--tile); font: 500 22px/1 var(--mono); }
 .tpl-graph .gr-empty { padding: 9px 0; font: 500 20px/1 var(--mono); color: rgba(20, 20, 19, 0.4); }

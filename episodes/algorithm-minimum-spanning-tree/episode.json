@@ -1,0 +1,750 @@
+{
+  "slug": "algorithm-minimum-spanning-tree",
+  "series": "algorithm",
+  "title": "Minimum spanning tree",
+  "kicker": "Algorithm · Minimum spanning tree",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/minimum-spanning-tree.md",
+  "summary": "Connect every vertex with V − 1 edges at minimum total weight: Kruskal's sorts edges and rejects cycles, Prim's grows one tree.",
+  "captionFixes": [
+    {
+      "match": [
+        "keeper"
+      ],
+      "display": "keep"
+    },
+    {
+      "match": [
+        "atta"
+      ],
+      "display": "at A"
+    },
+    {
+      "match": [
+        "crusticles"
+      ],
+      "display": "Kruskal's"
+    },
+    {
+      "match": [
+        "Cruskles"
+      ],
+      "display": "Kruskal's"
+    },
+    {
+      "match": [
+        "prims"
+      ],
+      "display": "Prim's"
+    },
+    {
+      "match": [
+        "Prims"
+      ],
+      "display": "Prim's"
+    },
+    {
+      "match": [
+        "union",
+        "fine"
+      ],
+      "display": "union-find"
+    },
+    {
+      "match": [
+        "MSD"
+      ],
+      "display": "MST"
+    },
+    {
+      "match": [
+        "single",
+        "root"
+      ],
+      "display": "single route"
+    },
+    {
+      "match": [
+        "min",
+        "heap"
+      ],
+      "display": "min-heap"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Kruskal's algorithm",
+      "question": "How does Kruskal's algorithm build a minimum spanning tree?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Minimum spanning tree, question one. How does Kruskal's algorithm build the tree? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How does <em>Kruskal's</em> build a minimum spanning tree?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Sort the edges by weight, then take them cheapest first. Weight one joins two separate trees, so keep it. Weight two: keep. Three: keep. Four: keep. Five: keep. That makes five edges for six vertices, so the tree is complete. Weight six would join E and F, which are already connected, so it would close a cycle. Skip it, and the weight eight edge as well. The total is fifteen.",
+          "props": {
+            "title": "Cheapest first, <em>never a cycle</em>",
+            "directed": false,
+            "nodes": [
+              {
+                "id": "A",
+                "x": 200,
+                "y": 330
+              },
+              {
+                "id": "B",
+                "x": 560,
+                "y": 330
+              },
+              {
+                "id": "C",
+                "x": 920,
+                "y": 330
+              },
+              {
+                "id": "D",
+                "x": 200,
+                "y": 650
+              },
+              {
+                "id": "E",
+                "x": 560,
+                "y": 650
+              },
+              {
+                "id": "F",
+                "x": 920,
+                "y": 650
+              }
+            ],
+            "edges": [
+              {
+                "from": "A",
+                "to": "B",
+                "w": 4
+              },
+              {
+                "from": "B",
+                "to": "C",
+                "w": 2
+              },
+              {
+                "from": "A",
+                "to": "D",
+                "w": 8
+              },
+              {
+                "from": "B",
+                "to": "E",
+                "w": 3
+              },
+              {
+                "from": "C",
+                "to": "F",
+                "w": 1
+              },
+              {
+                "from": "D",
+                "to": "E",
+                "w": 5
+              },
+              {
+                "from": "E",
+                "to": "F",
+                "w": 6
+              }
+            ],
+            "panels": [
+              {
+                "key": "set",
+                "label": "set (union-find root)",
+                "type": "table",
+                "initial": {
+                  "A": "A",
+                  "B": "B",
+                  "C": "C",
+                  "D": "D",
+                  "E": "E",
+                  "F": "F"
+                }
+              },
+              {
+                "key": "edges",
+                "label": "Edges by weight",
+                "type": "list",
+                "rows": 2,
+                "initial": [
+                  "C–F 1",
+                  "B–C 2",
+                  "B–E 3",
+                  "A–B 4",
+                  "D–E 5",
+                  "E–F 6",
+                  "A–D 8"
+                ]
+              },
+              {
+                "key": "total",
+                "label": "MST weight",
+                "type": "list",
+                "initial": [
+                  "0"
+                ]
+              }
+            ],
+            "steps": [
+              {
+                "at": "sort",
+                "note": "Sort all edges by weight"
+              },
+              {
+                "at": "1",
+                "nodes": {
+                  "C": "done",
+                  "F": "done"
+                },
+                "edges": {
+                  "C-F": "tree"
+                },
+                "panels": {
+                  "set": {
+                    "F": "C"
+                  },
+                  "edges": [
+                    "✓ C–F 1",
+                    "B–C 2",
+                    "B–E 3",
+                    "A–B 4",
+                    "D–E 5",
+                    "E–F 6",
+                    "A–D 8"
+                  ],
+                  "total": [
+                    "1"
+                  ]
+                },
+                "note": "C–F (1): different sets → keep, union"
+              },
+              {
+                "at": "2#2",
+                "nodes": {
+                  "B": "done"
+                },
+                "edges": {
+                  "B-C": "tree"
+                },
+                "panels": {
+                  "set": {
+                    "B": "C"
+                  },
+                  "edges": [
+                    "✓ C–F 1",
+                    "✓ B–C 2",
+                    "B–E 3",
+                    "A–B 4",
+                    "D–E 5",
+                    "E–F 6",
+                    "A–D 8"
+                  ],
+                  "total": [
+                    "3"
+                  ]
+                },
+                "note": "B–C (2): keep"
+              },
+              {
+                "at": "3",
+                "nodes": {
+                  "E": "done"
+                },
+                "edges": {
+                  "B-E": "tree"
+                },
+                "panels": {
+                  "set": {
+                    "E": "C"
+                  },
+                  "edges": [
+                    "✓ C–F 1",
+                    "✓ B–C 2",
+                    "✓ B–E 3",
+                    "A–B 4",
+                    "D–E 5",
+                    "E–F 6",
+                    "A–D 8"
+                  ],
+                  "total": [
+                    "6"
+                  ]
+                },
+                "note": "B–E (3): keep"
+              },
+              {
+                "at": "4",
+                "nodes": {
+                  "A": "done"
+                },
+                "edges": {
+                  "A-B": "tree"
+                },
+                "panels": {
+                  "set": {
+                    "A": "C"
+                  },
+                  "edges": [
+                    "✓ C–F 1",
+                    "✓ B–C 2",
+                    "✓ B–E 3",
+                    "✓ A–B 4",
+                    "D–E 5",
+                    "E–F 6",
+                    "A–D 8"
+                  ],
+                  "total": [
+                    "10"
+                  ]
+                },
+                "note": "A–B (4): keep"
+              },
+              {
+                "at": "5",
+                "nodes": {
+                  "D": "done"
+                },
+                "edges": {
+                  "D-E": "tree"
+                },
+                "panels": {
+                  "set": {
+                    "D": "C"
+                  },
+                  "edges": [
+                    "✓ C–F 1",
+                    "✓ B–C 2",
+                    "✓ B–E 3",
+                    "✓ A–B 4",
+                    "✓ D–E 5",
+                    "E–F 6",
+                    "A–D 8"
+                  ],
+                  "total": [
+                    "15"
+                  ]
+                },
+                "note": "D–E (5): keep"
+              },
+              {
+                "at": "complete",
+                "note": "5 edges = V − 1: the tree is complete"
+              },
+              {
+                "at": "6#2",
+                "edges": {
+                  "E-F": "relax"
+                },
+                "note": "E–F (6): E and F share root C"
+              },
+              {
+                "at": "cycle",
+                "edges": {
+                  "E-F": "dim"
+                },
+                "panels": {
+                  "edges": [
+                    "✓ C–F 1",
+                    "✓ B–C 2",
+                    "✓ B–E 3",
+                    "✓ A–B 4",
+                    "✓ D–E 5",
+                    "✗ E–F 6",
+                    "A–D 8"
+                  ]
+                },
+                "note": "Same set → it would close a cycle: skip"
+              },
+              {
+                "at": "eight",
+                "edges": {
+                  "A-D": "dim"
+                },
+                "panels": {
+                  "edges": [
+                    "✓ C–F 1",
+                    "✓ B–C 2",
+                    "✓ B–E 3",
+                    "✓ A–B 4",
+                    "✓ D–E 5",
+                    "✗ E–F 6",
+                    "✗ A–D 8"
+                  ]
+                },
+                "note": "A–D (8): skip as well"
+              },
+              {
+                "at": "fifteen",
+                "note": "MST weight = 1 + 2 + 3 + 4 + 5 = 15"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Prim's algorithm",
+      "question": "How does Prim's algorithm grow the tree, and how is it like Dijkstra?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. How does Prim's algorithm grow the tree, and how is it like Dijkstra? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How does <em>Prim's</em> grow the tree, and how is it like Dijkstra?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Begin at A, and push its edges onto a min-heap. Pop the cheapest crossing edge, A B at four, and pull B into the tree. B's edges join the heap. Now the cheapest is B C at two, so C joins. C brings in its edge to F, weight one, the cheapest yet, and F joins. Next, B E at three brings in E, and E's edge to D, weight five, finally reaches D. Every vertex is in, with the same total of fifteen. It is shaped like Dijkstra, but the heap key is the edge weight, not the distance from the source.",
+          "props": {
+            "title": "Grow one tree, <em>cheapest crossing edge</em>",
+            "directed": false,
+            "nodes": [
+              {
+                "id": "A",
+                "x": 200,
+                "y": 330
+              },
+              {
+                "id": "B",
+                "x": 560,
+                "y": 330
+              },
+              {
+                "id": "C",
+                "x": 920,
+                "y": 330
+              },
+              {
+                "id": "D",
+                "x": 200,
+                "y": 650
+              },
+              {
+                "id": "E",
+                "x": 560,
+                "y": 650
+              },
+              {
+                "id": "F",
+                "x": 920,
+                "y": 650
+              }
+            ],
+            "edges": [
+              {
+                "from": "A",
+                "to": "B",
+                "w": 4
+              },
+              {
+                "from": "B",
+                "to": "C",
+                "w": 2
+              },
+              {
+                "from": "A",
+                "to": "D",
+                "w": 8
+              },
+              {
+                "from": "B",
+                "to": "E",
+                "w": 3
+              },
+              {
+                "from": "C",
+                "to": "F",
+                "w": 1
+              },
+              {
+                "from": "D",
+                "to": "E",
+                "w": 5
+              },
+              {
+                "from": "E",
+                "to": "F",
+                "w": 6
+              }
+            ],
+            "panels": [
+              {
+                "key": "heap",
+                "label": "Min-heap of crossing edges",
+                "type": "list",
+                "rows": 2,
+                "initial": []
+              },
+              {
+                "key": "total",
+                "label": "MST weight",
+                "type": "list",
+                "initial": [
+                  "0"
+                ]
+              }
+            ],
+            "steps": [
+              {
+                "at": "begin",
+                "nodes": {
+                  "A": "done"
+                },
+                "note": "Tree = {A}"
+              },
+              {
+                "at": "push",
+                "edges": {
+                  "A-B": "relax",
+                  "A-D": "relax"
+                },
+                "panels": {
+                  "heap": [
+                    "A–B 4",
+                    "A–D 8"
+                  ]
+                },
+                "note": "Push A's edges"
+              },
+              {
+                "at": "pop",
+                "nodes": {
+                  "B": "done"
+                },
+                "edges": {
+                  "A-B": "tree",
+                  "A-D": "base"
+                },
+                "panels": {
+                  "heap": [
+                    "A–D 8"
+                  ],
+                  "total": [
+                    "4"
+                  ]
+                },
+                "note": "Pop A–B (4): B joins"
+              },
+              {
+                "at": "join",
+                "edges": {
+                  "B-C": "relax",
+                  "B-E": "relax"
+                },
+                "panels": {
+                  "heap": [
+                    "B–C 2",
+                    "B–E 3",
+                    "A–D 8"
+                  ]
+                },
+                "note": "Push B's edges"
+              },
+              {
+                "at": "cheapest#2",
+                "nodes": {
+                  "C": "done"
+                },
+                "edges": {
+                  "B-C": "tree",
+                  "B-E": "base"
+                },
+                "panels": {
+                  "heap": [
+                    "B–E 3",
+                    "A–D 8"
+                  ],
+                  "total": [
+                    "6"
+                  ]
+                },
+                "note": "Pop B–C (2): C joins"
+              },
+              {
+                "at": "brings",
+                "edges": {
+                  "C-F": "relax"
+                },
+                "panels": {
+                  "heap": [
+                    "C–F 1",
+                    "B–E 3",
+                    "A–D 8"
+                  ]
+                },
+                "note": "Push C–F (1)"
+              },
+              {
+                "at": "yet",
+                "nodes": {
+                  "F": "done"
+                },
+                "edges": {
+                  "C-F": "tree",
+                  "E-F": "relax"
+                },
+                "panels": {
+                  "heap": [
+                    "B–E 3",
+                    "E–F 6",
+                    "A–D 8"
+                  ],
+                  "total": [
+                    "7"
+                  ]
+                },
+                "note": "Pop C–F (1): F joins; push F–E (6)"
+              },
+              {
+                "at": "next",
+                "nodes": {
+                  "E": "done"
+                },
+                "edges": {
+                  "B-E": "tree",
+                  "E-F": "base",
+                  "D-E": "relax"
+                },
+                "panels": {
+                  "heap": [
+                    "D–E 5",
+                    "E–F 6",
+                    "A–D 8"
+                  ],
+                  "total": [
+                    "10"
+                  ]
+                },
+                "note": "Pop B–E (3): E joins; push E–D (5)"
+              },
+              {
+                "at": "finally",
+                "nodes": {
+                  "D": "done"
+                },
+                "edges": {
+                  "D-E": "tree"
+                },
+                "panels": {
+                  "heap": [
+                    "E–F 6 (stale)",
+                    "A–D 8 (stale)"
+                  ],
+                  "total": [
+                    "15"
+                  ]
+                },
+                "note": "Pop E–D (5): D joins"
+              },
+              {
+                "at": "every",
+                "edges": {
+                  "E-F": "dim",
+                  "A-D": "dim"
+                },
+                "note": "All 6 vertices in: total 15, same as Kruskal's"
+              },
+              {
+                "at": "shaped",
+                "note": "Dijkstra's shape; heap key = edge weight, not distance"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Kruskal's or Prim's?",
+      "question": "When do you pick Kruskal's over Prim's, and which properties make greedy MSTs correct?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. When do you pick Kruskal's over Prim's? And which properties make the greedy choice correct? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Kruskal's or Prim's? And why is <em>greedy</em> correct?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Kruskal's is edge-first. Sort every edge and use union-find to reject cycles, which suits sparse graphs. Prim's is vertex-first. Grow one tree with a min-heap of crossing edges, like Dijkstra, which suits dense graphs. Both run in E log E.",
+          "props": {
+            "title": "Edge-first or <em>vertex-first</em>",
+            "left": {
+              "at": "sort",
+              "label": "Kruskal's · sparse graphs",
+              "title": "Sort + union-find",
+              "code": "sort(edges by weight);\nfor (auto& e : edges)\n  if (dsu.unite(e.u, e.v))\n    mst.push_back(e);",
+              "body": "Also yields a forest when disconnected."
+            },
+            "right": {
+              "at": "grow",
+              "label": "Prim's · dense graphs",
+              "title": "Min-heap of crossing edges",
+              "code": "auto [w, u, v] = pq.top(); pq.pop();\nif (inMST[v]) continue;  // stale\ninMST[v] = true; total += w;\nfor (auto [x, wx] : adj[v]) pq.push({wx, v, x});",
+              "body": "O(V²) array version for complete graphs."
+            },
+            "verdict": {
+              "at": "both",
+              "text": "Both are O(E log E).",
+              "code": "LC 1584 · LC 1135"
+            }
+          }
+        },
+        {
+          "type": "points",
+          "say": "Four facts worth quoting. A spanning tree has exactly V minus one edges. The cut property: the cheapest edge across any cut belongs to some MST. The cycle property: the heaviest edge on a cycle never does. And an MST is not a shortest-path tree. It minimizes the total, not any single route.",
+          "props": {
+            "title": "Four facts to <em>quote</em>",
+            "items": [
+              {
+                "at": "exactly",
+                "label": "Size",
+                "title": "V − 1 edges",
+                "body": "Fewer: disconnected. More: a cycle.",
+                "code": "spanning tree"
+              },
+              {
+                "at": "cut",
+                "label": "Cut property",
+                "title": "Cheapest crossing edge",
+                "body": "Always safe to add.",
+                "code": "Prim's"
+              },
+              {
+                "at": "heaviest",
+                "label": "Cycle property",
+                "title": "Heaviest on a cycle",
+                "body": "Never needed.",
+                "code": "Kruskal's skip"
+              },
+              {
+                "at": "minimizes",
+                "label": "Not shortest paths",
+                "title": "Total, not routes",
+                "body": "Different objective from Dijkstra.",
+                "code": "sum of weights"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

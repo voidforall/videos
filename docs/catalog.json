@@ -260,6 +260,108 @@
           "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-union-find/algorithm-union-find-03.jpg"
         }
       ]
+    },
+    {
+      "slug": "algorithm-bfs",
+      "series": "algorithm",
+      "title": "Breadth-first search",
+      "kicker": "Algorithm · BFS",
+      "summary": "Explore level by level with a queue and a visited set: the first time you reach the target is the shortest path.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/bfs.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Level by level",
+          "question": "Why does BFS find the shortest path in an unweighted graph?",
+          "duration": 38,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-bfs/algorithm-bfs-01.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-bfs/algorithm-bfs-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "The framework",
+          "question": "Write BFS that returns the minimum number of steps to a target.",
+          "duration": 48,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-bfs/algorithm-bfs-02.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-bfs/algorithm-bfs-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Bidirectional BFS",
+          "question": "When the target is known, how can you make BFS dramatically faster?",
+          "duration": 45,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-bfs/algorithm-bfs-03.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-bfs/algorithm-bfs-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "algorithm-minimum-spanning-tree",
+      "series": "algorithm",
+      "title": "Minimum spanning tree",
+      "kicker": "Algorithm · Minimum spanning tree",
+      "summary": "Connect every vertex with V − 1 edges at minimum total weight: Kruskal's sorts edges and rejects cycles, Prim's grows one tree.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/minimum-spanning-tree.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Kruskal's algorithm",
+          "question": "How does Kruskal's algorithm build a minimum spanning tree?",
+          "duration": 36,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-minimum-spanning-tree/algorithm-minimum-spanning-tree-01.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-minimum-spanning-tree/algorithm-minimum-spanning-tree-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Prim's algorithm",
+          "question": "How does Prim's algorithm grow the tree, and how is it like Dijkstra?",
+          "duration": 41,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-minimum-spanning-tree/algorithm-minimum-spanning-tree-02.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-minimum-spanning-tree/algorithm-minimum-spanning-tree-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Kruskal's or Prim's?",
+          "question": "When do you pick Kruskal's over Prim's, and which properties make greedy MSTs correct?",
+          "duration": 48,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-minimum-spanning-tree/algorithm-minimum-spanning-tree-03.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-minimum-spanning-tree/algorithm-minimum-spanning-tree-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "algorithm-trie",
+      "series": "algorithm",
+      "title": "Trie",
+      "kicker": "Algorithm · Trie",
+      "summary": "A prefix tree: words share paths from the root, an end flag marks whole words, and every operation costs O(L).",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/trie.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Prefixes share paths",
+          "question": "How does a trie store words, and how do search and startsWith differ?",
+          "duration": 38,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-trie/algorithm-trie-01.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-trie/algorithm-trie-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "The code",
+          "question": "Implement insert, search, and startsWith.",
+          "duration": 31,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-trie/algorithm-trie-02.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-trie/algorithm-trie-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "When a trie wins",
+          "question": "When would you choose a trie over a hash set of strings?",
+          "duration": 38,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-trie/algorithm-trie-03.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-trie/algorithm-trie-03.jpg"
+        }
+      ]
     }
   ]
 }

@@ -4,14 +4,15 @@
 // lists (heap, queue, order). Steps change node/edge states, panels, and structure.
 // props: {
 //   title, directed?: true,
-//   nodes: [{ id, label?, x, y }],                      // centers, frame px
+//   nodes: [{ id, label?, x, y, hidden? }],             // centers, frame px; hidden until a step shows it
 //   edges: [{ from, to, w? }],                           // key "from-to"
 //   panels: [{ key, label, type: "table" | "list", initial: {id: v} | [..] }],
 //   steps: [{ at, note?,
 //             nodes?: { id: "active" | "done" | "queued" | "dim" | "base" },
 //             edges?: { "u-v": "relax" | "tree" | "dim" | "base" },
 //             panels?: { key: { id: v } (table, merged) | [..] (list, replaced) },
-//             add?: [{ from, to, w? }], remove?: ["u-v"], move?: { id: [x, y] } }] }
+//             show?: [id], add?: [{ from, to, w? }], remove?: ["u-v"], move?: { id: [x, y] } }] }
+// List panels take rows? (default 1) for taller content; table panels take columns? (default: sorted ids).
 registerTemplate("graph", {
   render(props, { esc }) {
     const R = GRAPH_R;
@@ -26,7 +27,7 @@ registerTemplate("graph", {
     const labels = allEdges.filter((e) => e.w != null).map((e) => `<span class="gr-w" data-key="${esc(`${e.from}-${e.to}`)}">${esc(e.w)}</span>`).join("");
     const panelHtml = props.panels.map((p) => {
       if (p.type === "table") {
-        const ids = props.nodes.map((n) => n.id).sort((x, y) => x.localeCompare(y, undefined, { numeric: true }));
+        const ids = p.columns ?? props.nodes.map((n) => n.id).sort((x, y) => x.localeCompare(y, undefined, { numeric: true }));
         const cells = ids.map((id) => {
           const values = [p.initial?.[id] ?? "", ...props.steps.map((s) => s.panels?.[p.key]?.[id])];
           return `<div class="gr-col"><span class="gr-th">${esc(props.nodes.find((n) => n.id === id).label ?? id)}</span><span class="gr-td">${
@@ -35,7 +36,7 @@ registerTemplate("graph", {
         return `<div class="card paper gr-panel" data-panel="${esc(p.key)}"><p class="label">${esc(p.label)}</p><div class="gr-table">${cells}</div></div>`;
       }
       const lists = [p.initial ?? [], ...props.steps.map((s) => s.panels?.[p.key])];
-      return `<div class="card paper gr-panel" data-panel="${esc(p.key)}"><p class="label">${esc(p.label)}</p><div class="gr-lists">${
+      return `<div class="card paper gr-panel" data-panel="${esc(p.key)}"><p class="label">${esc(p.label)}</p><div class="gr-lists" style="height:${(p.rows ?? 1) * 50 + 6}px">${
         lists.map((items, i) => (items == null ? "" : `<div class="gr-list" data-step="${i - 1}">${
           items.length ? items.map((it) => `<span class="gr-chip">${esc(it)}</span>`).join("") : `<span class="gr-empty">empty</span>`}</div>`)).join("")}</div></div>`;
     }).join("");
@@ -120,7 +121,9 @@ registerTemplate("graph", {
     });
     el.querySelectorAll(".gr-w").forEach((w) => { if (!live.has(w.dataset.key)) gsap.set(w, { autoAlpha: 0 }); });
 
-    fx.in(q(".gr-node"), 0.4, { y: 0, scale: 0.8, stagger: 0.06, dur: 0.45 })
+    const hidden = new Set(props.nodes.filter((n) => n.hidden).map((n) => n.id));
+    hidden.forEach((id) => gsap.set(nodeEl(id), { autoAlpha: 0 }));
+    fx.in([...q(".gr-node")].filter((n) => !hidden.has(n.dataset.id)), 0.4, { y: 0, scale: 0.8, stagger: 0.06, dur: 0.45 })
       .in([...q(".gr-edge")].filter((g) => live.has(g.dataset.key)), 0.8, { y: 0, scale: 1, dur: 0.5 })
       .in([...q(".gr-w")].filter((w) => live.has(w.dataset.key)), 0.9, { y: 0, scale: 1, dur: 0.4 })
       .in([...q(".gr-panel"), ...q(".gr-note")], 1.0, { y: 16, stagger: 0.1 });
@@ -139,6 +142,10 @@ registerTemplate("graph", {
       if (at - prevAt < MIN_GAP) throw new Error(`graph: step "${s.at}" is ${(at - prevAt).toFixed(2)}s after the previous step (min ${MIN_GAP}s)`);
       prevAt = at;
 
+      for (const id of s.show ?? []) {
+        if (!hidden.delete(id)) throw new Error(`graph: step "${s.at}" shows "${id}", which is not hidden`);
+        tl.fromTo(nodeEl(id), { autoAlpha: 0, scale: 0.6 }, { autoAlpha: 1, scale: 1, duration: 0.4, ease: "back.out(1.6)", immediateRender: false }, at);
+      }
       for (const key of s.remove ?? []) {
         if (!live.delete(key)) throw new Error(`graph: step "${s.at}" removes missing edge "${key}"`);
         const { g, w } = edgeEl(key);
