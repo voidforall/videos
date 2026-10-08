@@ -1,0 +1,19 @@
+{
+  "name": "videos",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "build": ".venv/bin/python engine/tools/build.py",
+    "dev": "node engine/tools/serve.mjs",
+    "snap": "node engine/tools/snap.mjs",
+    "render": "node engine/tools/render.mjs",
+    "publish": "node engine/tools/publish.mjs"
+  },
+  "dependencies": {
+    "gsap": "3.13.0"
+  },
+  "devDependencies": {
+    "puppeteer": "^24.0.0"
+  }
+}

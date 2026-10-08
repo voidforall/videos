@@ -1,20 +1,30 @@
 # Videos
 
-Short technical explainers generated with code-driven animation and local text-to-speech.
+Short revision episodes for the notes in [ai-docs](https://github.com/voidforall/ai-docs): one clip per
+question, each opening with the question and a pause to answer out loud before the explanation.
 
-## Published videos
+**Watch:** https://voidforall.github.io/videos/
 
-- **C++ functional programming walkthrough** — a 4:12 review of pure functions, higher-order locking, `std::function` type erasure, lambda captures, mutable, recursive, and generic lambdas. Built with plain HTML + GSAP; see [`cpp-functional-walkthrough/`](cpp-functional-walkthrough/).
-- **C++ OOP interview walkthrough** — a 3:27 review of ownership, interfaces, inheritance, composition, PImpl, initialization, object traits, and covariant returns.
+## Layout
 
-The public player is deployed from [`docs/`](docs/) with GitHub Pages. The OOP video's editable HyperFrames project lives in [`cpp-oop-walkthrough/`](cpp-oop-walkthrough/).
+| Path | What |
+|:---|:---|
+| [`engine/`](engine/) | Shared episode engine: templates, runtime, build / render / publish tools. Start with its README. |
+| [`episodes/<slug>/episode.json`](episodes/) | One spec per ai-docs note. The only file you write for a new episode. |
+| [`docs/`](docs/) | GitHub Pages index, rendered from `docs/catalog.json`. |
+| [`cpp-oop-walkthrough/`](cpp-oop-walkthrough/), [`cpp-functional-walkthrough/`](cpp-functional-walkthrough/) | Earlier long-form videos (HyperFrames and a standalone HTML project). |
 
-## Local development
+Videos and posters are **not** stored in git: each episode is a GitHub Release (`ep-<slug>`), and the
+catalog links to its assets. `npm run publish -- <slug>` uploads them and updates the catalog.
 
-The project expects Node.js 22 and a Python environment at `.venv/` with the local Kokoro TTS dependencies.
+## Quick start
 
 ```bash
-cd cpp-oop-walkthrough
 npm install
-npm run dev
+npm run build   -- algorithm-sliding-window   # narration + timings (Kokoro TTS, whisper)
+npm run dev                                   # preview: /engine/player.html?ep=algorithm-sliding-window&clip=01
+npm run render  -- algorithm-sliding-window
+npm run publish -- algorithm-sliding-window
 ```
+
+Requires Node.js 22, `ffmpeg`, `whisper-cli`, and a Python environment at `.venv/` with `kokoro-onnx`.

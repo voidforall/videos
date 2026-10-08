@@ -1,0 +1,599 @@
+{
+  "slug": "algorithm-sliding-window",
+  "title": "Sliding window",
+  "kicker": "Algorithm · Sliding window",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/sliding-window.md",
+  "summary": "Turn nested loops into one linear pass: expand right, shrink left, update the answer.",
+  "captionFixes": [
+    {
+      "match": [
+        "O",
+        "of",
+        "n",
+        "times",
+        "k"
+      ],
+      "display": "O(N·k)"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "n",
+        "squared"
+      ],
+      "display": "O(N²)"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "n"
+      ],
+      "display": "O(N)"
+    },
+    {
+      "match": [
+        "K"
+      ],
+      "display": "k"
+    },
+    {
+      "match": [
+        "Write",
+        "expands"
+      ],
+      "display": "Right expands"
+    },
+    {
+      "match": [
+        "account"
+      ],
+      "display": "a count"
+    },
+    {
+      "match": [
+        "both",
+        "pointers"
+      ],
+      "display": "Both pointers"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Why a window?",
+      "question": "Why does a sliding window beat nested loops?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Sliding window, question one. Why does a sliding window beat nested loops? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Why does a sliding window beat <em>nested loops</em>?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Brute force recomputes every window from scratch: a nested loop costing O of N times k, or O of N squared. A sliding window reuses work. When the window moves one step, add the element that enters and remove the one that leaves. Each element enters once and leaves once, so the whole scan is O of N.",
+          "props": {
+            "title": "Recompute vs <em>reuse</em>",
+            "left": {
+              "at": "brute",
+              "label": "Brute force",
+              "title": "O(N·k)",
+              "tone": "bad",
+              "code": "for (int i = 0; i + k <= n; ++i) {\n  int sum = 0;\n  for (int j = i; j < i + k; ++j)\n    sum += a[j];          // redo k adds\n  best = std::max(best, sum);\n}",
+              "body": "Every window is summed from scratch."
+            },
+            "right": {
+              "at": "reuses",
+              "label": "Sliding window",
+              "title": "O(N)",
+              "tone": "good",
+              "code": "for (int r = 0; r < n; ++r) {\n  sum += a[r];            // enters\n  if (r >= k) sum -= a[r - k];  // leaves\n  if (r >= k - 1) best = std::max(best, sum);\n}",
+              "body": "One add and one remove per step."
+            },
+            "verdict": {
+              "at": "once",
+              "text": "Each element enters once and leaves once.",
+              "code": "O(N)"
+            }
+          }
+        },
+        {
+          "type": "array",
+          "say": "Take a fixed window of three. The first sum is eight. Slide right: add one, drop two, and the sum is seven. Slide again: nine. Then six. The best window sums to nine.",
+          "props": {
+            "title": "A fixed window of <em>three</em>",
+            "problem": "Maximum sum of any 3 consecutive elements",
+            "values": [
+              2,
+              1,
+              5,
+              1,
+              3,
+              2
+            ],
+            "stateLabel": "Running sum",
+            "resultLabel": "Best",
+            "steps": [
+              {
+                "at": "first",
+                "l": 0,
+                "r": 2,
+                "state": "2 + 1 + 5 = 8",
+                "note": "Build the first window",
+                "result": "8"
+              },
+              {
+                "at": "slide",
+                "l": 1,
+                "r": 3,
+                "state": "8 + 1 − 2 = 7",
+                "note": "Add the entering 1, drop the leaving 2"
+              },
+              {
+                "at": "again",
+                "l": 2,
+                "r": 4,
+                "state": "7 + 3 − 1 = 9",
+                "note": "Slide: one add, one remove",
+                "result": "9"
+              },
+              {
+                "at": "then",
+                "l": 3,
+                "r": 5,
+                "state": "9 + 2 − 5 = 6",
+                "note": "Still constant work per step"
+              },
+              {
+                "at": "best",
+                "l": 2,
+                "r": 4,
+                "mark": "ok",
+                "note": "The best window: 5 + 1 + 3",
+                "state": "5 + 1 + 3 = 9"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "Windows come in two shapes. Fixed size, where k never changes and the window simply slides. And variable size, where the window grows and shrinks to satisfy a constraint. Interviews mostly ask the variable kind.",
+          "props": {
+            "title": "Two <em>shapes</em>",
+            "items": [
+              {
+                "at": "fixed",
+                "label": "Fixed size",
+                "title": "k stays constant",
+                "body": "Slide by one: add the entering element, remove the leaving one.",
+                "code": "max sum of k elements"
+              },
+              {
+                "at": "variable",
+                "label": "Variable size",
+                "title": "Grows and shrinks",
+                "body": "Expand right; shrink left while a constraint is violated.",
+                "code": "longest substring without repeats"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Expand, shrink, update",
+      "question": "What are the four moves of a variable-size sliding window?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. What are the four moves of a variable-size sliding window? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What are the four moves of a <em>variable-size</em> window?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Initialize left and right at zero. Expand by moving right to include a new element. Shrink by moving left while the window violates the constraint. Then update the best answer from the valid window.",
+          "props": {
+            "title": "Four <em>moves</em>",
+            "items": [
+              {
+                "at": "initialize",
+                "label": "01",
+                "title": "Initialize",
+                "body": "Both pointers start at zero.",
+                "code": "left = right = 0"
+              },
+              {
+                "at": "expand",
+                "label": "02",
+                "title": "Expand",
+                "body": "Move right to include a new element.",
+                "code": "++right"
+              },
+              {
+                "at": "shrink",
+                "label": "03",
+                "title": "Shrink",
+                "body": "Move left while the window is invalid.",
+                "code": "while (bad) ++left"
+              },
+              {
+                "at": "update",
+                "label": "04",
+                "title": "Update",
+                "body": "Record the answer from a valid window.",
+                "code": "best = max(...)"
+              }
+            ]
+          }
+        },
+        {
+          "type": "array",
+          "say": "Find the longest substring without repeating characters. Right expands over the first three letters, so the window is three long. The next letter repeats the first one, and the window is invalid. Left shrinks past the old copy, and the window is valid again. The same thing happens at each repeat. At the double letter, left has to move twice. The best length is three.",
+          "props": {
+            "title": "Longest substring, <em>no repeats</em>",
+            "problem": "s = \"abcabcbb\"",
+            "values": [
+              "a",
+              "b",
+              "c",
+              "a",
+              "b",
+              "c",
+              "b",
+              "b"
+            ],
+            "stateLabel": "Characters in window",
+            "resultLabel": "Best length",
+            "steps": [
+              {
+                "at": "expands",
+                "l": 0,
+                "r": 0,
+                "state": "{a}",
+                "note": "Expand: right takes a",
+                "result": "1"
+              },
+              {
+                "at": "expands+0.55",
+                "l": 0,
+                "r": 1,
+                "state": "{a, b}",
+                "note": "Expand: right takes b",
+                "result": "2"
+              },
+              {
+                "at": "expands+1.1",
+                "l": 0,
+                "r": 2,
+                "state": "{a, b, c}",
+                "note": "Expand: right takes c",
+                "result": "3"
+              },
+              {
+                "at": "repeats",
+                "l": 0,
+                "r": 3,
+                "mark": "bad",
+                "state": "{a, b, c, a}",
+                "note": "Invalid: a appears twice"
+              },
+              {
+                "at": "shrinks",
+                "l": 1,
+                "r": 3,
+                "state": "{b, c, a}",
+                "note": "Shrink: left drops the old a"
+              },
+              {
+                "at": "same",
+                "l": 2,
+                "r": 4,
+                "state": "{c, a, b}",
+                "note": "Repeat b → expand, then shrink once"
+              },
+              {
+                "at": "same+1.0",
+                "l": 3,
+                "r": 5,
+                "state": "{a, b, c}",
+                "note": "Repeat c → expand, then shrink once"
+              },
+              {
+                "at": "double",
+                "l": 3,
+                "r": 6,
+                "mark": "bad",
+                "state": "{a, b, c, b}",
+                "note": "Invalid: b appears twice"
+              },
+              {
+                "at": "twice",
+                "l": 5,
+                "r": 6,
+                "state": "{c, b}",
+                "note": "Shrink twice: drop a, then b"
+              },
+              {
+                "at": "best",
+                "l": 7,
+                "r": 7,
+                "mark": "ok",
+                "state": "{b}",
+                "note": "Scan done. Best: \"abc\", length 3"
+              }
+            ]
+          }
+        },
+        {
+          "type": "statement",
+          "say": "Both pointers only ever move forward. That is why the scan stays linear, even with a while loop inside the for loop.",
+          "props": {
+            "text": "Both pointers only move <em>forward</em>.",
+            "sub": "The inner while loop is amortized: at most N shrinks in total, so the scan is O(N).",
+            "subAt": "linear"
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "The C++ template",
+      "question": "Write the general variable-size sliding window template from memory.",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. Write the general variable-size sliding window template from memory. Pause, and sketch it out.",
+          "pauseAfter": 4,
+          "props": {
+            "question": "Write the variable-size window <em>template</em> from memory."
+          }
+        },
+        {
+          "type": "code",
+          "say": "Here is the template, made concrete for the longest substring without repeats. Keep the window state, here a count map, plus left and the best answer. The for loop moves right and adds the incoming element. The while loop shrinks from the left until the window is valid again, undoing each outgoing element. Finally, update the answer with the window length: right minus left plus one. Swap the state and the condition, and the same skeleton solves most variable-window problems.",
+          "props": {
+            "title": "One skeleton, <em>many problems</em>",
+            "file": "sliding_window.cpp",
+            "tag": "variable size",
+            "code": "int longestUnique(const std::string& s) {\n    std::unordered_map<char, int> count;\n    int left = 0, best = 0;\n    for (int right = 0; right < (int)s.size(); ++right) {\n        count[s[right]]++;\n        while (count[s[right]] > 1) {\n            count[s[left]]--;\n            ++left;\n        }\n        best = std::max(best, right - left + 1);\n    }\n    return best;\n}",
+            "highlights": [
+              {
+                "at": "state",
+                "lines": "2-3",
+                "note": "Window state + left pointer + answer"
+              },
+              {
+                "at": "for#2",
+                "lines": "4-5",
+                "note": "Expand: right moves, incoming element is added"
+              },
+              {
+                "at": "while",
+                "lines": "6-8",
+                "note": "Shrink while invalid, undoing the outgoing element"
+              },
+              {
+                "at": "finally",
+                "lines": "10",
+                "note": "Update with the window length"
+              },
+              {
+                "at": "swap",
+                "lines": "2,6",
+                "note": "Swap state + condition for a new problem"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "For the state, use a hash map for general keys, a fixed array indexed by character code, which is faster, or a plain integer when you only need a sum or a count.",
+          "props": {
+            "title": "Choosing the <em>state</em>",
+            "items": [
+              {
+                "at": "hash",
+                "label": "General keys",
+                "title": "Hash map",
+                "body": "Any key type; frequency counts.",
+                "code": "unordered_map<T, int>"
+              },
+              {
+                "at": "array",
+                "label": "Character codes",
+                "title": "Fixed array",
+                "body": "Faster: no hashing, cache friendly.",
+                "code": "int count[128] = {}"
+              },
+              {
+                "at": "integer",
+                "label": "Sum or count",
+                "title": "Plain integer",
+                "body": "When one number describes the window.",
+                "code": "int sum = 0"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "04",
+      "title": "Max vs min: where to update",
+      "question": "For a maximum window and a minimum window, where does the update go?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question four. For a maximum window and for a minimum window, where does the result update go? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Maximum window, minimum window: where does the <em>update</em> go?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "For the longest, or maximum window, shrink until the window is valid, then update after the loop. For the shortest, or minimum window, the loop runs while the window is valid, so update inside it, before each shrink makes the window smaller.",
+          "props": {
+            "title": "Where the update <em>lives</em>",
+            "left": {
+              "at": "longest",
+              "label": "Maximum window",
+              "title": "After the shrink loop",
+              "code": "while (invalid) {\n  remove(s[left++]);\n}\nbest = max(best, right - left + 1);",
+              "body": "Shrink until valid, then measure."
+            },
+            "right": {
+              "at": "shortest",
+              "label": "Minimum window",
+              "title": "Inside the shrink loop",
+              "code": "while (valid) {\n  best = min(best, right - left + 1);\n  remove(s[left++]);\n}",
+              "body": "Measure each valid window before it shrinks."
+            },
+            "verdict": {
+              "at": "inside",
+              "text": "Max: update after shrinking. Min: update inside.",
+              "code": "LC 3 · LC 209"
+            }
+          }
+        },
+        {
+          "type": "array",
+          "say": "Find the shortest subarray with a sum of at least seven. Expand right until the sum reaches eight. That window is valid, so record its length, four, and shrink. Expand again, and the sum is ten. Record, shrink, and the sum is still seven, so record three. Expand to the end, and the sum is nine. Shrink once: still seven. Record two, the answer.",
+          "props": {
+            "title": "Shortest subarray, <em>sum ≥ 7</em>",
+            "problem": "nums = [2, 3, 1, 2, 4, 3], target = 7",
+            "values": [
+              2,
+              3,
+              1,
+              2,
+              4,
+              3
+            ],
+            "stateLabel": "Window sum",
+            "resultLabel": "Shortest",
+            "steps": [
+              {
+                "at": "expand",
+                "l": 0,
+                "r": 0,
+                "state": "2",
+                "note": "Expand: sum below 7",
+                "result": "∞"
+              },
+              {
+                "at": "expand+0.55",
+                "l": 0,
+                "r": 1,
+                "state": "5",
+                "note": "Expand: sum below 7"
+              },
+              {
+                "at": "expand+1.1",
+                "l": 0,
+                "r": 2,
+                "state": "6",
+                "note": "Expand: sum below 7"
+              },
+              {
+                "at": "eight",
+                "l": 0,
+                "r": 3,
+                "mark": "ok",
+                "state": "8",
+                "note": "Valid: sum ≥ 7"
+              },
+              {
+                "at": "record",
+                "result": "4",
+                "note": "Inside the loop: record length 4"
+              },
+              {
+                "at": "shrink",
+                "l": 1,
+                "r": 3,
+                "state": "6",
+                "note": "Shrink: drop 2, sum falls below 7"
+              },
+              {
+                "at": "ten",
+                "l": 1,
+                "r": 4,
+                "mark": "ok",
+                "state": "10",
+                "note": "Valid again: record 4, keep shrinking"
+              },
+              {
+                "at": "still",
+                "l": 2,
+                "r": 4,
+                "mark": "ok",
+                "state": "7",
+                "note": "Still valid after dropping 3",
+                "result": "3"
+              },
+              {
+                "at": "nine",
+                "l": 3,
+                "r": 5,
+                "mark": "ok",
+                "state": "9",
+                "note": "Shrink to 6, then expand: 9"
+              },
+              {
+                "at": "once",
+                "l": 4,
+                "r": 5,
+                "mark": "ok",
+                "state": "7",
+                "note": "Still valid after dropping 2"
+              },
+              {
+                "at": "answer",
+                "result": "2",
+                "note": "Recorded inside the shrink loop"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Reuse work instead of recomputing. Expand right, shrink left, update the answer. Both pointers only move forward, so it is linear. And for the update: maximum goes after the shrink loop, minimum goes inside it.",
+          "props": {
+            "title": "Sliding window, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "reuse",
+                "text": "Reuse work: add what enters, remove what leaves.",
+                "code": "O(N·k) → O(N)"
+              },
+              {
+                "at": "expand",
+                "text": "Expand right, shrink left, update the answer.",
+                "code": "for + while"
+              },
+              {
+                "at": "forward",
+                "text": "Both pointers only move forward.",
+                "code": "amortized O(N)"
+              },
+              {
+                "at": "maximum",
+                "text": "Max: update after shrinking. Min: update inside.",
+                "code": "LC 3 · LC 209"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

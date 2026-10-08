@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Clip player</title>
+    <link rel="stylesheet" href="styles/base.css" />
+    <link rel="stylesheet" href="styles/templates.css" />
+    <style>
+      body { background: #0f0f0e; font-family: system-ui, sans-serif; }
+      #frame { margin: 0 auto; overflow: hidden; }
+      #stage { transform-origin: 0 0; }
+      #controls { display: flex; gap: 14px; align-items: center; height: 64px; padding: 0 20px; color: #faf9f5; }
+      #controls input { flex: 1; }
+      #controls button { width: 84px; padding: 8px; }
+      #controls output { font: 14px ui-monospace, monospace; min-width: 170px; text-align: right; }
+      .fatal { position: fixed; inset: 20px; z-index: 99; padding: 20px; background: #c64545; color: #fff; font: 16px/1.5 ui-monospace, monospace; white-space: pre-wrap; }
+      body.render { background: #faf9f5; }
+      body.render #controls { display: none; }
+    </style>
+  </head>
+  <body>
+    <div id="frame"><div id="stage"><div id="captions"></div></div></div>
+    <div id="controls"><button type="button">Play</button><input type="range" min="0" step="0.01" value="0" /><output></output></div>
+
+    <script src="../node_modules/gsap/dist/gsap.min.js"></script>
+    <script src="highlight.js"></script>
+    <script src="runtime.js"></script>
+    <script src="templates/question.js"></script>
+    <script src="templates/statement.js"></script>
+    <script src="templates/points.js"></script>
+    <script src="templates/compare.js"></script>
+    <script src="templates/code.js"></script>
+    <script src="templates/array.js"></script>
+    <script src="templates/recap.js"></script>
+  </body>
+</html>

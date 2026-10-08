@@ -1,0 +1,80 @@
+{
+  "release": "https://github.com/voidforall/videos/releases",
+  "episodes": [
+    {
+      "slug": "algorithm-sliding-window",
+      "title": "Sliding window",
+      "kicker": "Algorithm · Sliding window",
+      "summary": "Turn nested loops into one linear pass: expand right, shrink left, update the answer.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/sliding-window.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Why a window?",
+          "question": "Why does a sliding window beat nested loops?",
+          "duration": 55,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-sliding-window/algorithm-sliding-window-01.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-sliding-window/algorithm-sliding-window-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Expand, shrink, update",
+          "question": "What are the four moves of a variable-size sliding window?",
+          "duration": 51,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-sliding-window/algorithm-sliding-window-02.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-sliding-window/algorithm-sliding-window-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "The C++ template",
+          "question": "Write the general variable-size sliding window template from memory.",
+          "duration": 49,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-sliding-window/algorithm-sliding-window-03.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-sliding-window/algorithm-sliding-window-03.jpg"
+        },
+        {
+          "id": "04",
+          "title": "Max vs min: where to update",
+          "question": "For a maximum window and a minimum window, where does the update go?",
+          "duration": 61,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-sliding-window/algorithm-sliding-window-04.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-sliding-window/algorithm-sliding-window-04.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "cpp-functional-walkthrough",
+      "title": "C++ functional programming walkthrough",
+      "kicker": "C++ · Functional programming",
+      "summary": "Pure functions, higher-order locking, type erasure behind std::function, capture pitfalls, mutable and recursive lambdas, and generic lambdas.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/interview/cpp-functional.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Full walkthrough",
+          "question": "Seven C++ functional programming interview questions in one review.",
+          "duration": 252,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-functional-walkthrough/cpp-functional-walkthrough-01.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-functional-walkthrough/cpp-functional-walkthrough-01.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "cpp-oop-walkthrough",
+      "title": "C++ OOP interview walkthrough",
+      "kicker": "C++ · Object-oriented design",
+      "summary": "Eight practical mental models—from resource ownership and interfaces to initialization and the object model.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/interview/cpp-oop.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Full walkthrough",
+          "question": "Eight C++ OOP interview topics in one review.",
+          "duration": 207,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-oop-walkthrough/cpp-oop-walkthrough-01.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-oop-walkthrough/cpp-oop-walkthrough-01.jpg"
+        }
+      ]
+    }
+  ]
+}

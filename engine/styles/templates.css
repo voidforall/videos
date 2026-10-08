@@ -1,0 +1,67 @@
+/* Template layouts. Frame is 1920×1080; content stays above the caption band (y < 880). */
+
+/* — question — */
+.tpl-question .q-label { left: 80px; top: 250px; font: 500 26px/1 var(--mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--coral); }
+.tpl-question .q-text { left: 80px; top: 300px; width: 1640px; font: 400 96px/1.06 var(--serif); letter-spacing: -0.024em; }
+.tpl-question .q-text em { font-style: italic; }
+.tpl-question .q-pause { left: 80px; top: 700px; width: 640px; }
+.tpl-question .q-pause-label { font: 500 22px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: rgba(20, 20, 19, 0.62); margin-bottom: 18px; }
+.tpl-question .q-track { height: 6px; border-radius: 9999px; background: var(--tile-strong); overflow: hidden; }
+.tpl-question .q-bar { height: 100%; background: var(--ink); transform-origin: 0 50%; }
+
+/* — statement — */
+.tpl-statement .st-text { left: 80px; top: 330px; width: 1700px; font: 400 112px/1.04 var(--serif); letter-spacing: -0.026em; }
+.tpl-statement .st-text em { font-style: italic; }
+.tpl-statement .st-sub { left: 84px; top: 620px; width: 1300px; font: 400 34px/1.45 var(--sans); color: rgba(20, 20, 19, 0.66); }
+
+/* — points — */
+.tpl-points .pt-grid { left: 80px; right: 80px; top: 222px; height: 640px; align-content: center; display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 32px; }
+.tpl-points .pt-card { min-height: 400px; display: flex; flex-direction: column; padding: 32px 34px; }
+.tpl-points .pt-title { margin: 18px 0 16px; font: 400 54px/1.04 var(--serif); letter-spacing: -0.018em; }
+.tpl-points .pt-body { font: 400 27px/1.4 var(--sans); color: rgba(20, 20, 19, 0.74); }
+.tpl-points .pt-code { margin-top: auto; padding-top: 26px; font: 500 24px/1.3 var(--mono); }
+
+/* — compare — */
+.tpl-compare .cmp-row { left: 80px; right: 80px; top: 222px; display: flex; gap: 40px; }
+.tpl-compare .cmp-panel { flex: 1; min-width: 0; padding: 28px 32px; }
+.tpl-compare .cmp-title { margin: 14px 0 20px; font: 400 52px/1 var(--serif); letter-spacing: -0.018em; }
+.tpl-compare .cmp-title.tone-bad { color: var(--warn); }
+.tpl-compare .cmp-title.tone-good { color: #3f8f52; }
+.tpl-compare .cmp-code .code-body { font-size: 20px; padding: 16px 22px; }
+.tpl-compare .cmp-body { margin-top: 18px; font: 400 25px/1.4 var(--sans); color: rgba(20, 20, 19, 0.7); }
+.tpl-compare .cmp-verdict { left: 80px; right: 80px; top: 742px; height: 104px; display: flex; align-items: center; justify-content: space-between; padding: 0 36px; border-left: 3px solid var(--coral); }
+.tpl-compare .cmp-verdict-text { font: 400 44px/1 var(--serif); letter-spacing: -0.015em; }
+.tpl-compare .cmp-verdict code { font: 500 28px/1 var(--mono); }
+
+/* — code — */
+.tpl-code .cd-panel { left: 80px; top: 222px; }
+.tpl-code .cd-panel .code-body { padding: 18px 26px 22px 18px; }
+.tpl-code .cd-num { display: inline-block; width: 2.2em; font-style: normal; color: rgba(250, 249, 245, 0.28); }
+.tpl-code .cd-notes { top: 222px; right: 80px; list-style: none; display: flex; flex-direction: column; gap: 14px; }
+.tpl-code .cd-note { display: grid; grid-template-columns: 44px 1fr; column-gap: 16px; row-gap: 8px; padding: 18px 22px; border: 1px solid var(--hair); border-radius: 10px; background: var(--tile); font: 400 24px/1.35 var(--sans); }
+.tpl-code .cd-note code { grid-column: 2; font: 500 17px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: rgba(20, 20, 19, 0.5); }
+.tpl-code .cd-badge { grid-row: span 2; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 9999px; background: var(--ink); color: var(--cream); font: 500 20px/1 var(--mono); }
+
+/* — array — */
+.tpl-array .ar-problem { left: 80px; top: 214px; font: 500 28px/1 var(--mono); color: rgba(20, 20, 19, 0.72); }
+.tpl-array .ar-idx { top: 296px; width: 124px; text-align: center; font: 500 18px/1 var(--mono); color: rgba(20, 20, 19, 0.45); }
+.tpl-array .ar-cell { top: 326px; width: 124px; height: 124px; display: grid; place-items: center; border: 1px solid var(--hair-strong); border-radius: 10px; background: var(--tile); font: 400 62px/1 var(--serif); }
+.tpl-array .ar-window { top: 316px; height: 144px; border: 4px solid var(--coral); border-radius: 16px; }
+.tpl-array .ar-ptr { top: 478px; width: 100px; text-align: center; font: 500 21px/1 var(--mono); letter-spacing: 0.06em; }
+.tpl-array .ar-panel { top: 590px; height: 230px; padding: 26px 30px; }
+.tpl-array .ar-state { left: 80px; width: 640px; }
+.tpl-array .ar-note { left: 750px; width: 680px; }
+.tpl-array .ar-result { left: 1460px; width: 380px; }
+.tpl-array .ar-slot { position: relative; margin-top: 22px; height: 130px; }
+.tpl-array .ar-swap { position: absolute; left: 0; top: 0; right: 0; }
+.tpl-array .ar-state .ar-swap { font: 500 44px/1.25 var(--mono); }
+.tpl-array .ar-note .ar-swap { font: 400 34px/1.3 var(--sans); }
+.tpl-array .ar-result .ar-swap { font: 400 112px/1 var(--serif); letter-spacing: -0.02em; }
+
+/* — recap — */
+.tpl-recap .rc-list { left: 80px; right: 80px; top: 228px; list-style: none; display: flex; flex-direction: column; gap: 18px; }
+.tpl-recap .rc-row { display: flex; align-items: center; gap: 34px; height: 116px; padding: 0 36px; }
+.tpl-recap .rc-num { font: 400 56px/1 var(--serif); color: rgba(20, 20, 19, 0.32); width: 70px; }
+.tpl-recap .rc-text { flex: 1; font: 400 44px/1.1 var(--serif); letter-spacing: -0.015em; }
+.tpl-recap .rc-code { font: 500 24px/1 var(--mono); color: rgba(20, 20, 19, 0.62); }
+.tpl-recap .rc-sign { right: 80px; top: 772px; font: 400 40px/1 var(--sans); color: var(--coral); }

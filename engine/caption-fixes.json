@@ -1,0 +1,5 @@
+[
+  { "match": ["standard", "function"], "display": "std::function" },
+  { "match": ["Lambda"], "display": "lambda" },
+  { "match": ["Lambdas"], "display": "lambdas" }
+]
