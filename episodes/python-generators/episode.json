@@ -1,0 +1,477 @@
+{
+  "slug": "python-generators",
+  "series": "python",
+  "title": "Iterators and generators",
+  "kicker": "Python · Generators",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/python/iterators-and-generators.md",
+  "summary": "The iterator protocol behind every for loop, how yield freezes and resumes a function, and why generators stay lazy.",
+  "captionFixes": [
+    {
+      "match": [
+        "stop",
+        "iteration"
+      ],
+      "display": "StopIteration"
+    },
+    {
+      "match": [
+        "Stop",
+        "iteration"
+      ],
+      "display": "StopIteration"
+    },
+    {
+      "match": [
+        "yield",
+        "from"
+      ],
+      "display": "yield from"
+    },
+    {
+      "match": [
+        "find",
+        "all"
+      ],
+      "display": "findall"
+    },
+    {
+      "match": [
+        "find",
+        "itter"
+      ],
+      "display": "finditer"
+    },
+    {
+      "match": [
+        "isle",
+        "ice"
+      ],
+      "display": "islice"
+    },
+    {
+      "match": [
+        "Islas"
+      ],
+      "display": "islice"
+    },
+    {
+      "match": [
+        "eye-slice"
+      ],
+      "display": "islice"
+    },
+    {
+      "match": [
+        "Eye-slice"
+      ],
+      "display": "islice"
+    },
+    {
+      "match": [
+        "itrable"
+      ],
+      "display": "iterable"
+    },
+    {
+      "match": [
+        "Why",
+        "a",
+        "generator",
+        "so"
+      ],
+      "display": "Why are generators so"
+    },
+    {
+      "match": [
+        "so",
+        "an",
+        "iterable"
+      ],
+      "display": "So an iterable"
+    },
+    {
+      "match": [
+        "iSlice"
+      ],
+      "display": "islice"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Iterable vs iterator",
+      "question": "What is the difference between an iterable and an iterator?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Python generators, question one. What is the difference between an iterable and an iterator? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What's the difference between an <em>iterable</em> and an <em>iterator</em>?"
+          }
+        },
+        {
+          "type": "code",
+          "say": "Every for loop runs this protocol. It calls iter on the object once, which asks the iterable for an iterator. Then it calls next, again and again, and each call returns the next item. When there are no items left, next raises stop iteration, and the loop catches it and ends.",
+          "props": {
+            "title": "What a <em>for</em> loop really does",
+            "file": "for_loop.py",
+            "tag": "iterator protocol",
+            "lang": "python",
+            "size": 25,
+            "width": 1060,
+            "code": "# for x in obj: body\nit = iter(obj)              # obj.__iter__()\nwhile True:\n    try:\n        x = next(it)        # it.__next__()\n    except StopIteration:\n        break\n    body(x)",
+            "highlights": [
+              {
+                "at": "once",
+                "lines": "2",
+                "note": "iter(): the iterable hands out an iterator"
+              },
+              {
+                "at": "again",
+                "lines": "5",
+                "note": "next(): one item per call"
+              },
+              {
+                "at": "left",
+                "lines": "6-7",
+                "note": "Exhausted → StopIteration ends the loop"
+              }
+            ]
+          }
+        },
+        {
+          "type": "compare",
+          "say": "So an iterable makes iterators, and should hand out a fresh one every time, so you can loop over it repeatedly. An iterator makes values. Its own iter returns itself, and once it is exhausted, it stays exhausted.",
+          "props": {
+            "title": "One makes iterators, <em>one makes values</em>",
+            "lang": "python",
+            "left": {
+              "at": "fresh",
+              "label": "Iterable",
+              "title": "Reusable",
+              "tone": "good",
+              "code": "words = [\"the\", \"quick\"]\nlist(words)   # ['the', 'quick']\nlist(words)   # ['the', 'quick']",
+              "body": "__iter__ returns a fresh iterator each time."
+            },
+            "right": {
+              "at": "exhausted",
+              "label": "Iterator",
+              "title": "Single-use",
+              "code": "it = iter(words)\nlist(it)      # ['the', 'quick']\nlist(it)      # []  — exhausted",
+              "body": "__iter__ returns self; __next__ produces values."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "What yield does",
+      "question": "What happens, step by step, when you call a generator function?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. What happens, step by step, when you call a generator function? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What happens when you <em>call</em> a generator function?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Calling a generator function runs none of its body. It just returns a generator object. The first next runs the body until the first yield, hands out that value, and freezes every local variable in place. The second call resumes on the line after the yield, loops, and yields again. When the body finishes, the generator raises stop iteration, and a for loop simply ends.",
+          "props": {
+            "title": "Run to <em>yield</em>, freeze, resume",
+            "nodes": [
+              {
+                "id": "call",
+                "label": "g = words_gen(text)",
+                "x": 250,
+                "y": 300,
+                "w": 360,
+                "h": 64
+              },
+              {
+                "id": "gen",
+                "label": "<generator object>",
+                "x": 250,
+                "y": 520,
+                "w": 360,
+                "h": 64,
+                "hidden": true
+              },
+              {
+                "id": "l1",
+                "label": "for w in text.split():",
+                "x": 850,
+                "y": 300,
+                "w": 420,
+                "h": 60
+              },
+              {
+                "id": "l2",
+                "label": "yield w",
+                "x": 850,
+                "y": 420,
+                "w": 420,
+                "h": 60
+              },
+              {
+                "id": "l3",
+                "label": "(body ends → StopIteration)",
+                "x": 850,
+                "y": 560,
+                "w": 420,
+                "h": 60
+              }
+            ],
+            "edges": [
+              {
+                "from": "l1",
+                "to": "l2"
+              },
+              {
+                "from": "l2",
+                "to": "l3"
+              }
+            ],
+            "panels": [
+              {
+                "key": "out",
+                "label": "Values handed out",
+                "type": "list",
+                "rows": 2,
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "none",
+                "nodes": {
+                  "call": "active"
+                },
+                "note": "Calling runs none of the body"
+              },
+              {
+                "at": "returns",
+                "show": [
+                  "gen"
+                ],
+                "add": [
+                  {
+                    "from": "call",
+                    "to": "gen"
+                  }
+                ],
+                "nodes": {
+                  "call": "base",
+                  "gen": "active"
+                },
+                "note": "…it returns a generator object"
+              },
+              {
+                "at": "first",
+                "add": [
+                  {
+                    "from": "gen",
+                    "to": "l1",
+                    "w": "next(g)"
+                  }
+                ],
+                "nodes": {
+                  "gen": "base",
+                  "l1": "active"
+                },
+                "edges": {
+                  "gen-l1": "relax"
+                },
+                "note": "next(g): run the body…"
+              },
+              {
+                "at": "hands",
+                "nodes": {
+                  "l1": "base",
+                  "l2": "active"
+                },
+                "edges": {
+                  "l1-l2": "relax"
+                },
+                "panels": {
+                  "out": [
+                    "'the'"
+                  ]
+                },
+                "note": "…until yield: hand out 'the'"
+              },
+              {
+                "at": "freezes",
+                "nodes": {
+                  "l2": "queued"
+                },
+                "edges": {
+                  "l1-l2": "base",
+                  "gen-l1": "base"
+                },
+                "note": "Paused at yield; w and the loop state are kept"
+              },
+              {
+                "at": "resumes",
+                "nodes": {
+                  "l2": "base",
+                  "l1": "active"
+                },
+                "edges": {
+                  "gen-l1": "relax"
+                },
+                "note": "next(g): resume after the yield"
+              },
+              {
+                "at": "again",
+                "nodes": {
+                  "l1": "base",
+                  "l2": "queued"
+                },
+                "edges": {
+                  "gen-l1": "base"
+                },
+                "panels": {
+                  "out": [
+                    "'the'",
+                    "'quick'"
+                  ]
+                },
+                "note": "Loop, yield 'quick', pause again"
+              },
+              {
+                "at": "finishes",
+                "nodes": {
+                  "l2": "base",
+                  "l3": "active"
+                },
+                "edges": {
+                  "l2-l3": "relax"
+                },
+                "note": "No words left: the body returns"
+              },
+              {
+                "at": "raises",
+                "nodes": {
+                  "l3": "done",
+                  "gen": "dim"
+                },
+                "note": "StopIteration → the for loop ends"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Laziness and yield from",
+      "question": "Why are generators memory-cheap, and what does yield from do?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. Why are generators so cheap in memory, and what does yield from do? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Why are generators <em>memory-cheap</em>, and what does <em>yield from</em> do?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "The eager version calls find all in the constructor, and builds the whole word list before you ask for a single word. The lazy version keeps only the text, and produces each word on demand. On a one gigabyte log, that is the difference between constant memory and loading everything at once.",
+          "props": {
+            "title": "Eager list, <em>lazy stream</em>",
+            "lang": "python",
+            "left": {
+              "at": "eager",
+              "label": "Eager",
+              "title": "Builds every word now",
+              "tone": "bad",
+              "code": "class Sentence:\n    def __init__(self, text):\n        self.words = WORD_RE.findall(text)\n    def __iter__(self):\n        yield from self.words"
+            },
+            "right": {
+              "at": "lazy",
+              "label": "Lazy",
+              "title": "One word per next()",
+              "tone": "good",
+              "code": "class Sentence:\n    def __init__(self, text):\n        self.text = text\n    def __iter__(self):\n        for m in WORD_RE.finditer(self.text):\n            yield m.group()"
+            },
+            "verdict": {
+              "at": "difference",
+              "text": "Lazy: constant memory, even on a 1 GB log.",
+              "code": "O(1) memory"
+            }
+          }
+        },
+        {
+          "type": "code",
+          "say": "Laziness also makes infinite sequences safe: just stop pulling, here with eye-slice. And yield from delegates to another iterable, yielding everything it produces. That makes recursive flattening a three-line function.",
+          "props": {
+            "title": "Infinite streams and <em>yield from</em>",
+            "file": "lazy.py",
+            "tag": "itertools",
+            "lang": "python",
+            "size": 23,
+            "width": 1080,
+            "code": "def progression(begin, step):\n    while True:                 # never ends…\n        yield begin\n        begin += step\n\nlist(itertools.islice(progression(1, 2), 5))  # [1, 3, 5, 7, 9]\n\ndef flatten(items):\n    for item in items:\n        if isinstance(item, (list, tuple)):\n            yield from flatten(item)   # delegate\n        else:\n            yield item",
+            "highlights": [
+              {
+                "at": "infinite",
+                "lines": "1-4",
+                "note": "An endless generator is fine…"
+              },
+              {
+                "at": "pulling",
+                "lines": "6",
+                "note": "…take only what you need"
+              },
+              {
+                "at": "delegates",
+                "lines": "11",
+                "note": "yield from: yield everything it yields"
+              },
+              {
+                "at": "flattening",
+                "lines": "8-13",
+                "note": "[1, [2, [3]]] → 1, 2, 3"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. An iterable makes iterators; an iterator makes values. A for loop calls iter once, then next until stop iteration. A generator function returns a generator that freezes at each yield. And laziness gives constant memory, and infinite streams.",
+          "props": {
+            "title": "Generators, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "makes",
+                "text": "Iterables make iterators; iterators make values.",
+                "code": "__iter__ / __next__"
+              },
+              {
+                "at": "once",
+                "text": "for: iter() once, next() until StopIteration.",
+                "code": "the protocol"
+              },
+              {
+                "at": "freezes",
+                "text": "yield hands out a value and freezes the frame.",
+                "code": "resume on next()"
+              },
+              {
+                "at": "laziness",
+                "text": "Laziness: constant memory, infinite streams.",
+                "code": "islice · yield from"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

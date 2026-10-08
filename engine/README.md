@@ -52,8 +52,8 @@ Global fixes live in `engine/caption-fixes.json`.
 | `question` | `question` (HTML) · scene `pauseAfter` | Clip opener: ask, then a draining pause bar to answer out loud |
 | `statement` | `text`, `at?`, `sub?`, `subAt?` | One key fact or stance |
 | `points` | `title`, `items[{ at, label?, title, body?, code? }]` (1–4) | Definitions, steps, options |
-| `compare` | `title`, `left`/`right` `{ at, label, title, tone?, code?, body? }`, `verdict?{ at, text, code? }` | Before/after, A vs B |
-| `code` | `title`, `file`, `tag?`, `code`, `size?`, `width?`, `highlights[{ at, lines: "2-3" \| "2,6", note }]` | Walking through an implementation |
+| `compare` | `title`, `lang?`, `left`/`right` `{ at, label, title, tone?, code?, body? }`, `verdict?{ at, text, code? }` | Before/after, A vs B |
+| `code` | `title`, `file`, `tag?`, `code`, `lang?` (cpp\|python), `size?`, `width?`, `highlights[{ at, lines: "2-3" \| "2,6", note }]` | Walking through an implementation |
 | `array` | `title`, `problem?`, `values`, `stateLabel`, `resultLabel`, `pointers?{ l, r, m }` (labels), `steps[{ at, l?, r?, m?, mark?: ok\|bad, state?, note?, result? }]` | Sliding window, two pointers, binary search (`m` = mid; `l = r + 1` shows crossed pointers). Steps ≥ 0.5 s apart |
 | `stack` | `title`, `problem?`, `values`, `resultMode: value\|distance`, `resultDefault?`, `stackLabel?`, `steps[{ at, i?, ops?: [push\|pop…], note? }]` | Monotonic stack: the template simulates pushes/pops and fills results on each pop |
 | `graph` | `title`, `directed?`, `nodes[{ id, label?, x, y, w?, h?, hidden? }]` (w/h → box) (frame px; area x 80–1180, y 230–740), `edges[{ from, to, w? }]`, `panels[{ key, label, type: table\|list, initial }]`, `steps[{ at, note?, nodes?{ id: active\|done\|queued\|dim\|base }, edges?{ "u-v": relax\|tree\|dim\|base }, panels?{ key: {id: v} \| [..] }, show?[id], add?, remove?, move?{ id: [x, y] } }]` (list panels: `rows?`; table panels: `columns?`) | Dijkstra, BFS/DFS, topological sort, union-find forests. Edges follow moved nodes; steps ≥ 0.5 s apart |

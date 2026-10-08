@@ -1,5 +1,5 @@
 // Two side-by-side panels (each may carry a code block) and an optional verdict bar.
-// props: { title, left: Panel, right: Panel, verdict?: { at, text, code? } }
+// props: { title, lang?, left: Panel, right: Panel, verdict?: { at, text, code? } }
 // Panel: { at, label, title, tone?: "good" | "bad", code?, body? }
 registerTemplate("compare", {
   render(props, { esc }) {
@@ -7,7 +7,7 @@ registerTemplate("compare", {
       <article class="card paper cmp-panel cmp-${side}">
         <p class="label">${esc(p.label)}</p>
         <p class="cmp-title ${p.tone ? `tone-${p.tone}` : ""}">${p.title}</p>
-        ${p.code ? `<div class="code cmp-code"><div class="code-body">${highlightCode(p.code).map((l) => `<span class="ln">${l || " "}</span>`).join("")}</div></div>` : ""}
+        ${p.code ? `<div class="code cmp-code"><div class="code-body">${highlightCode(p.code, props.lang).map((l) => `<span class="ln">${l || " "}</span>`).join("")}</div></div>` : ""}
         ${p.body ? `<p class="cmp-body">${p.body}</p>` : ""}
       </article>`;
     const v = props.verdict;

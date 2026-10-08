@@ -10,6 +10,11 @@
       "id": "cpp",
       "title": "C++",
       "blurb": "Language design questions interviewers probe: ownership, interfaces, lambdas, and the object model."
+    },
+    {
+      "id": "python",
+      "title": "Python",
+      "blurb": "How the language really works: decorators and closures, generators and laziness, and the GIL behind every concurrency choice."
     }
   ],
   "episodes": [
@@ -564,6 +569,108 @@
           "duration": 207,
           "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-oop-walkthrough/cpp-oop-walkthrough-01.mp4",
           "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-oop-walkthrough/cpp-oop-walkthrough-01.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "python-decorators",
+      "series": "python",
+      "title": "Decorators",
+      "kicker": "Python · Decorators",
+      "summary": "A decorator is a callable that returns a callable: name rebinding at import time, closures, functools helpers, and decorator factories.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/python/decorators.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "A callable that returns a callable",
+          "question": "What does the @decorator line actually do, and when does it run?",
+          "duration": 44,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-python-decorators/python-decorators-01.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-python-decorators/python-decorators-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "functools essentials",
+          "question": "Why should a decorator use functools.wraps, and which functools decorators should you know?",
+          "duration": 46,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-python-decorators/python-decorators-02.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-python-decorators/python-decorators-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Decorators with arguments",
+          "question": "How do you write a decorator that takes arguments, like @repeat(3)?",
+          "duration": 41,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-python-decorators/python-decorators-03.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-python-decorators/python-decorators-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "python-generators",
+      "series": "python",
+      "title": "Iterators and generators",
+      "kicker": "Python · Generators",
+      "summary": "The iterator protocol behind every for loop, how yield freezes and resumes a function, and why generators stay lazy.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/python/iterators-and-generators.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Iterable vs iterator",
+          "question": "What is the difference between an iterable and an iterator?",
+          "duration": 42,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-python-generators/python-generators-01.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-python-generators/python-generators-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "What yield does",
+          "question": "What happens, step by step, when you call a generator function?",
+          "duration": 33,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-python-generators/python-generators-02.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-python-generators/python-generators-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Laziness and yield from",
+          "question": "Why are generators memory-cheap, and what does yield from do?",
+          "duration": 58,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-python-generators/python-generators-03.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-python-generators/python-generators-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "python-concurrency",
+      "series": "python",
+      "title": "Concurrency models",
+      "kicker": "Python · Concurrency",
+      "summary": "Threads, processes, and asyncio: what the GIL serializes, when each model wins, and the one rule of the event loop.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/python/concurrency-models.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "The GIL",
+          "question": "Why don't threads speed up CPU-bound Python code?",
+          "duration": 38,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-python-concurrency/python-concurrency-01.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-python-concurrency/python-concurrency-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Threads, processes, or asyncio",
+          "question": "When do you choose threads, processes, or asyncio?",
+          "duration": 50,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-python-concurrency/python-concurrency-02.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-python-concurrency/python-concurrency-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "The rule of asyncio",
+          "question": "What does await do, and what is the cardinal rule of asyncio?",
+          "duration": 55,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-python-concurrency/python-concurrency-03.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-python-concurrency/python-concurrency-03.jpg"
         }
       ]
     }

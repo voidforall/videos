@@ -184,8 +184,10 @@ registerTemplate("graph", {
         placeEdge(key, at + (moved.length ? 0.6 : 0), 0.01);
         const t = at + (moved.length ? 0.6 : 0);
         tl.fromTo(g, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.01, immediateRender: false }, t);
-        const len = 400;
+        const g2 = geom(key);
+        const len = Math.ceil(Math.hypot(g2.x2 - g2.x1, g2.y2 - g2.y1)) + 4;
         tl.fromTo(line, { strokeDasharray: len, strokeDashoffset: len }, { strokeDashoffset: 0, duration: 0.5, ease: "power2.out", immediateRender: false }, t);
+        tl.set(line, { strokeDasharray: "none" }, t + 0.5);  // later moves may lengthen the edge
         if (w) tl.fromTo(w, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3, immediateRender: false }, t + 0.3);
       }
 

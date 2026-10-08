@@ -1,0 +1,406 @@
+{
+  "slug": "python-decorators",
+  "series": "python",
+  "title": "Decorators",
+  "kicker": "Python · Decorators",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/python/decorators.md",
+  "summary": "A decorator is a callable that returns a callable: name rebinding at import time, closures, functools helpers, and decorator factories.",
+  "captionFixes": [
+    {
+      "match": [
+        "func",
+        "tools"
+      ],
+      "display": "functools"
+    },
+    {
+      "match": [
+        "funk",
+        "tools"
+      ],
+      "display": "functools"
+    },
+    {
+      "match": [
+        "single",
+        "dispatch"
+      ],
+      "display": "singledispatch"
+    },
+    {
+      "match": [
+        "funktools.wraps"
+      ],
+      "display": "functools.wraps"
+    },
+    {
+      "match": [
+        "funktools"
+      ],
+      "display": "functools"
+    },
+    {
+      "match": [
+        "Rapsa"
+      ],
+      "display": "wraps"
+    },
+    {
+      "match": [
+        "memoises"
+      ],
+      "display": "memoizes"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "A callable that returns a callable",
+      "question": "What does the @decorator line actually do, and when does it run?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Python decorators, question one. What does the at-decorator line actually do, and when does it run? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What does <em>@decorator</em> actually do, and <em>when</em> does it run?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "The at sign is syntactic sugar. Writing it above a function is exactly the same as defining the function, and then reassigning its name to whatever the decorator returns.",
+          "props": {
+            "title": "Sugar for a <em>reassignment</em>",
+            "lang": "python",
+            "left": {
+              "at": "sugar",
+              "label": "With @",
+              "title": "Decorator syntax",
+              "code": "@timer\ndef calculate_sum(n):\n    return sum(range(n + 1))"
+            },
+            "right": {
+              "at": "reassigning",
+              "label": "Without @",
+              "title": "What it means",
+              "code": "def calculate_sum(n):\n    return sum(range(n + 1))\ncalculate_sum = timer(calculate_sum)"
+            },
+            "verdict": {
+              "at": "returns",
+              "text": "The name is rebound to the decorator's result.",
+              "code": "name = deco(func)"
+            }
+          }
+        },
+        {
+          "type": "graph",
+          "say": "When Python defines the function, the name points to the original function object. Then, still at import time, the decorator runs. Timer receives that function and builds a wrapper. The wrapper is a closure, so it remembers the original function. Finally, the name is rebound to the wrapper. Every later call runs the wrapper, which times the original call it wraps.",
+          "props": {
+            "title": "The name moves to the <em>wrapper</em>",
+            "nodes": [
+              {
+                "id": "name",
+                "label": "calculate_sum",
+                "x": 220,
+                "y": 340,
+                "w": 280,
+                "h": 66
+              },
+              {
+                "id": "orig",
+                "label": "<function> original",
+                "x": 820,
+                "y": 340,
+                "w": 320,
+                "h": 66
+              },
+              {
+                "id": "wrap",
+                "label": "wrapper(*args, **kwargs)",
+                "x": 820,
+                "y": 620,
+                "w": 380,
+                "h": 66,
+                "hidden": true
+              }
+            ],
+            "edges": [
+              {
+                "from": "name",
+                "to": "orig"
+              }
+            ],
+            "panels": [
+              {
+                "key": "when",
+                "label": "When",
+                "type": "list",
+                "rows": 2,
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "defines",
+                "nodes": {
+                  "orig": "active"
+                },
+                "edges": {
+                  "name-orig": "relax"
+                },
+                "panels": {
+                  "when": [
+                    "import time"
+                  ]
+                },
+                "note": "def binds the name to the function"
+              },
+              {
+                "at": "runs",
+                "nodes": {
+                  "orig": "base"
+                },
+                "edges": {
+                  "name-orig": "base"
+                },
+                "note": "@timer runs right after def"
+              },
+              {
+                "at": "builds",
+                "show": [
+                  "wrap"
+                ],
+                "nodes": {
+                  "wrap": "active"
+                },
+                "note": "timer(func) builds wrapper"
+              },
+              {
+                "at": "closure",
+                "add": [
+                  {
+                    "from": "wrap",
+                    "to": "orig",
+                    "w": "closure: func"
+                  }
+                ],
+                "edges": {
+                  "wrap-orig": "relax"
+                },
+                "note": "wrapper closes over func"
+              },
+              {
+                "at": "rebound",
+                "remove": [
+                  "name-orig"
+                ],
+                "add": [
+                  {
+                    "from": "name",
+                    "to": "wrap"
+                  }
+                ],
+                "nodes": {
+                  "wrap": "base",
+                  "name": "active"
+                },
+                "edges": {
+                  "wrap-orig": "base",
+                  "name-wrap": "relax"
+                },
+                "note": "calculate_sum = wrapper"
+              },
+              {
+                "at": "later",
+                "nodes": {
+                  "name": "base",
+                  "wrap": "done",
+                  "orig": "done"
+                },
+                "edges": {
+                  "name-wrap": "tree",
+                  "wrap-orig": "tree"
+                },
+                "panels": {
+                  "when": [
+                    "import time",
+                    "call time: wrapper → func"
+                  ]
+                },
+                "note": "Calls go through wrapper, which calls func"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "functools essentials",
+      "question": "Why should a decorator use functools.wraps, and which functools decorators should you know?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. Why should every decorator use funk tools dot wraps? And which other funk tools decorators should you know? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Why <em>functools.wraps</em>, and which functools decorators matter?"
+          }
+        },
+        {
+          "type": "code",
+          "say": "Here is a timing decorator. The wrapper accepts any arguments, calls the original, and returns its value. Without wraps, the decorated function would report its name as wrapper, and lose its docstring. Wraps copies that metadata from the original onto the wrapper.",
+          "props": {
+            "title": "A well-behaved <em>decorator</em>",
+            "file": "timer.py",
+            "tag": "closure",
+            "lang": "python",
+            "size": 23,
+            "width": 1080,
+            "code": "import functools, time\n\ndef timer(func):\n    @functools.wraps(func)\n    def wrapper(*args, **kwargs):\n        start = time.perf_counter()\n        value = func(*args, **kwargs)\n        print(f\"{func.__name__} took {time.perf_counter() - start:.4f}s\")\n        return value\n    return wrapper",
+            "highlights": [
+              {
+                "at": "accepts",
+                "lines": "5",
+                "note": "Forward any positional and keyword args"
+              },
+              {
+                "at": "calls",
+                "lines": "7",
+                "note": "Call the original through the closure"
+              },
+              {
+                "at": "returns",
+                "lines": "9",
+                "note": "Return its result unchanged"
+              },
+              {
+                "at": "without",
+                "lines": "4",
+                "note": "Without it: __name__ == 'wrapper'"
+              },
+              {
+                "at": "copies",
+                "lines": "4",
+                "note": "Copies __name__, __doc__, signature"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "Three funk tools decorators to know. Wraps, for writing your own. Cache, which memoizes a pure function, so repeated calls with the same arguments return instantly. And single dispatch, which turns a function into a generic one that picks an implementation by the type of its first argument.",
+          "props": {
+            "title": "The <em>functools</em> trio",
+            "items": [
+              {
+                "at": "own",
+                "label": "@functools.wraps",
+                "title": "Keep metadata",
+                "body": "Name, docstring, signature survive.",
+                "code": "inside every decorator"
+              },
+              {
+                "at": "memoizes",
+                "label": "@functools.cache",
+                "title": "Memoize",
+                "body": "Same args → cached result. Pure functions only.",
+                "code": "fibonacci(35)"
+              },
+              {
+                "at": "turns",
+                "label": "@functools.singledispatch",
+                "title": "Overload by type",
+                "body": "process.register(int), register(str)…",
+                "code": "generic functions"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Decorators with arguments",
+      "question": "How do you write a decorator that takes arguments, like @repeat(3)?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. How do you write a decorator that takes its own arguments, like repeat, three times? Pause and sketch it out.",
+          "pauseAfter": 4,
+          "props": {
+            "question": "How do you write <em>@repeat(3)</em>?"
+          }
+        },
+        {
+          "type": "code",
+          "say": "Add one more layer. The outer function is a factory: it takes the arguments, and returns a decorator. That decorator takes the function, and returns the wrapper. And the wrapper does the work, here calling the function the requested number of times.",
+          "props": {
+            "title": "Three layers: <em>factory, decorator, wrapper</em>",
+            "file": "repeat.py",
+            "tag": "decorator factory",
+            "lang": "python",
+            "size": 23,
+            "width": 1080,
+            "code": "def repeat(num_times):                 # factory\n    def decorator(func):               # decorator\n        @functools.wraps(func)\n        def wrapper(*args, **kwargs):  # wrapper\n            for _ in range(num_times):\n                value = func(*args, **kwargs)\n            return value\n        return wrapper\n    return decorator\n\n@repeat(num_times=3)\ndef greet(name):\n    print(f\"Hello, {name}!\")",
+            "highlights": [
+              {
+                "at": "factory",
+                "lines": "1,9",
+                "note": "Takes the arguments, returns a decorator"
+              },
+              {
+                "at": "takes#2",
+                "lines": "2,8",
+                "note": "Takes the function, returns the wrapper"
+              },
+              {
+                "at": "work",
+                "lines": "4-7",
+                "note": "Runs func num_times times"
+              },
+              {
+                "at": "requested",
+                "lines": "11-12",
+                "note": "@repeat(3) → repeat(3)(greet)"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. A decorator is a callable that returns a callable. It runs at import time, and rebinds the name. The wrapper is a closure over the original. Always use wraps. And for arguments, add a factory layer on top.",
+          "props": {
+            "title": "Decorators, <em>in five lines</em>",
+            "items": [
+              {
+                "at": "callable",
+                "text": "A callable that returns a callable.",
+                "code": "f = deco(f)"
+              },
+              {
+                "at": "import",
+                "text": "Runs at import time; rebinds the name.",
+                "code": "not at call time"
+              },
+              {
+                "at": "closure",
+                "text": "The wrapper is a closure over func.",
+                "code": "*args, **kwargs"
+              },
+              {
+                "at": "always",
+                "text": "Always use functools.wraps.",
+                "code": "keep __name__"
+              },
+              {
+                "at": "factory",
+                "text": "Arguments? Add a factory layer.",
+                "code": "@repeat(3)"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

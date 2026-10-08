@@ -1,0 +1,523 @@
+{
+  "slug": "python-concurrency",
+  "series": "python",
+  "title": "Concurrency models",
+  "kicker": "Python · Concurrency",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/python/concurrency-models.md",
+  "summary": "Threads, processes, and asyncio: what the GIL serializes, when each model wins, and the one rule of the event loop.",
+  "captionFixes": [
+    {
+      "match": [
+        "async",
+        "IO"
+      ],
+      "display": "asyncio"
+    },
+    {
+      "match": [
+        "Async",
+        "IO"
+      ],
+      "display": "asyncio"
+    },
+    {
+      "match": [
+        "async",
+        "io"
+      ],
+      "display": "asyncio"
+    },
+    {
+      "match": [
+        "Gil"
+      ],
+      "display": "GIL"
+    },
+    {
+      "match": [
+        "gil"
+      ],
+      "display": "GIL"
+    },
+    {
+      "match": [
+        "a",
+        "sync",
+        "I/O"
+      ],
+      "display": "asyncio"
+    },
+    {
+      "match": [
+        "A",
+        "Sync",
+        "I/O"
+      ],
+      "display": "asyncio"
+    },
+    {
+      "match": [
+        "a",
+        "sink",
+        "I",
+        "owe"
+      ],
+      "display": "asyncio"
+    },
+    {
+      "match": [
+        "async",
+        "i/o"
+      ],
+      "display": "asyncio"
+    },
+    {
+      "match": [
+        "async",
+        "I/O"
+      ],
+      "display": "asyncio"
+    },
+    {
+      "match": [
+        "a",
+        "weight"
+      ],
+      "display": "await"
+    },
+    {
+      "match": [
+        "PRIME's"
+      ],
+      "display": "primes"
+    },
+    {
+      "match": [
+        "Modrit"
+      ],
+      "display": "moderate"
+    },
+    {
+      "match": [
+        "canceled",
+        "error"
+      ],
+      "display": "CancelledError"
+    },
+    {
+      "match": [
+        "Create",
+        "task"
+      ],
+      "display": "create_task"
+    },
+    {
+      "match": [
+        "i/o"
+      ],
+      "display": "I/O"
+    },
+    {
+      "match": [
+        "that",
+        "leads"
+      ],
+      "display": "That leads"
+    },
+    {
+      "match": [
+        "Python",
+        "Concurrency",
+        "Question"
+      ],
+      "display": "Python concurrency, question"
+    },
+    {
+      "match": [
+        "async",
+        "I/O.sleep"
+      ],
+      "display": "asyncio.sleep"
+    },
+    {
+      "match": [
+        "to",
+        "thread"
+      ],
+      "display": "to_thread"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "The GIL",
+      "question": "Why don't threads speed up CPU-bound Python code?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Python concurrency, question one. Why don't threads speed up CPU-bound Python code? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Why don't threads speed up <em>CPU-bound</em> Python?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "The global interpreter lock lets only one thread run Python bytecode at a time. Thread one holds it, while the others wait. The interpreter switches the holder every few milliseconds, but only one ever runs, so CPU-bound work gets no faster with more threads. Blocking I/O is different. A thread waiting on the network releases the lock, so another thread can run in the meantime. That is why threads do help I/O-bound work.",
+          "props": {
+            "title": "One lock, <em>one runner</em>",
+            "nodes": [
+              {
+                "id": "t1",
+                "label": "Thread 1",
+                "x": 220,
+                "y": 300,
+                "w": 220,
+                "h": 64
+              },
+              {
+                "id": "t2",
+                "label": "Thread 2",
+                "x": 220,
+                "y": 480,
+                "w": 220,
+                "h": 64
+              },
+              {
+                "id": "t3",
+                "label": "Thread 3",
+                "x": 220,
+                "y": 660,
+                "w": 220,
+                "h": 64
+              },
+              {
+                "id": "gil",
+                "label": "GIL\n(one holder)",
+                "x": 820,
+                "y": 480,
+                "w": 260,
+                "h": 100
+              }
+            ],
+            "edges": [
+              {
+                "from": "t1",
+                "to": "gil"
+              },
+              {
+                "from": "t2",
+                "to": "gil"
+              },
+              {
+                "from": "t3",
+                "to": "gil"
+              }
+            ],
+            "panels": [
+              {
+                "key": "state",
+                "label": "Running Python bytecode",
+                "type": "list",
+                "initial": [
+                  "—"
+                ]
+              }
+            ],
+            "steps": [
+              {
+                "at": "only",
+                "nodes": {
+                  "gil": "active"
+                },
+                "note": "One thread runs bytecode at a time"
+              },
+              {
+                "at": "holds",
+                "nodes": {
+                  "gil": "base",
+                  "t1": "active",
+                  "t2": "queued",
+                  "t3": "queued"
+                },
+                "edges": {
+                  "t1-gil": "tree",
+                  "t2-gil": "dim",
+                  "t3-gil": "dim"
+                },
+                "panels": {
+                  "state": [
+                    "Thread 1"
+                  ]
+                },
+                "note": "Thread 1 holds the GIL; 2 and 3 wait"
+              },
+              {
+                "at": "switches",
+                "nodes": {
+                  "t1": "queued",
+                  "t2": "active"
+                },
+                "edges": {
+                  "t1-gil": "dim",
+                  "t2-gil": "tree"
+                },
+                "panels": {
+                  "state": [
+                    "Thread 2"
+                  ]
+                },
+                "note": "Switch interval (~5 ms): a new holder"
+              },
+              {
+                "at": "faster",
+                "nodes": {
+                  "t2": "queued",
+                  "t3": "active"
+                },
+                "edges": {
+                  "t2-gil": "dim",
+                  "t3-gil": "tree"
+                },
+                "panels": {
+                  "state": [
+                    "Thread 3"
+                  ]
+                },
+                "note": "Still one at a time: no CPU speedup"
+              },
+              {
+                "at": "different",
+                "nodes": {
+                  "t3": "queued"
+                },
+                "edges": {
+                  "t3-gil": "dim"
+                },
+                "panels": {
+                  "state": [
+                    "—"
+                  ]
+                },
+                "note": "Blocking I/O changes the picture"
+              },
+              {
+                "at": "releases",
+                "nodes": {
+                  "t1": "dim"
+                },
+                "edges": {
+                  "t1-gil": "relax"
+                },
+                "panels": {
+                  "state": [
+                    "Thread 1: recv()  (GIL released)"
+                  ]
+                },
+                "note": "Thread 1 waits on the socket, GIL released"
+              },
+              {
+                "at": "meantime",
+                "nodes": {
+                  "t2": "active"
+                },
+                "edges": {
+                  "t1-gil": "dim",
+                  "t2-gil": "tree"
+                },
+                "panels": {
+                  "state": [
+                    "Thread 2 runs while 1 waits"
+                  ]
+                },
+                "note": "Another thread runs during the wait"
+              },
+              {
+                "at": "help",
+                "nodes": {
+                  "t2": "done"
+                },
+                "note": "Threads overlap waiting, not computing"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Threads, processes, or asyncio",
+      "question": "When do you choose threads, processes, or asyncio?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. When do you choose threads, processes, or async I O? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Threads, processes, or <em>asyncio</em>: when do you pick each?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Threads are preemptive OS threads sharing one interpreter. They suit moderate I/O-bound work, but give no speedup on CPU. Processes each get their own interpreter and their own GIL, so CPU-bound work runs truly in parallel. The cost is heavier startup, and pickling arguments across the boundary. Async I O runs one thread and one event loop, switching only at await. It scales to thousands of sockets, but gives no CPU speedup either.",
+          "props": {
+            "title": "Match the model to the <em>bottleneck</em>",
+            "items": [
+              {
+                "at": "preemptive",
+                "label": "threading",
+                "title": "I/O-bound, moderate",
+                "body": "Shared memory; GIL blocks CPU speedup.",
+                "code": "ThreadPoolExecutor"
+              },
+              {
+                "at": "parallel",
+                "label": "multiprocessing",
+                "title": "CPU-bound",
+                "body": "One GIL per process; arguments are pickled.",
+                "code": "ProcessPoolExecutor"
+              },
+              {
+                "at": "loop",
+                "label": "asyncio",
+                "title": "I/O-bound, massive",
+                "body": "One thread, cooperative switches at await.",
+                "code": "thousands of sockets"
+              }
+            ]
+          }
+        },
+        {
+          "type": "compare",
+          "say": "The primes benchmark makes it concrete. Checking big numbers for primality with a thread pool takes about as long as doing it sequentially. A process pool divides the time by the number of cores.",
+          "props": {
+            "title": "CPU-bound: <em>threads vs processes</em>",
+            "lang": "python",
+            "left": {
+              "at": "pool",
+              "label": "ThreadPoolExecutor",
+              "title": "≈ sequential time",
+              "tone": "bad",
+              "code": "with ThreadPoolExecutor() as ex:\n    list(ex.map(is_prime, NUMBERS))\n# the GIL serializes is_prime",
+              "body": "Real threads, but one runs Python at a time."
+            },
+            "right": {
+              "at": "divides",
+              "label": "ProcessPoolExecutor",
+              "title": "÷ number of cores",
+              "tone": "good",
+              "code": "with ProcessPoolExecutor() as ex:\n    list(ex.map(is_prime, NUMBERS))\n# one interpreter + GIL per process",
+              "body": "is_prime must be a top-level, picklable function."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "The rule of asyncio",
+      "question": "What does await do, and what is the cardinal rule of asyncio?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. What does await actually do, and what is the one rule of async I O? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What does <em>await</em> do, and what's the rule of asyncio?"
+          }
+        },
+        {
+          "type": "code",
+          "say": "Create task schedules the spinner on the event loop. Awaiting the slow coroutine hands control back to the loop, so the spinner animates in the meantime. When the result arrives, cancel stops the spinner by raising cancelled error inside it.",
+          "props": {
+            "title": "Cooperative switching at <em>await</em>",
+            "file": "spinner.py",
+            "tag": "one thread",
+            "lang": "python",
+            "size": 22,
+            "width": 1080,
+            "code": "async def spin(msg):\n    for char in itertools.cycle(\"|/-\\\\\"):\n        print(f\"\\r{char} {msg}\", end=\"\", flush=True)\n        try:\n            await asyncio.sleep(0.1)   # yield to the loop\n        except asyncio.CancelledError:\n            break\n\nasync def supervisor():\n    spinner = asyncio.create_task(spin(\"thinking!\"))\n    result = await slow_work()          # loop runs spin meanwhile\n    spinner.cancel()\n    return result",
+            "highlights": [
+              {
+                "at": "schedules",
+                "lines": "10",
+                "note": "create_task: schedule spin on the loop"
+              },
+              {
+                "at": "awaiting",
+                "lines": "11",
+                "note": "await: give control back to the loop"
+              },
+              {
+                "at": "animates",
+                "lines": "5",
+                "note": "spin runs between awaits"
+              },
+              {
+                "at": "cancel",
+                "lines": "12,6-7",
+                "note": "cancel() raises CancelledError inside spin"
+              }
+            ]
+          }
+        },
+        {
+          "type": "compare",
+          "say": "That leads to the cardinal rule: never block the event loop. A coroutine that calls time dot sleep freezes every task on the loop, and the spinner stops dead. Await async I O dot sleep instead, or push blocking calls to a thread with to thread.",
+          "props": {
+            "title": "Never <em>block the loop</em>",
+            "lang": "python",
+            "left": {
+              "at": "freezes",
+              "label": "Blocks",
+              "title": "Every task stops",
+              "tone": "bad",
+              "code": "async def slow_work():\n    time.sleep(3)        # blocks the thread\n    return 42"
+            },
+            "right": {
+              "at": "instead",
+              "label": "Yields",
+              "title": "Loop keeps running",
+              "tone": "good",
+              "code": "async def slow_work():\n    await asyncio.sleep(3)   # yields to the loop\n    return 42\n# or: await asyncio.to_thread(blocking_call)"
+            },
+            "verdict": {
+              "at": "push",
+              "text": "Blocking work goes to a thread or a process.",
+              "code": "asyncio.to_thread"
+            }
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. The GIL lets one thread run Python at a time, but I/O releases it. Use threads for moderate I/O, processes for CPU-bound work, and async I O for massive I/O. And never block the event loop.",
+          "props": {
+            "title": "Python concurrency, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "lets",
+                "text": "The GIL: one thread runs bytecode; I/O releases it.",
+                "code": "per interpreter"
+              },
+              {
+                "at": "moderate",
+                "text": "Threads for moderate I/O.",
+                "code": "ThreadPoolExecutor"
+              },
+              {
+                "at": "processes",
+                "text": "Processes for CPU-bound work.",
+                "code": "ProcessPoolExecutor"
+              },
+              {
+                "at": "never",
+                "text": "asyncio for massive I/O—never block the loop.",
+                "code": "await, not sleep"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,9 +1,9 @@
 // A code surface with a numbered note rail; each highlight lights its lines and adds a note.
-// props: { title, file, tag?, code, size?, width?, highlights: [{ at, lines: "2-3" | "2,6", note }] }
+// props: { title, file, tag?, code, lang?: "cpp" | "python", size?, width?, highlights: [{ at, lines: "2-3" | "2,6", note }] }
 registerTemplate("code", {
   render(props, { esc }) {
     const width = props.width ?? 1060;
-    const lines = highlightCode(props.code);
+    const lines = highlightCode(props.code, props.lang);
     return `
       <section class="code cd-panel" style="width:${width}px">
         <div class="code-head"><span>${esc(props.file)}</span>${props.tag ? `<span>${esc(props.tag)}</span>` : ""}</div>
