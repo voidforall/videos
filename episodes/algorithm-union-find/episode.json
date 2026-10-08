@@ -1,0 +1,650 @@
+{
+  "slug": "algorithm-union-find",
+  "series": "algorithm",
+  "title": "Union-find",
+  "kicker": "Algorithm · Union-find",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/disjoint-set.md",
+  "summary": "Disjoint sets as a forest of parent pointers: find the root, link roots, and two optimizations make it effectively constant time.",
+  "captionFixes": [
+    {
+      "match": [
+        "route"
+      ],
+      "display": "root"
+    },
+    {
+      "match": [
+        "find",
+        "in",
+        "Union"
+      ],
+      "display": "find and union"
+    },
+    {
+      "match": [
+        "Union",
+        "find"
+      ],
+      "display": "Union-find"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Find and union",
+      "question": "How does union-find represent sets, and what do find and union do?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Union-find, question one. How does it represent sets, and what do find and union actually do? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How are sets represented, and what do <em>find</em> and <em>union</em> do?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Each set is a tree of parent pointers, and the root names the set. Find follows parents up to the root. Union finds both roots and points one root at the other. Two elements are connected exactly when they share a root.",
+          "props": {
+            "title": "A forest of <em>parent pointers</em>",
+            "items": [
+              {
+                "at": "tree",
+                "label": "Representation",
+                "title": "Root names the set",
+                "body": "parent[x] == x means x is a root.",
+                "code": "vector<int> parent"
+              },
+              {
+                "at": "follows",
+                "label": "find(x)",
+                "title": "Climb to the root",
+                "body": "Follow parent pointers upward.",
+                "code": "while (p[x] != x) x = p[x]"
+              },
+              {
+                "at": "both",
+                "label": "unite(x, y)",
+                "title": "Link the roots",
+                "body": "Point one root at the other.",
+                "code": "parent[ry] = rx"
+              },
+              {
+                "at": "connected",
+                "label": "connected(x, y)",
+                "title": "Same root?",
+                "body": "One find each, then compare.",
+                "code": "find(x) == find(y)"
+              }
+            ]
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Every element starts as its own root. Union one and two, and two now points at one. Union three and four the same way. Union one and three: link root to root, so three's whole tree hangs under one. Union five and six. Now find four: it climbs to three, and then up to one. Two also reaches one, so two and four are connected.",
+          "props": {
+            "title": "Unions build <em>trees</em>",
+            "nodes": [
+              {
+                "id": "1",
+                "x": 180,
+                "y": 320
+              },
+              {
+                "id": "2",
+                "x": 360,
+                "y": 320
+              },
+              {
+                "id": "3",
+                "x": 540,
+                "y": 320
+              },
+              {
+                "id": "4",
+                "x": 720,
+                "y": 320
+              },
+              {
+                "id": "5",
+                "x": 900,
+                "y": 320
+              },
+              {
+                "id": "6",
+                "x": 1080,
+                "y": 320
+              }
+            ],
+            "edges": [],
+            "panels": [
+              {
+                "key": "parent",
+                "label": "parent[ ]",
+                "type": "table",
+                "initial": {
+                  "1": "1",
+                  "2": "2",
+                  "3": "3",
+                  "4": "4",
+                  "5": "5",
+                  "6": "6"
+                }
+              },
+              {
+                "key": "sets",
+                "label": "Sets",
+                "type": "list",
+                "initial": [
+                  "{1}",
+                  "{2}",
+                  "{3}",
+                  "{4}",
+                  "{5}",
+                  "{6}"
+                ]
+              }
+            ],
+            "steps": [
+              {
+                "at": "starts",
+                "nodes": {
+                  "1": "queued",
+                  "2": "queued",
+                  "3": "queued",
+                  "4": "queued",
+                  "5": "queued",
+                  "6": "queued"
+                },
+                "note": "Six singletons: everyone is a root"
+              },
+              {
+                "at": "union",
+                "nodes": {
+                  "1": "base",
+                  "2": "base"
+                },
+                "move": {
+                  "2": [
+                    180,
+                    500
+                  ]
+                },
+                "add": [
+                  {
+                    "from": "2",
+                    "to": "1"
+                  }
+                ],
+                "panels": {
+                  "parent": {
+                    "2": "1"
+                  },
+                  "sets": [
+                    "{1, 2}",
+                    "{3}",
+                    "{4}",
+                    "{5}",
+                    "{6}"
+                  ]
+                },
+                "note": "unite(1, 2): parent[2] = 1"
+              },
+              {
+                "at": "union#2",
+                "nodes": {
+                  "3": "base",
+                  "4": "base"
+                },
+                "move": {
+                  "4": [
+                    540,
+                    500
+                  ]
+                },
+                "add": [
+                  {
+                    "from": "4",
+                    "to": "3"
+                  }
+                ],
+                "panels": {
+                  "parent": {
+                    "4": "3"
+                  },
+                  "sets": [
+                    "{1, 2}",
+                    "{3, 4}",
+                    "{5}",
+                    "{6}"
+                  ]
+                },
+                "note": "unite(3, 4): parent[4] = 3"
+              },
+              {
+                "at": "union#3",
+                "move": {
+                  "3": [
+                    400,
+                    500
+                  ],
+                  "4": [
+                    400,
+                    680
+                  ]
+                },
+                "add": [
+                  {
+                    "from": "3",
+                    "to": "1"
+                  }
+                ],
+                "panels": {
+                  "parent": {
+                    "3": "1"
+                  },
+                  "sets": [
+                    "{1, 2, 3, 4}",
+                    "{5}",
+                    "{6}"
+                  ]
+                },
+                "note": "unite(1, 3): root 3 now points at root 1"
+              },
+              {
+                "at": "union#4",
+                "nodes": {
+                  "5": "base",
+                  "6": "base"
+                },
+                "move": {
+                  "6": [
+                    900,
+                    500
+                  ]
+                },
+                "add": [
+                  {
+                    "from": "6",
+                    "to": "5"
+                  }
+                ],
+                "panels": {
+                  "parent": {
+                    "6": "5"
+                  },
+                  "sets": [
+                    "{1, 2, 3, 4}",
+                    "{5, 6}"
+                  ]
+                },
+                "note": "unite(5, 6): parent[6] = 5"
+              },
+              {
+                "at": "find",
+                "nodes": {
+                  "4": "active"
+                },
+                "note": "find(4)"
+              },
+              {
+                "at": "climbs",
+                "nodes": {
+                  "3": "active"
+                },
+                "edges": {
+                  "4-3": "relax"
+                },
+                "note": "4 → 3"
+              },
+              {
+                "at": "then",
+                "nodes": {
+                  "1": "active"
+                },
+                "edges": {
+                  "3-1": "relax"
+                },
+                "note": "3 → 1: root"
+              },
+              {
+                "at": "also",
+                "nodes": {
+                  "2": "active"
+                },
+                "edges": {
+                  "2-1": "relax"
+                },
+                "note": "find(2) → 1 as well"
+              },
+              {
+                "at": "connected",
+                "nodes": {
+                  "1": "done",
+                  "2": "done",
+                  "3": "done",
+                  "4": "done"
+                },
+                "note": "Same root → connected(2, 4) is true"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "The two optimizations",
+      "question": "Which two optimizations make union-find effectively constant time?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. Which two optimizations make union-find effectively constant time? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Which two optimizations make it <em>effectively constant</em>?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "First, path compression. Finding four walks up through three to reach one. On the way back, four is pointed straight at the root, so the next find is a single hop. Second, union by rank. When the two trees merge, hang the shorter tree under the taller one, so five's tree goes under one and the height stays small.",
+          "props": {
+            "title": "Flatten on find, <em>balance</em> on union",
+            "nodes": [
+              {
+                "id": "1",
+                "x": 300,
+                "y": 310
+              },
+              {
+                "id": "2",
+                "x": 160,
+                "y": 490
+              },
+              {
+                "id": "3",
+                "x": 420,
+                "y": 490
+              },
+              {
+                "id": "4",
+                "x": 420,
+                "y": 670
+              },
+              {
+                "id": "5",
+                "x": 880,
+                "y": 310
+              },
+              {
+                "id": "6",
+                "x": 880,
+                "y": 490
+              }
+            ],
+            "edges": [
+              {
+                "from": "2",
+                "to": "1"
+              },
+              {
+                "from": "3",
+                "to": "1"
+              },
+              {
+                "from": "4",
+                "to": "3"
+              },
+              {
+                "from": "6",
+                "to": "5"
+              }
+            ],
+            "panels": [
+              {
+                "key": "parent",
+                "label": "parent[ ]",
+                "type": "table",
+                "initial": {
+                  "1": "1",
+                  "2": "1",
+                  "3": "1",
+                  "4": "3",
+                  "5": "5",
+                  "6": "5"
+                }
+              },
+              {
+                "key": "rank",
+                "label": "rank (roots)",
+                "type": "list",
+                "initial": [
+                  "1: rank 2",
+                  "5: rank 1"
+                ]
+              }
+            ],
+            "steps": [
+              {
+                "at": "compression",
+                "nodes": {
+                  "4": "active"
+                },
+                "note": "find(4) with path compression"
+              },
+              {
+                "at": "through",
+                "nodes": {
+                  "3": "active"
+                },
+                "edges": {
+                  "4-3": "relax"
+                },
+                "note": "4 → 3"
+              },
+              {
+                "at": "reach",
+                "nodes": {
+                  "1": "active"
+                },
+                "edges": {
+                  "3-1": "relax"
+                },
+                "note": "3 → 1: the root"
+              },
+              {
+                "at": "straight",
+                "nodes": {
+                  "1": "base",
+                  "3": "base",
+                  "4": "done"
+                },
+                "edges": {
+                  "3-1": "base"
+                },
+                "remove": [
+                  "4-3"
+                ],
+                "move": {
+                  "4": [
+                    560,
+                    490
+                  ]
+                },
+                "add": [
+                  {
+                    "from": "4",
+                    "to": "1"
+                  }
+                ],
+                "panels": {
+                  "parent": {
+                    "4": "1"
+                  }
+                },
+                "note": "parent[4] = 1: the path is flattened"
+              },
+              {
+                "at": "single",
+                "edges": {
+                  "4-1": "relax"
+                },
+                "note": "Next find(4) is one hop"
+              },
+              {
+                "at": "rank",
+                "nodes": {
+                  "4": "base"
+                },
+                "edges": {
+                  "4-1": "base"
+                },
+                "note": "Union by rank: shorter tree under taller"
+              },
+              {
+                "at": "merge",
+                "nodes": {
+                  "1": "active",
+                  "5": "active"
+                },
+                "note": "unite(1, 5): rank 2 vs rank 1"
+              },
+              {
+                "at": "goes",
+                "nodes": {
+                  "1": "done",
+                  "5": "done"
+                },
+                "move": {
+                  "5": [
+                    780,
+                    490
+                  ],
+                  "6": [
+                    780,
+                    670
+                  ]
+                },
+                "add": [
+                  {
+                    "from": "5",
+                    "to": "1"
+                  }
+                ],
+                "panels": {
+                  "parent": {
+                    "5": "1"
+                  },
+                  "rank": [
+                    "1: rank 2"
+                  ]
+                },
+                "note": "parent[5] = 1; height stays 2"
+              }
+            ]
+          }
+        },
+        {
+          "type": "statement",
+          "say": "Together they give inverse Ackermann time per operation. That function is at most four for any input you could ever store, so in practice it is constant.",
+          "props": {
+            "text": "O(α(n)) — <em>effectively constant</em>.",
+            "sub": "α is the inverse Ackermann function: α(n) ≤ 4 for any n that fits in memory. Either optimization alone gives O(log n).",
+            "subAt": "four"
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Code and patterns",
+      "question": "Write union-find with both optimizations, and name problems it solves.",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. Write union-find with both optimizations, and name the problems it solves. Pause and sketch it out.",
+          "pauseAfter": 4,
+          "props": {
+            "question": "Write union-find with both optimizations, and <em>name its problems</em>."
+          }
+        },
+        {
+          "type": "code",
+          "say": "The constructor makes every element its own parent. Find compresses as it returns: each node is re-pointed at the root. Unite finds both roots and returns false if they already match, which is how you detect a cycle. Otherwise the higher rank becomes the parent, and equal ranks grow by one.",
+          "props": {
+            "title": "Union-find, <em>in code</em>",
+            "file": "dsu.cpp",
+            "tag": "O(α(n))",
+            "size": 21,
+            "width": 1060,
+            "code": "class DSU {\npublic:\n    DSU(int n) : parent(n), rank(n, 0) {\n        iota(parent.begin(), parent.end(), 0);\n    }\n    int find(int x) {\n        return parent[x] == x ? x : parent[x] = find(parent[x]);\n    }\n    bool unite(int x, int y) {\n        int rx = find(x), ry = find(y);\n        if (rx == ry) return false;  // already connected\n        if (rank[rx] < rank[ry]) swap(rx, ry);\n        parent[ry] = rx;\n        if (rank[rx] == rank[ry]) rank[rx]++;\n        return true;\n    }\nprivate:\n    vector<int> parent, rank;\n};",
+            "highlights": [
+              {
+                "at": "constructor",
+                "lines": "3-4",
+                "note": "Everyone starts as their own root"
+              },
+              {
+                "at": "compresses",
+                "lines": "7",
+                "note": "Path compression on the way back"
+              },
+              {
+                "at": "false",
+                "lines": "10-11",
+                "note": "Same root → already connected (cycle)"
+              },
+              {
+                "at": "higher",
+                "lines": "12-13",
+                "note": "Union by rank: higher rank is the parent"
+              },
+              {
+                "at": "equal",
+                "lines": "14",
+                "note": "Equal ranks: the new root grows"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "Reach for it when connectivity only grows. Counting connected components. Detecting a cycle in an undirected graph, when an edge joins two nodes already connected. Kruskal's minimum spanning tree, which adds the cheapest edges that do not form a cycle. And grid problems like islands, where each cell is a node.",
+          "props": {
+            "title": "When connectivity only <em>grows</em>",
+            "items": [
+              {
+                "at": "counting",
+                "label": "Components",
+                "title": "Count groups",
+                "body": "Each successful unite merges two.",
+                "code": "LC 547"
+              },
+              {
+                "at": "detecting",
+                "label": "Undirected cycle",
+                "title": "Redundant edge",
+                "body": "unite() returns false.",
+                "code": "LC 684"
+              },
+              {
+                "at": "spanning",
+                "label": "Kruskal",
+                "title": "Minimum spanning tree",
+                "body": "Cheapest edges that skip cycles.",
+                "code": "LC 1584"
+              },
+              {
+                "at": "grid",
+                "label": "Grids",
+                "title": "Islands",
+                "body": "Cells are nodes; join neighbors.",
+                "code": "LC 200"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

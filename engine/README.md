@@ -56,6 +56,7 @@ Global fixes live in `engine/caption-fixes.json`.
 | `code` | `title`, `file`, `tag?`, `code`, `size?`, `width?`, `highlights[{ at, lines: "2-3" \| "2,6", note }]` | Walking through an implementation |
 | `array` | `title`, `problem?`, `values`, `stateLabel`, `resultLabel`, `pointers?{ l, r, m }` (labels), `steps[{ at, l?, r?, m?, mark?: ok\|bad, state?, note?, result? }]` | Sliding window, two pointers, binary search (`m` = mid; `l = r + 1` shows crossed pointers). Steps ≥ 0.5 s apart |
 | `stack` | `title`, `problem?`, `values`, `resultMode: value\|distance`, `resultDefault?`, `stackLabel?`, `steps[{ at, i?, ops?: [push\|pop…], note? }]` | Monotonic stack: the template simulates pushes/pops and fills results on each pop |
+| `graph` | `title`, `directed?`, `nodes[{ id, label?, x, y }]` (frame px; area x 80–1180, y 230–740), `edges[{ from, to, w? }]`, `panels[{ key, label, type: table\|list, initial }]`, `steps[{ at, note?, nodes?{ id: active\|done\|queued\|dim\|base }, edges?{ "u-v": relax\|tree\|dim\|base }, panels?{ key: {id: v} \| [..] }, add?, remove?, move?{ id: [x, y] } }]` | Dijkstra, BFS/DFS, topological sort, union-find forests. Edges follow moved nodes; steps ≥ 0.5 s apart |
 | `recap` | `title`, `items[{ at, text, code? }]` (≤ 5) | Clip or episode close |
 
 Titles accept inline `<em>` for the italic accent. Add a template by registering it in

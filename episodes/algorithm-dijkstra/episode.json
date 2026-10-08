@@ -1,0 +1,651 @@
+{
+  "slug": "algorithm-dijkstra",
+  "series": "algorithm",
+  "title": "Dijkstra's algorithm",
+  "kicker": "Algorithm · Dijkstra",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/dijkstra.md",
+  "summary": "Greedy single-source shortest paths: pop the closest vertex, relax its edges, never look back—until a negative edge breaks the promise.",
+  "captionFixes": [
+    {
+      "match": [
+        "O",
+        "of",
+        "V",
+        "plus",
+        "E",
+        "log",
+        "V"
+      ],
+      "display": "O((V + E) log V)"
+    },
+    {
+      "match": [
+        "through",
+        "you",
+        "gives",
+        "via"
+      ],
+      "display": "through u gives v a"
+    },
+    {
+      "match": [
+        "at",
+        "a"
+      ],
+      "display": "at A"
+    },
+    {
+      "match": [
+        "Too",
+        "later"
+      ],
+      "display": "Too late"
+    },
+    {
+      "match": [
+        "Floyd-Woshall"
+      ],
+      "display": "Floyd-Warshall"
+    },
+    {
+      "match": [
+        "v-cubed"
+      ],
+      "display": "V³"
+    },
+    {
+      "match": [
+        "min",
+        "heap"
+      ],
+      "display": "min-heap"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Relax and commit",
+      "question": "What does Dijkstra commit to at each step, and why is that safe?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Dijkstra, question one. What does the algorithm commit to at each step, and why is that safe? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What does Dijkstra <em>commit</em> to at each step, and why is it safe?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Three ideas. Relaxation: if going through u gives v a shorter distance, update it. A min-heap always hands you the closest unfinished vertex. And the greedy invariant: when a vertex leaves the heap, its distance is final, because with non-negative weights no later path can be shorter.",
+          "props": {
+            "title": "Three <em>ideas</em>",
+            "items": [
+              {
+                "at": "relaxation",
+                "label": "Relax",
+                "title": "Try a shorter path",
+                "body": "Through u, can v get closer?",
+                "code": "dist[v] = min(dist[v], dist[u] + w)"
+              },
+              {
+                "at": "heap",
+                "label": "Min-heap",
+                "title": "Closest first",
+                "body": "Always expand the nearest unfinished vertex.",
+                "code": "(distance, vertex)"
+              },
+              {
+                "at": "invariant",
+                "label": "Invariant",
+                "title": "Popped means final",
+                "body": "Non-negative weights: nothing later can beat it.",
+                "code": "w ≥ 0"
+              }
+            ]
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Start at A with distance zero. Every other vertex is infinitely far. Pop A, the closest vertex, and relax its edges. B drops to two, and C drops to four. Pop B at distance two. Through B, D becomes seven and E becomes five. Pop C at four. Its edge to E also gives five, which is not shorter, so nothing changes. Pop E at five, then D at seven. Each vertex was final the moment it left the heap.",
+          "props": {
+            "title": "Pop the closest, <em>relax</em> its edges",
+            "nodes": [
+              {
+                "id": "A",
+                "x": 200,
+                "y": 340
+              },
+              {
+                "id": "B",
+                "x": 580,
+                "y": 340
+              },
+              {
+                "id": "D",
+                "x": 980,
+                "y": 340
+              },
+              {
+                "id": "C",
+                "x": 200,
+                "y": 650
+              },
+              {
+                "id": "E",
+                "x": 580,
+                "y": 650
+              }
+            ],
+            "edges": [
+              {
+                "from": "A",
+                "to": "B",
+                "w": 2
+              },
+              {
+                "from": "B",
+                "to": "D",
+                "w": 5
+              },
+              {
+                "from": "A",
+                "to": "C",
+                "w": 4
+              },
+              {
+                "from": "B",
+                "to": "E",
+                "w": 3
+              },
+              {
+                "from": "C",
+                "to": "E",
+                "w": 1
+              }
+            ],
+            "panels": [
+              {
+                "key": "dist",
+                "label": "dist[ ]",
+                "type": "table",
+                "initial": {
+                  "A": "∞",
+                  "B": "∞",
+                  "C": "∞",
+                  "D": "∞",
+                  "E": "∞"
+                }
+              },
+              {
+                "key": "heap",
+                "label": "Min-heap (distance, vertex)",
+                "type": "list",
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "start",
+                "nodes": {
+                  "A": "queued"
+                },
+                "panels": {
+                  "dist": {
+                    "A": "0"
+                  },
+                  "heap": [
+                    "(0, A)"
+                  ]
+                },
+                "note": "dist[A] = 0, everything else ∞"
+              },
+              {
+                "at": "pop",
+                "nodes": {
+                  "A": "active"
+                },
+                "panels": {
+                  "heap": []
+                },
+                "note": "Pop the closest vertex: A"
+              },
+              {
+                "at": "drops",
+                "nodes": {
+                  "B": "queued"
+                },
+                "edges": {
+                  "A-B": "relax"
+                },
+                "panels": {
+                  "dist": {
+                    "B": "2"
+                  },
+                  "heap": [
+                    "(2, B)"
+                  ]
+                },
+                "note": "0 + 2 < ∞ → dist[B] = 2"
+              },
+              {
+                "at": "drops#2",
+                "nodes": {
+                  "C": "queued"
+                },
+                "edges": {
+                  "A-C": "relax"
+                },
+                "panels": {
+                  "dist": {
+                    "C": "4"
+                  },
+                  "heap": [
+                    "(2, B)",
+                    "(4, C)"
+                  ]
+                },
+                "note": "0 + 4 < ∞ → dist[C] = 4"
+              },
+              {
+                "at": "pop#2",
+                "nodes": {
+                  "A": "done",
+                  "B": "active"
+                },
+                "edges": {
+                  "A-B": "tree",
+                  "A-C": "base"
+                },
+                "panels": {
+                  "heap": [
+                    "(4, C)"
+                  ]
+                },
+                "note": "Pop B (2): final"
+              },
+              {
+                "at": "through",
+                "nodes": {
+                  "D": "queued"
+                },
+                "edges": {
+                  "B-D": "relax"
+                },
+                "panels": {
+                  "dist": {
+                    "D": "7"
+                  },
+                  "heap": [
+                    "(4, C)",
+                    "(7, D)"
+                  ]
+                },
+                "note": "2 + 5 → dist[D] = 7"
+              },
+              {
+                "at": "becomes#2",
+                "nodes": {
+                  "E": "queued"
+                },
+                "edges": {
+                  "B-E": "relax"
+                },
+                "panels": {
+                  "dist": {
+                    "E": "5"
+                  },
+                  "heap": [
+                    "(4, C)",
+                    "(5, E)",
+                    "(7, D)"
+                  ]
+                },
+                "note": "2 + 3 → dist[E] = 5"
+              },
+              {
+                "at": "pop#3",
+                "nodes": {
+                  "B": "done",
+                  "C": "active"
+                },
+                "edges": {
+                  "A-C": "tree",
+                  "B-D": "base",
+                  "B-E": "base"
+                },
+                "panels": {
+                  "heap": [
+                    "(5, E)",
+                    "(7, D)"
+                  ]
+                },
+                "note": "Pop C (4): final"
+              },
+              {
+                "at": "also",
+                "edges": {
+                  "C-E": "relax"
+                },
+                "note": "4 + 1 = 5: not shorter than 5"
+              },
+              {
+                "at": "nothing",
+                "edges": {
+                  "C-E": "dim"
+                },
+                "note": "No update"
+              },
+              {
+                "at": "pop#4",
+                "nodes": {
+                  "C": "done",
+                  "E": "active"
+                },
+                "edges": {
+                  "B-E": "tree"
+                },
+                "panels": {
+                  "heap": [
+                    "(7, D)"
+                  ]
+                },
+                "note": "Pop E (5): final"
+              },
+              {
+                "at": "then",
+                "nodes": {
+                  "E": "done",
+                  "D": "active"
+                },
+                "edges": {
+                  "B-D": "tree"
+                },
+                "panels": {
+                  "heap": []
+                },
+                "note": "Pop D (7): final"
+              },
+              {
+                "at": "final",
+                "nodes": {
+                  "D": "done"
+                },
+                "note": "Order: A, B, C, E, D — each final when popped"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "The heap and stale entries",
+      "question": "In the heap version, why check whether the popped distance is larger than dist[u]?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. In the heap version, why do you check whether the popped distance is larger than the recorded distance? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Why check <em>d &gt; dist[u]</em> after popping?"
+          }
+        },
+        {
+          "type": "code",
+          "say": "Here is the standard implementation. Distances start at infinity, and the source at zero. The priority queue is a min-heap, so it needs greater. Pop the closest pair. If its distance is larger than the recorded one, it is a stale entry, so skip it. Otherwise relax each edge, and push the improved neighbor.",
+          "props": {
+            "title": "Dijkstra <em>with a min-heap</em>",
+            "file": "dijkstra.cpp",
+            "tag": "O((V + E) log V)",
+            "size": 21,
+            "width": 1100,
+            "code": "vector<int> dijkstra(int n, const Graph& adj, int src) {\n    vector<int> dist(n, INF);\n    dist[src] = 0;\n    priority_queue<pair<int,int>, vector<pair<int,int>>, greater<>> pq;\n    pq.push({0, src});\n    while (!pq.empty()) {\n        auto [d, u] = pq.top(); pq.pop();\n        if (d > dist[u]) continue;  // stale entry\n        for (auto [v, w] : adj[u]) {\n            if (dist[u] + w < dist[v]) {\n                dist[v] = dist[u] + w;\n                pq.push({dist[v], v});\n            }\n        }\n    }\n    return dist;\n}",
+            "highlights": [
+              {
+                "at": "infinity",
+                "lines": "2-3",
+                "note": "INF everywhere, 0 at the source"
+              },
+              {
+                "at": "greater",
+                "lines": "4",
+                "note": "greater<> makes it a min-heap"
+              },
+              {
+                "at": "closest",
+                "lines": "7",
+                "note": "Pop the smallest (distance, vertex)"
+              },
+              {
+                "at": "stale",
+                "lines": "8",
+                "note": "An older, longer entry: skip it"
+              },
+              {
+                "at": "relax",
+                "lines": "9-12",
+                "note": "Relax and push the improvement"
+              }
+            ]
+          }
+        },
+        {
+          "type": "statement",
+          "say": "There is no decrease-key in the standard heap, so a vertex can be pushed several times. The outdated copies are simply skipped when they surface. That is lazy deletion.",
+          "props": {
+            "text": "Push duplicates, <em>skip the stale</em>.",
+            "sub": "std::priority_queue has no decrease-key, so outdated (distance, vertex) pairs stay in the heap until popped—then the check discards them.",
+            "subAt": "outdated"
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "When it breaks",
+      "question": "Why does Dijkstra fail with negative edges, and what do you use instead?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. Why does Dijkstra fail with negative edges, and what do you use instead? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Why do <em>negative edges</em> break Dijkstra?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Here is a graph with one negative edge. Dijkstra pops A, then sets B to two and C to three. B is the closest, so it is popped and declared final at two. Then C is popped, and its negative edge offers B a path of length one. Too late. B was already final, and the greedy invariant breaks.",
+          "props": {
+            "title": "One negative edge, <em>one wrong answer</em>",
+            "nodes": [
+              {
+                "id": "A",
+                "x": 240,
+                "y": 490
+              },
+              {
+                "id": "B",
+                "x": 760,
+                "y": 310
+              },
+              {
+                "id": "C",
+                "x": 760,
+                "y": 670
+              }
+            ],
+            "edges": [
+              {
+                "from": "A",
+                "to": "B",
+                "w": 2
+              },
+              {
+                "from": "A",
+                "to": "C",
+                "w": 3
+              },
+              {
+                "from": "C",
+                "to": "B",
+                "w": "−2"
+              }
+            ],
+            "panels": [
+              {
+                "key": "dist",
+                "label": "dist[ ]",
+                "type": "table",
+                "initial": {
+                  "A": "0",
+                  "B": "∞",
+                  "C": "∞"
+                }
+              },
+              {
+                "key": "heap",
+                "label": "Min-heap",
+                "type": "list",
+                "initial": [
+                  "(0, A)"
+                ]
+              }
+            ],
+            "steps": [
+              {
+                "at": "negative",
+                "edges": {
+                  "C-B": "relax"
+                },
+                "note": "C → B has weight −2"
+              },
+              {
+                "at": "pops",
+                "nodes": {
+                  "A": "active"
+                },
+                "edges": {
+                  "C-B": "base"
+                },
+                "panels": {
+                  "heap": []
+                },
+                "note": "Pop A"
+              },
+              {
+                "at": "sets",
+                "nodes": {
+                  "B": "queued",
+                  "C": "queued"
+                },
+                "edges": {
+                  "A-B": "relax",
+                  "A-C": "relax"
+                },
+                "panels": {
+                  "dist": {
+                    "B": "2",
+                    "C": "3"
+                  },
+                  "heap": [
+                    "(2, B)",
+                    "(3, C)"
+                  ]
+                },
+                "note": "dist[B] = 2, dist[C] = 3"
+              },
+              {
+                "at": "final",
+                "nodes": {
+                  "A": "done",
+                  "B": "done"
+                },
+                "edges": {
+                  "A-B": "tree",
+                  "A-C": "base"
+                },
+                "panels": {
+                  "heap": [
+                    "(3, C)"
+                  ]
+                },
+                "note": "B popped at 2 and declared final"
+              },
+              {
+                "at": "then#2",
+                "nodes": {
+                  "C": "active"
+                },
+                "edges": {
+                  "A-C": "tree"
+                },
+                "panels": {
+                  "heap": []
+                },
+                "note": "Pop C (3)"
+              },
+              {
+                "at": "offers",
+                "edges": {
+                  "C-B": "relax"
+                },
+                "panels": {
+                  "dist": {
+                    "B": "1 ✗"
+                  }
+                },
+                "note": "3 + (−2) = 1 < 2 … but B is already final"
+              },
+              {
+                "at": "breaks",
+                "nodes": {
+                  "B": "queued"
+                },
+                "note": "The greedy invariant breaks: use Bellman-Ford"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "So pick by graph. Dijkstra for non-negative weights. Bellman-Ford handles negative weights and detects negative cycles. Floyd-Warshall gives all pairs in V cubed. And on an unweighted graph, plain BFS is enough.",
+          "props": {
+            "title": "Pick the <em>right tool</em>",
+            "items": [
+              {
+                "at": "dijkstra",
+                "label": "Non-negative",
+                "title": "Dijkstra",
+                "body": "Single source, greedy.",
+                "code": "O((V+E) log V)"
+              },
+              {
+                "at": "bellman-ford",
+                "label": "Negative edges",
+                "title": "Bellman-Ford",
+                "body": "Detects negative cycles.",
+                "code": "O(V·E)"
+              },
+              {
+                "at": "floyd-warshall",
+                "label": "All pairs",
+                "title": "Floyd-Warshall",
+                "body": "Every source at once.",
+                "code": "O(V³)"
+              },
+              {
+                "at": "unweighted",
+                "label": "Unweighted",
+                "title": "BFS",
+                "body": "A plain queue suffices.",
+                "code": "O(V+E)"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

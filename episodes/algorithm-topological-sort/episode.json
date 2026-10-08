@@ -1,0 +1,652 @@
+{
+  "slug": "algorithm-topological-sort",
+  "series": "algorithm",
+  "title": "Topological sort",
+  "kicker": "Algorithm · Topological sort",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/topological-sort.md",
+  "summary": "Order a DAG so every edge points forward: peel off in-degree-zero vertices, and a leftover means a cycle.",
+  "captionFixes": [
+    {
+      "match": [
+        "R",
+        "and",
+        "B"
+      ],
+      "display": "A and B"
+    },
+    {
+      "match": [
+        "Take",
+        "R"
+      ],
+      "display": "Take A"
+    },
+    {
+      "match": [
+        "Only",
+        "a"
+      ],
+      "display": "Only A"
+    },
+    {
+      "match": [
+        "a",
+        "low",
+        "as"
+      ],
+      "display": "A lowers"
+    },
+    {
+      "match": [
+        "it",
+        "shows"
+      ],
+      "display": "It shows"
+    },
+    {
+      "match": [
+        "min",
+        "heap"
+      ],
+      "display": "min-heap"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Kahn's algorithm",
+      "question": "How does Kahn's algorithm produce a topological order?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Topological sort, question one. How does Kahn's algorithm produce a valid order? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How does <em>Kahn's algorithm</em> produce a valid order?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Count each vertex's incoming edges. A and B have none, so they start in the queue. Take A and remove its edge: C drops to one. Take B: C drops to zero and joins the queue, and so does D. Take C: E drops to one. Take D: E and F both reach zero and join the queue. Take E, then F. Every vertex came out, so the order is valid.",
+          "props": {
+            "title": "Peel off <em>in-degree zero</em>",
+            "nodes": [
+              {
+                "id": "A",
+                "x": 200,
+                "y": 340
+              },
+              {
+                "id": "B",
+                "x": 200,
+                "y": 650
+              },
+              {
+                "id": "C",
+                "x": 540,
+                "y": 340
+              },
+              {
+                "id": "D",
+                "x": 540,
+                "y": 650
+              },
+              {
+                "id": "E",
+                "x": 900,
+                "y": 340
+              },
+              {
+                "id": "F",
+                "x": 900,
+                "y": 650
+              }
+            ],
+            "edges": [
+              {
+                "from": "A",
+                "to": "C"
+              },
+              {
+                "from": "B",
+                "to": "C"
+              },
+              {
+                "from": "B",
+                "to": "D"
+              },
+              {
+                "from": "C",
+                "to": "E"
+              },
+              {
+                "from": "D",
+                "to": "E"
+              },
+              {
+                "from": "D",
+                "to": "F"
+              }
+            ],
+            "panels": [
+              {
+                "key": "deg",
+                "label": "in-degree",
+                "type": "table",
+                "initial": {
+                  "A": "0",
+                  "B": "0",
+                  "C": "2",
+                  "D": "1",
+                  "E": "2",
+                  "F": "1"
+                }
+              },
+              {
+                "key": "queue",
+                "label": "Queue",
+                "type": "list",
+                "initial": []
+              },
+              {
+                "key": "order",
+                "label": "Order",
+                "type": "list",
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "count",
+                "note": "In-degree = number of incoming edges"
+              },
+              {
+                "at": "none",
+                "nodes": {
+                  "A": "queued",
+                  "B": "queued"
+                },
+                "panels": {
+                  "queue": [
+                    "A",
+                    "B"
+                  ]
+                },
+                "note": "In-degree 0: no prerequisites"
+              },
+              {
+                "at": "take",
+                "nodes": {
+                  "A": "active"
+                },
+                "edges": {
+                  "A-C": "dim"
+                },
+                "panels": {
+                  "queue": [
+                    "B"
+                  ],
+                  "order": [
+                    "A"
+                  ]
+                },
+                "note": "Output A, remove its edges"
+              },
+              {
+                "at": "drops",
+                "panels": {
+                  "deg": {
+                    "C": "1"
+                  }
+                },
+                "note": "C: 2 → 1"
+              },
+              {
+                "at": "take#2",
+                "nodes": {
+                  "A": "done",
+                  "B": "active"
+                },
+                "edges": {
+                  "B-C": "dim",
+                  "B-D": "dim"
+                },
+                "panels": {
+                  "queue": [],
+                  "order": [
+                    "A",
+                    "B"
+                  ]
+                },
+                "note": "Output B"
+              },
+              {
+                "at": "drops#2",
+                "nodes": {
+                  "C": "queued"
+                },
+                "panels": {
+                  "deg": {
+                    "C": "0"
+                  },
+                  "queue": [
+                    "C"
+                  ]
+                },
+                "note": "C reaches 0 → enqueue"
+              },
+              {
+                "at": "does",
+                "nodes": {
+                  "D": "queued"
+                },
+                "panels": {
+                  "deg": {
+                    "D": "0"
+                  },
+                  "queue": [
+                    "C",
+                    "D"
+                  ]
+                },
+                "note": "D reaches 0 → enqueue"
+              },
+              {
+                "at": "take#3",
+                "nodes": {
+                  "B": "done",
+                  "C": "active"
+                },
+                "edges": {
+                  "C-E": "dim"
+                },
+                "panels": {
+                  "queue": [
+                    "D"
+                  ],
+                  "order": [
+                    "A",
+                    "B",
+                    "C"
+                  ]
+                },
+                "note": "Output C"
+              },
+              {
+                "at": "drops#3",
+                "panels": {
+                  "deg": {
+                    "E": "1"
+                  }
+                },
+                "note": "E: 2 → 1"
+              },
+              {
+                "at": "take#4",
+                "nodes": {
+                  "C": "done",
+                  "D": "active"
+                },
+                "edges": {
+                  "D-E": "dim",
+                  "D-F": "dim"
+                },
+                "panels": {
+                  "queue": [],
+                  "order": [
+                    "A",
+                    "B",
+                    "C",
+                    "D"
+                  ]
+                },
+                "note": "Output D"
+              },
+              {
+                "at": "both",
+                "nodes": {
+                  "E": "queued",
+                  "F": "queued"
+                },
+                "panels": {
+                  "deg": {
+                    "E": "0",
+                    "F": "0"
+                  },
+                  "queue": [
+                    "E",
+                    "F"
+                  ]
+                },
+                "note": "E and F reach 0 → enqueue"
+              },
+              {
+                "at": "take#5",
+                "nodes": {
+                  "D": "done",
+                  "E": "active"
+                },
+                "panels": {
+                  "queue": [
+                    "F"
+                  ],
+                  "order": [
+                    "A",
+                    "B",
+                    "C",
+                    "D",
+                    "E"
+                  ]
+                },
+                "note": "Output E"
+              },
+              {
+                "at": "then",
+                "nodes": {
+                  "E": "done",
+                  "F": "active"
+                },
+                "panels": {
+                  "queue": [],
+                  "order": [
+                    "A",
+                    "B",
+                    "C",
+                    "D",
+                    "E",
+                    "F"
+                  ]
+                },
+                "note": "Output F"
+              },
+              {
+                "at": "every",
+                "nodes": {
+                  "F": "done"
+                },
+                "note": "All 6 vertices output → valid order"
+              }
+            ]
+          }
+        },
+        {
+          "type": "statement",
+          "say": "Notice that A and B could have come out in either order. A graph can have many valid topological orders. It is unique only when the vertices form a single chain.",
+          "props": {
+            "text": "Many valid orders, <em>one rule</em>.",
+            "sub": "Every edge u → v puts u before v. The order is unique only when the DAG is a single chain.",
+            "subAt": "unique"
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Detecting a cycle",
+      "question": "How does topological sort tell you the graph has a cycle?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. How does topological sort tell you that the graph has a cycle? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How does topological sort detect a <em>cycle</em>?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Close a loop: B points to C, C to D, and D back to B. Only A starts at zero. Removing A lowers B to one, but B still waits on D, D waits on C, and C waits on B. The queue empties with only one of four vertices output. Fewer vertices than the graph has means a cycle.",
+          "props": {
+            "title": "A loop <em>never drains</em>",
+            "nodes": [
+              {
+                "id": "A",
+                "x": 220,
+                "y": 490
+              },
+              {
+                "id": "B",
+                "x": 560,
+                "y": 490
+              },
+              {
+                "id": "C",
+                "x": 920,
+                "y": 310
+              },
+              {
+                "id": "D",
+                "x": 920,
+                "y": 670
+              }
+            ],
+            "edges": [
+              {
+                "from": "A",
+                "to": "B"
+              },
+              {
+                "from": "B",
+                "to": "C"
+              },
+              {
+                "from": "C",
+                "to": "D"
+              },
+              {
+                "from": "D",
+                "to": "B"
+              }
+            ],
+            "panels": [
+              {
+                "key": "deg",
+                "label": "in-degree",
+                "type": "table",
+                "initial": {
+                  "A": "0",
+                  "B": "2",
+                  "C": "1",
+                  "D": "1"
+                }
+              },
+              {
+                "key": "queue",
+                "label": "Queue",
+                "type": "list",
+                "initial": []
+              },
+              {
+                "key": "order",
+                "label": "Order",
+                "type": "list",
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "loop",
+                "edges": {
+                  "B-C": "relax",
+                  "C-D": "relax",
+                  "D-B": "relax"
+                },
+                "note": "B → C → D → B"
+              },
+              {
+                "at": "only",
+                "nodes": {
+                  "A": "queued"
+                },
+                "edges": {
+                  "B-C": "base",
+                  "C-D": "base",
+                  "D-B": "base"
+                },
+                "panels": {
+                  "queue": [
+                    "A"
+                  ]
+                },
+                "note": "Only A has in-degree 0"
+              },
+              {
+                "at": "removing",
+                "nodes": {
+                  "A": "done"
+                },
+                "edges": {
+                  "A-B": "dim"
+                },
+                "panels": {
+                  "deg": {
+                    "B": "1"
+                  },
+                  "queue": [],
+                  "order": [
+                    "A"
+                  ]
+                },
+                "note": "Output A; B: 2 → 1"
+              },
+              {
+                "at": "waits",
+                "nodes": {
+                  "B": "dim",
+                  "C": "dim",
+                  "D": "dim"
+                },
+                "edges": {
+                  "B-C": "relax",
+                  "C-D": "relax",
+                  "D-B": "relax"
+                },
+                "note": "B, C, D each wait on another"
+              },
+              {
+                "at": "empties",
+                "note": "Queue empty: 1 of 4 vertices output"
+              },
+              {
+                "at": "fewer",
+                "note": "order.size() < V → the graph has a cycle"
+              }
+            ]
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Kahn's algorithm detects a cycle by counting: the output is shorter than the number of vertices. The DFS version tracks a visiting state, and an edge back to a vertex still on the call stack is a back edge, which is a cycle.",
+          "props": {
+            "title": "Two ways to <em>catch it</em>",
+            "left": {
+              "at": "counting",
+              "label": "Kahn's (BFS)",
+              "title": "Count the output",
+              "code": "if ((int)order.size() != n)\n    return {};  // cycle",
+              "body": "Leftover vertices are on or behind a cycle."
+            },
+            "right": {
+              "at": "visiting",
+              "label": "DFS",
+              "title": "Find a back edge",
+              "code": "state[u] = VISITING;\nfor (int v : adj[u])\n    if (state[v] == VISITING)\n        return false;  // cycle",
+              "body": "An edge into the current DFS path."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Code and patterns",
+      "question": "Write Kahn's algorithm, and name problems it solves.",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. Write Kahn's algorithm from memory, and name the problems it solves. Pause and sketch it out.",
+          "pauseAfter": 4,
+          "props": {
+            "question": "Write Kahn's algorithm, and <em>name its problems</em>."
+          }
+        },
+        {
+          "type": "code",
+          "say": "Compute every in-degree first. Seed the queue with all zero in-degree vertices. Pop one, append it to the order, and decrement each neighbor. A neighbor that reaches zero joins the queue. Finally, if the order is shorter than n, report a cycle.",
+          "props": {
+            "title": "Kahn's algorithm, <em>in code</em>",
+            "file": "topo_sort.cpp",
+            "tag": "O(V + E)",
+            "size": 21,
+            "width": 1060,
+            "code": "vector<int> topoSort(int n, const vector<vector<int>>& adj) {\n    vector<int> indegree(n, 0);\n    for (int u = 0; u < n; ++u)\n        for (int v : adj[u]) indegree[v]++;\n    queue<int> q;\n    for (int i = 0; i < n; ++i)\n        if (indegree[i] == 0) q.push(i);\n    vector<int> order;\n    while (!q.empty()) {\n        int u = q.front(); q.pop();\n        order.push_back(u);\n        for (int v : adj[u])\n            if (--indegree[v] == 0) q.push(v);\n    }\n    if ((int)order.size() != n) return {};  // cycle\n    return order;\n}",
+            "highlights": [
+              {
+                "at": "compute",
+                "lines": "2-4",
+                "note": "Count incoming edges"
+              },
+              {
+                "at": "seed",
+                "lines": "5-7",
+                "note": "Start from every in-degree-0 vertex"
+              },
+              {
+                "at": "append",
+                "lines": "10-11",
+                "note": "Pop and output"
+              },
+              {
+                "at": "decrement",
+                "lines": "12-13",
+                "note": "Decrement; enqueue at zero"
+              },
+              {
+                "at": "finally",
+                "lines": "15",
+                "note": "Short output → cycle"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "It shows up everywhere. Course schedules and build orders are dependency resolution. Processing the queue level by level gives parallel scheduling, and the number of levels is the minimum time. Swap the queue for a min-heap to get the lexicographically smallest order. And in a DAG, relaxing edges in topological order gives longest or shortest paths in linear time.",
+          "props": {
+            "title": "Where it <em>shows up</em>",
+            "items": [
+              {
+                "at": "course",
+                "label": "Dependencies",
+                "title": "Course schedule",
+                "body": "Can every task finish? In what order?",
+                "code": "LC 207 · LC 210"
+              },
+              {
+                "at": "level",
+                "label": "Level by level",
+                "title": "Parallel scheduling",
+                "body": "Levels = minimum semesters.",
+                "code": "LC 1136"
+              },
+              {
+                "at": "swap",
+                "label": "Min-heap queue",
+                "title": "Smallest order",
+                "body": "Lexicographically first ordering.",
+                "code": "Alien Dictionary"
+              },
+              {
+                "at": "relaxing",
+                "label": "DAG DP",
+                "title": "Longest path",
+                "body": "Relax edges in topo order: O(V + E).",
+                "code": "LC 329"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

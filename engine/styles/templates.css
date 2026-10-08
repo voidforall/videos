@@ -82,3 +82,28 @@
 .tpl-stack .sk-item { left: 1470px; top: 0; width: 340px; height: 72px; display: flex; align-items: center; justify-content: space-between; padding: 0 26px; border: 1px solid var(--hair-strong); border-radius: 10px; background: var(--cream); box-shadow: var(--shadow); }
 .tpl-stack .sk-item b { font: 400 44px/1 var(--serif); }
 .tpl-stack .sk-item span { font: 500 18px/1 var(--mono); color: rgba(20, 20, 19, 0.5); letter-spacing: 0.06em; }
+
+/* — graph — (graph area x 80–1180, y 220–740; side panels x 1240–1840; note below) */
+.tpl-graph .gr-svg { left: 0; top: 0; width: 1920px; height: 1080px; overflow: visible; }
+.tpl-graph .gr-svg line { stroke-linecap: round; }
+.tpl-graph .gr-node { left: 0; top: 0; display: grid; place-items: center; border-radius: 9999px; border: 2px solid var(--hair-strong); background: var(--tile); font: 400 40px/1 var(--serif); box-shadow: var(--shadow); }
+.tpl-graph .gr-node.gr-active { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+.tpl-graph .gr-node.gr-done { background: var(--cream); border-color: #5db872; border-width: 3px; }
+.tpl-graph .gr-node.gr-queued { background: var(--cream); border: 3px dashed var(--coral); }
+.tpl-graph .gr-node.gr-dim { opacity: 0.35; }
+.tpl-graph .gr-w { left: 0; top: 0; width: 44px; height: 36px; display: grid; place-items: center; border-radius: 8px; background: var(--cream); border: 1px solid var(--hair); font: 500 22px/1 var(--mono); }
+.tpl-graph .gr-side { left: 1240px; top: 222px; width: 600px; display: flex; flex-direction: column; gap: 18px; }
+.tpl-graph .gr-panel { position: relative; padding: 20px 24px 22px; }
+.tpl-graph .gr-table { display: flex; margin-top: 14px; border: 1px solid var(--hair); border-radius: 8px; overflow: hidden; }
+.tpl-graph .gr-col { flex: 1; min-width: 0; text-align: center; }
+.tpl-graph .gr-col + .gr-col { border-left: 1px solid var(--hair); }
+.tpl-graph .gr-th { display: block; padding: 8px 0; background: var(--tile); font: 400 26px/1 var(--serif); }
+.tpl-graph .gr-td { position: relative; display: block; height: 52px; }
+.tpl-graph .gr-v { position: absolute; inset: 0; display: grid; place-items: center; font: 500 26px/1 var(--mono); opacity: 0; visibility: hidden; }
+.tpl-graph .gr-lists { position: relative; height: 56px; margin-top: 14px; }
+.tpl-graph .gr-list { position: absolute; inset: 0; display: flex; flex-wrap: wrap; gap: 10px; align-content: flex-start; opacity: 0; visibility: hidden; }
+.tpl-graph .gr-chip { padding: 9px 14px 8px; border: 1px solid var(--hair-strong); border-radius: 8px; background: var(--tile); font: 500 22px/1 var(--mono); }
+.tpl-graph .gr-empty { padding: 9px 0; font: 500 20px/1 var(--mono); color: rgba(20, 20, 19, 0.4); }
+.tpl-graph .gr-note { left: 80px; right: 80px; top: 764px; height: 100px; padding: 16px 26px; }
+.tpl-graph .gr-note .ar-slot { margin-top: 10px; height: 40px; }
+.tpl-graph .gr-note .ar-swap { font: 400 30px/1.2 var(--sans); }

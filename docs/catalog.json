@@ -158,6 +158,108 @@
           "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-monotonic-stack/algorithm-monotonic-stack-03.jpg"
         }
       ]
+    },
+    {
+      "slug": "algorithm-dijkstra",
+      "series": "algorithm",
+      "title": "Dijkstra's algorithm",
+      "kicker": "Algorithm · Dijkstra",
+      "summary": "Greedy single-source shortest paths: pop the closest vertex, relax its edges, never look back—until a negative edge breaks the promise.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/dijkstra.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Relax and commit",
+          "question": "What does Dijkstra commit to at each step, and why is that safe?",
+          "duration": 56,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-dijkstra/algorithm-dijkstra-01.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-dijkstra/algorithm-dijkstra-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "The heap and stale entries",
+          "question": "In the heap version, why check whether the popped distance is larger than dist[u]?",
+          "duration": 42,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-dijkstra/algorithm-dijkstra-02.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-dijkstra/algorithm-dijkstra-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "When it breaks",
+          "question": "Why does Dijkstra fail with negative edges, and what do you use instead?",
+          "duration": 44,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-dijkstra/algorithm-dijkstra-03.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-dijkstra/algorithm-dijkstra-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "algorithm-topological-sort",
+      "series": "algorithm",
+      "title": "Topological sort",
+      "kicker": "Algorithm · Topological sort",
+      "summary": "Order a DAG so every edge points forward: peel off in-degree-zero vertices, and a leftover means a cycle.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/topological-sort.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Kahn's algorithm",
+          "question": "How does Kahn's algorithm produce a topological order?",
+          "duration": 42,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-topological-sort/algorithm-topological-sort-01.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-topological-sort/algorithm-topological-sort-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Detecting a cycle",
+          "question": "How does topological sort tell you the graph has a cycle?",
+          "duration": 42,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-topological-sort/algorithm-topological-sort-02.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-topological-sort/algorithm-topological-sort-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Code and patterns",
+          "question": "Write Kahn's algorithm, and name problems it solves.",
+          "duration": 49,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-topological-sort/algorithm-topological-sort-03.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-topological-sort/algorithm-topological-sort-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "algorithm-union-find",
+      "series": "algorithm",
+      "title": "Union-find",
+      "kicker": "Algorithm · Union-find",
+      "summary": "Disjoint sets as a forest of parent pointers: find the root, link roots, and two optimizations make it effectively constant time.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/disjoint-set.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Find and union",
+          "question": "How does union-find represent sets, and what do find and union do?",
+          "duration": 45,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-union-find/algorithm-union-find-01.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-union-find/algorithm-union-find-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "The two optimizations",
+          "question": "Which two optimizations make union-find effectively constant time?",
+          "duration": 38,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-union-find/algorithm-union-find-02.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-union-find/algorithm-union-find-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Code and patterns",
+          "question": "Write union-find with both optimizations, and name problems it solves.",
+          "duration": 50,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-union-find/algorithm-union-find-03.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-union-find/algorithm-union-find-03.jpg"
+        }
+      ]
     }
   ]
 }
