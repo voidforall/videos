@@ -430,6 +430,108 @@
       ]
     },
     {
+      "slug": "cpp-raii-rule-of-zero",
+      "series": "cpp",
+      "title": "RAII and the rule of zero",
+      "kicker": "C++ · RAII",
+      "summary": "Tie resources to object lifetimes: destructors run during unwinding, shallow copies double-free, and the rule of zero lets the compiler get it right.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/cpp/rule-of-5-and-0.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "RAII and stack unwinding",
+          "question": "What is RAII, and why does it make code exception safe?",
+          "duration": 50,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-raii-rule-of-zero/cpp-raii-rule-of-zero-01.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-raii-rule-of-zero/cpp-raii-rule-of-zero-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "The rule of three and five",
+          "question": "Your class deletes a raw pointer in its destructor. What else must you write, and why?",
+          "duration": 48,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-raii-rule-of-zero/cpp-raii-rule-of-zero-02.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-raii-rule-of-zero/cpp-raii-rule-of-zero-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "The rule of zero",
+          "question": "How do you avoid writing any of the five special members?",
+          "duration": 46,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-raii-rule-of-zero/cpp-raii-rule-of-zero-03.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-raii-rule-of-zero/cpp-raii-rule-of-zero-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "cpp-copy-elision",
+      "series": "cpp",
+      "title": "Copy elision and RVO",
+      "kicker": "C++ · Return value optimization",
+      "summary": "Returning by value builds the object straight in the caller: what C++17 guarantees, what blocks NRVO, and the elide → move → copy fallback.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/cpp/return-value-optimization.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Construct in place",
+          "question": "What does return value optimization actually do?",
+          "duration": 40,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-copy-elision/cpp-copy-elision-01.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-copy-elision/cpp-copy-elision-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Guaranteed vs optional",
+          "question": "Which copy elisions does C++17 guarantee, and what blocks NRVO?",
+          "duration": 43,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-copy-elision/cpp-copy-elision-02.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-copy-elision/cpp-copy-elision-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Elide, move, or copy",
+          "question": "If the compiler cannot elide a return, what happens instead?",
+          "duration": 46,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-copy-elision/cpp-copy-elision-03.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-copy-elision/cpp-copy-elision-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "cpp-memory-ordering",
+      "series": "cpp",
+      "title": "Memory ordering and atomics",
+      "kicker": "C++ · Memory ordering",
+      "summary": "Why another thread can see a flag before the data it guards, how release and acquire fix it, and what std::atomic can hold lock-free.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/cpp/concurrency/memory-barrier.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Why reordering breaks threads",
+          "question": "How can another thread see a flag set before the data it guards?",
+          "duration": 36,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-memory-ordering/cpp-memory-ordering-01.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-memory-ordering/cpp-memory-ordering-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "The memory orders",
+          "question": "relaxed, acquire, release, seq_cst: what does each guarantee?",
+          "duration": 45,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-memory-ordering/cpp-memory-ordering-02.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-memory-ordering/cpp-memory-ordering-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "What std::atomic can hold",
+          "question": "Which types can std::atomic hold lock-free, and why?",
+          "duration": 57,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-memory-ordering/cpp-memory-ordering-03.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-memory-ordering/cpp-memory-ordering-03.jpg"
+        }
+      ]
+    },
+    {
       "series": "cpp",
       "slug": "cpp-functional-walkthrough",
       "title": "C++ functional programming walkthrough",

@@ -43,7 +43,8 @@ def kokoro():
 
 
 def synthesize(text: str, cfg: dict, out: Path) -> None:
-    sentences = [s.strip() for s in re.split(r"(?<=[.?!])\s+", text) if s.strip()]
+    # split on sentence ends, but not after spelled-out initials like "R. A. I. I."
+    sentences = [s.strip() for s in re.split(r"(?<!\b[A-Z]\.)(?<=[.?!])\s+", text) if s.strip()]
     pieces = []
     for sentence in sentences:
         audio, rate = kokoro().create(sentence, voice=cfg["voice"], speed=cfg["speed"], lang=cfg["lang"])

@@ -1,0 +1,420 @@
+{
+  "slug": "cpp-copy-elision",
+  "series": "cpp",
+  "title": "Copy elision and RVO",
+  "kicker": "C++ · Return value optimization",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/cpp/return-value-optimization.md",
+  "summary": "Returning by value builds the object straight in the caller: what C++17 guarantees, what blocks NRVO, and the elide → move → copy fallback.",
+  "captionFixes": [
+    {
+      "match": [
+        "standard",
+        "move"
+      ],
+      "display": "std::move"
+    },
+    {
+      "match": [
+        "N",
+        "R",
+        "V",
+        "O"
+      ],
+      "display": "NRVO"
+    },
+    {
+      "match": [
+        "NRV",
+        "O"
+      ],
+      "display": "NRVO"
+    },
+    {
+      "match": [
+        "R",
+        "V",
+        "O"
+      ],
+      "display": "RVO"
+    },
+    {
+      "match": [
+        "Kali"
+      ],
+      "display": "callee"
+    },
+    {
+      "match": [
+        "copier",
+        "lisions"
+      ],
+      "display": "copy elisions"
+    },
+    {
+      "match": [
+        "PR",
+        "value"
+      ],
+      "display": "prvalue"
+    },
+    {
+      "match": [
+        "R",
+        "value"
+      ],
+      "display": "rvalue"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Construct in place",
+      "question": "What does return value optimization actually do?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Copy elision, question one. What does return value optimization actually do? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What does <em>return value optimization</em> actually do?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Without elision, returning by value builds a temporary inside the callee, moves or copies it into the caller's variable, and then destroys the temporary. With return value optimization, the caller passes the address of its own variable as a hidden parameter, and the callee constructs the object right there. One construction. No copy, no move, and no temporary.",
+          "props": {
+            "title": "Build it <em>where it will live</em>",
+            "nodes": [
+              {
+                "id": "caller",
+                "label": "caller:  Heavy obj",
+                "x": 330,
+                "y": 320,
+                "w": 420,
+                "h": 72
+              },
+              {
+                "id": "callee",
+                "label": "callee:  createObject()",
+                "x": 330,
+                "y": 620,
+                "w": 420,
+                "h": 72
+              },
+              {
+                "id": "temp",
+                "label": "temporary Heavy",
+                "x": 900,
+                "y": 620,
+                "w": 300,
+                "h": 72,
+                "hidden": true
+              }
+            ],
+            "edges": [],
+            "panels": [
+              {
+                "key": "ops",
+                "label": "Operations",
+                "type": "list",
+                "rows": 3,
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "builds",
+                "show": [
+                  "temp"
+                ],
+                "add": [
+                  {
+                    "from": "callee",
+                    "to": "temp"
+                  }
+                ],
+                "nodes": {
+                  "temp": "active"
+                },
+                "panels": {
+                  "ops": [
+                    "Heavy()  (temp)"
+                  ]
+                },
+                "note": "Without elision: construct a temporary"
+              },
+              {
+                "at": "moves",
+                "add": [
+                  {
+                    "from": "temp",
+                    "to": "caller",
+                    "w": "copy / move"
+                  }
+                ],
+                "nodes": {
+                  "temp": "base",
+                  "caller": "active"
+                },
+                "edges": {
+                  "temp-caller": "relax"
+                },
+                "panels": {
+                  "ops": [
+                    "Heavy()  (temp)",
+                    "Heavy(Heavy&&)  → obj"
+                  ]
+                },
+                "note": "…move or copy it into obj"
+              },
+              {
+                "at": "destroys",
+                "nodes": {
+                  "temp": "dim",
+                  "caller": "base"
+                },
+                "edges": {
+                  "temp-caller": "dim"
+                },
+                "panels": {
+                  "ops": [
+                    "Heavy()  (temp)",
+                    "Heavy(Heavy&&)  → obj",
+                    "~Heavy()  (temp)"
+                  ]
+                },
+                "note": "…then destroy the temporary"
+              },
+              {
+                "at": "passes",
+                "remove": [
+                  "temp-caller",
+                  "callee-temp"
+                ],
+                "add": [
+                  {
+                    "from": "caller",
+                    "to": "callee",
+                    "w": "hidden &obj"
+                  }
+                ],
+                "nodes": {
+                  "caller": "active"
+                },
+                "panels": {
+                  "ops": []
+                },
+                "note": "With RVO: the caller passes &obj"
+              },
+              {
+                "at": "constructs",
+                "nodes": {
+                  "caller": "done",
+                  "callee": "active"
+                },
+                "edges": {
+                  "caller-callee": "tree"
+                },
+                "panels": {
+                  "ops": [
+                    "Heavy()  directly in obj"
+                  ]
+                },
+                "note": "The callee constructs straight into obj"
+              },
+              {
+                "at": "one",
+                "nodes": {
+                  "callee": "base"
+                },
+                "note": "1 constructor · 0 copies · 0 moves"
+              }
+            ]
+          }
+        },
+        {
+          "type": "code",
+          "say": "You can prove it with a type that counts its copies and moves. Return a temporary from a factory, and both counters stay at zero.",
+          "props": {
+            "title": "Count the <em>copies</em>",
+            "file": "tracker.cpp",
+            "tag": "C++17",
+            "size": 22,
+            "width": 1080,
+            "code": "struct Tracker {\n    static inline int copies = 0, moves = 0;\n    Tracker() = default;\n    Tracker(const Tracker&) { ++copies; }\n    Tracker(Tracker&&) { ++moves; }\n};\nTracker factory() { return Tracker(); }\n\nint main() {\n    Tracker t = factory();\n    std::cout << Tracker::copies << Tracker::moves;  // 00\n}",
+            "highlights": [
+              {
+                "at": "counts",
+                "lines": "2-5",
+                "note": "Count every copy and move"
+              },
+              {
+                "at": "factory",
+                "lines": "7,10",
+                "note": "Return a temporary (a prvalue)"
+              },
+              {
+                "at": "zero",
+                "lines": "11",
+                "note": "copies == 0, moves == 0"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Guaranteed vs optional",
+      "question": "Which copy elisions does C++17 guarantee, and what blocks NRVO?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. Which copy elisions does C plus plus seventeen guarantee, and what blocks the named version? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What does <em>C++17 guarantee</em>, and what blocks NRVO?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Returning a temporary, a prvalue, is guaranteed elision since C plus plus seventeen. It even works for a type that cannot be copied or moved at all. Returning a named local is the named return value optimization. Every major compiler does it, but the standard does not require it.",
+          "props": {
+            "title": "Unnamed or <em>named</em>",
+            "left": {
+              "at": "temporary",
+              "label": "RVO · prvalue",
+              "title": "Guaranteed (C++17)",
+              "tone": "good",
+              "code": "NoCopy factory() {\n    return NoCopy();  // OK even if copy/move\n}                     // are deleted",
+              "body": "Language rule, not an optimization."
+            },
+            "right": {
+              "at": "named",
+              "label": "NRVO · named local",
+              "title": "Optional",
+              "code": "Heavy create() {\n    Heavy h;\n    h.configure();\n    return h;  // usually elided\n}",
+              "body": "Every major compiler does it at -O1+."
+            },
+            "verdict": {
+              "at": "require",
+              "text": "Guaranteed: prvalues. Best effort: named locals.",
+              "code": "C++17"
+            }
+          }
+        },
+        {
+          "type": "points",
+          "say": "The named version is blocked when a function returns one of two different locals, returns a parameter, returns a global or a member, or wraps the return in standard move. Then you get a move, or a copy if the type cannot move.",
+          "props": {
+            "title": "What <em>blocks</em> NRVO",
+            "items": [
+              {
+                "at": "different",
+                "label": "Two candidates",
+                "title": "return flag ? a : b",
+                "body": "The compiler can't pick one slot.",
+                "code": "use one variable"
+              },
+              {
+                "at": "parameter",
+                "label": "Parameter",
+                "title": "return param;",
+                "body": "Already lives in another frame.",
+                "code": "implicit move"
+              },
+              {
+                "at": "global",
+                "label": "Global / member",
+                "title": "return member_;",
+                "body": "Outlives the call: must copy.",
+                "code": "copy"
+              },
+              {
+                "at": "wraps",
+                "label": "Anti-pattern",
+                "title": "return std::move(x);",
+                "body": "Turns elision into a move.",
+                "code": "never"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Elide, move, or copy",
+      "question": "If the compiler cannot elide a return, what happens instead?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. If the compiler cannot elide a return, what happens instead? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "If elision is impossible, <em>what happens instead</em>?"
+          }
+        },
+        {
+          "type": "statement",
+          "say": "There is a strict order of preference. First, elision, which is no operation at all. If that is impossible, an implicit move, because a returned local is treated as an rvalue. Only if the type cannot move does it fall back to a copy.",
+          "props": {
+            "text": "Elide → <em>move</em> → copy.",
+            "sub": "Elision costs nothing. A returned local is implicitly treated as an rvalue, so it moves. Copying is the last resort for non-movable types.",
+            "subAt": "fall"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "To keep the named optimization, return a single variable from every path. Two candidates mean the compiler cannot know which one to build in the caller's slot.",
+          "props": {
+            "title": "One <em>return variable</em>",
+            "left": {
+              "at": "two",
+              "label": "Blocks NRVO",
+              "title": "Two candidates",
+              "tone": "bad",
+              "code": "std::string build(bool flag) {\n    std::string yes = \"yes\", no = \"no\";\n    return flag ? yes : no;\n}"
+            },
+            "right": {
+              "at": "single",
+              "label": "NRVO-friendly",
+              "title": "One variable",
+              "tone": "good",
+              "code": "std::string build(bool flag) {\n    std::string result;\n    result = flag ? \"yes\" : \"no\";\n    return result;\n}"
+            }
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Return by value, because it is cheap. Never wrap a return in standard move. Use a single return variable. And prefer returning a prvalue, which is guaranteed.",
+          "props": {
+            "title": "Copy elision, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "cheap",
+                "text": "Return by value: it's cheap.",
+                "code": "elide → move → copy"
+              },
+              {
+                "at": "never",
+                "text": "Never return std::move(local).",
+                "code": "blocks NRVO"
+              },
+              {
+                "at": "single",
+                "text": "One named return variable.",
+                "code": "NRVO-friendly"
+              },
+              {
+                "at": "guaranteed",
+                "text": "Prefer returning a prvalue.",
+                "code": "guaranteed (C++17)"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

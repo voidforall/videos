@@ -1,0 +1,624 @@
+{
+  "slug": "cpp-raii-rule-of-zero",
+  "series": "cpp",
+  "title": "RAII and the rule of zero",
+  "kicker": "C++ · RAII",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/cpp/rule-of-5-and-0.md",
+  "summary": "Tie resources to object lifetimes: destructors run during unwinding, shallow copies double-free, and the rule of zero lets the compiler get it right.",
+  "captionFixes": [
+    {
+      "match": [
+        "unique",
+        "pointer"
+      ],
+      "display": "unique_ptr"
+    },
+    {
+      "match": [
+        "lock",
+        "guard"
+      ],
+      "display": "lock_guard"
+    },
+    {
+      "match": [
+        "exceptions",
+        "safe"
+      ],
+      "display": "exception safe"
+    },
+    {
+      "match": [
+        "pass"
+      ],
+      "display": "parse"
+    },
+    {
+      "match": [
+        "main",
+        "calls"
+      ],
+      "display": "Main calls"
+    },
+    {
+      "match": [
+        "process",
+        "opens"
+      ],
+      "display": "Process opens"
+    },
+    {
+      "match": [
+        "it",
+        "then"
+      ],
+      "display": "It then"
+    },
+    {
+      "match": [
+        "now"
+      ],
+      "display": "Now"
+    },
+    {
+      "match": [
+        "as",
+        "the"
+      ],
+      "display": "As the"
+    },
+    {
+      "match": [
+        "the",
+        "vector",
+        "frees"
+      ],
+      "display": "The vector frees"
+    },
+    {
+      "match": [
+        "then",
+        "the"
+      ],
+      "display": "Then the"
+    },
+    {
+      "match": [
+        "assignment",
+        "2"
+      ],
+      "display": "assignment too"
+    },
+    {
+      "match": [
+        "RII"
+      ],
+      "display": "RAII"
+    },
+    {
+      "match": [
+        "RAI-I"
+      ],
+      "display": "RAII"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "RAII and stack unwinding",
+      "question": "What is RAII, and why does it make code exception safe?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "R. A. I. I., question one. What is R. A. I. I., and why does it make code exception safe? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What is <em>RAII</em>, and why is it exception safe?"
+          }
+        },
+        {
+          "type": "code",
+          "say": "R. A. I. I. ties a resource to an object's lifetime. The constructor acquires it, and if that fails, it throws, so a half-built object never exists. The destructor releases it, and it must never throw.",
+          "props": {
+            "title": "Acquire in the constructor, <em>release in the destructor</em>",
+            "file": "file_handler.hpp",
+            "tag": "RAII",
+            "size": 23,
+            "width": 1100,
+            "code": "class FileHandler {\npublic:\n    explicit FileHandler(const char* name) : file_(name) {\n        if (!file_) throw std::runtime_error(\"open failed\");\n    }\n    ~FileHandler() { file_.close(); }   // never throws\nprivate:\n    std::ofstream file_;\n};",
+            "highlights": [
+              {
+                "at": "ties",
+                "lines": "1,8",
+                "note": "The resource lives inside an object"
+              },
+              {
+                "at": "acquires",
+                "lines": "3",
+                "note": "Acquire in the constructor"
+              },
+              {
+                "at": "fails",
+                "lines": "4",
+                "note": "Failure throws: no half-built object"
+              },
+              {
+                "at": "releases",
+                "lines": "6",
+                "note": "Release in the destructor, never throw"
+              }
+            ]
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Main calls process. Process opens a file and takes a lock, each held by a local object. It then calls parse, which builds a vector. Now parse throws. As the exception travels up, every frame it leaves runs its destructors, newest first. The vector frees its memory. Then the lock guard unlocks the mutex, and the file handler closes the file. Nothing leaks, and no cleanup code was written by hand.",
+          "props": {
+            "title": "Unwinding runs <em>every destructor</em>",
+            "nodes": [
+              {
+                "id": "main",
+                "label": "main()",
+                "x": 200,
+                "y": 290,
+                "w": 220,
+                "h": 70
+              },
+              {
+                "id": "proc",
+                "label": "process()",
+                "x": 200,
+                "y": 455,
+                "w": 220,
+                "h": 70,
+                "hidden": true
+              },
+              {
+                "id": "parse",
+                "label": "parse()",
+                "x": 200,
+                "y": 650,
+                "w": 220,
+                "h": 70,
+                "hidden": true
+              },
+              {
+                "id": "file",
+                "label": "FileHandler f",
+                "x": 600,
+                "y": 410,
+                "w": 300,
+                "h": 60,
+                "hidden": true
+              },
+              {
+                "id": "lock",
+                "label": "lock_guard lk",
+                "x": 600,
+                "y": 500,
+                "w": 300,
+                "h": 60,
+                "hidden": true
+              },
+              {
+                "id": "buf",
+                "label": "std::vector buf",
+                "x": 600,
+                "y": 650,
+                "w": 300,
+                "h": 60,
+                "hidden": true
+              }
+            ],
+            "edges": [],
+            "panels": [
+              {
+                "key": "dtors",
+                "label": "Destructors run",
+                "type": "list",
+                "rows": 3,
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "calls",
+                "show": [
+                  "proc"
+                ],
+                "add": [
+                  {
+                    "from": "main",
+                    "to": "proc"
+                  }
+                ],
+                "nodes": {
+                  "proc": "active"
+                },
+                "note": "main → process()"
+              },
+              {
+                "at": "opens",
+                "show": [
+                  "file"
+                ],
+                "add": [
+                  {
+                    "from": "proc",
+                    "to": "file"
+                  }
+                ],
+                "note": "FileHandler f(\"log.txt\")"
+              },
+              {
+                "at": "takes",
+                "show": [
+                  "lock"
+                ],
+                "add": [
+                  {
+                    "from": "proc",
+                    "to": "lock"
+                  }
+                ],
+                "note": "lock_guard lk(mtx)"
+              },
+              {
+                "at": "calls#2",
+                "show": [
+                  "parse"
+                ],
+                "add": [
+                  {
+                    "from": "proc",
+                    "to": "parse"
+                  }
+                ],
+                "nodes": {
+                  "proc": "base",
+                  "parse": "active"
+                },
+                "note": "process → parse()"
+              },
+              {
+                "at": "builds",
+                "show": [
+                  "buf"
+                ],
+                "add": [
+                  {
+                    "from": "parse",
+                    "to": "buf"
+                  }
+                ],
+                "note": "std::vector buf(1024)"
+              },
+              {
+                "at": "throws",
+                "nodes": {
+                  "parse": "queued"
+                },
+                "note": "throw std::runtime_error"
+              },
+              {
+                "at": "travels",
+                "note": "Stack unwinding: newest objects first"
+              },
+              {
+                "at": "frees",
+                "nodes": {
+                  "buf": "dim",
+                  "parse": "dim"
+                },
+                "panels": {
+                  "dtors": [
+                    "~vector  → memory freed"
+                  ]
+                },
+                "note": "parse() frame unwinds"
+              },
+              {
+                "at": "unlocks",
+                "nodes": {
+                  "lock": "dim"
+                },
+                "panels": {
+                  "dtors": [
+                    "~vector  → memory freed",
+                    "~lock_guard → mutex unlocked"
+                  ]
+                },
+                "note": "process() frame: newest first"
+              },
+              {
+                "at": "closes",
+                "nodes": {
+                  "file": "dim",
+                  "proc": "dim"
+                },
+                "panels": {
+                  "dtors": [
+                    "~vector  → memory freed",
+                    "~lock_guard → mutex unlocked",
+                    "~FileHandler → file closed"
+                  ]
+                },
+                "note": "…then the file"
+              },
+              {
+                "at": "nothing",
+                "nodes": {
+                  "main": "done"
+                },
+                "note": "No leaks, no hand-written cleanup"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "The rule of three and five",
+      "question": "Your class deletes a raw pointer in its destructor. What else must you write, and why?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. Your class deletes a raw pointer in its destructor. What else must you write, and why? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Your destructor deletes a raw pointer. <em>What else</em> must you write?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Here is a string class that owns a raw buffer and frees it in its destructor. Copy it, and the compiler's copy constructor copies the pointer, not the buffer. Now two objects share one allocation. When the copy is destroyed, the buffer is freed. When the original is destroyed, it frees the same memory again: a double free, which is undefined behavior.",
+          "props": {
+            "title": "A shallow copy, <em>a double free</em>",
+            "nodes": [
+              {
+                "id": "s1",
+                "label": "s1  (data_)",
+                "x": 220,
+                "y": 340,
+                "w": 240,
+                "h": 64
+              },
+              {
+                "id": "s2",
+                "label": "s2 = s1",
+                "x": 220,
+                "y": 620,
+                "w": 240,
+                "h": 64,
+                "hidden": true
+              },
+              {
+                "id": "heap",
+                "label": "heap: \"hello\"",
+                "x": 780,
+                "y": 480,
+                "w": 300,
+                "h": 90
+              }
+            ],
+            "edges": [
+              {
+                "from": "s1",
+                "to": "heap"
+              }
+            ],
+            "panels": [
+              {
+                "key": "events",
+                "label": "Lifetime",
+                "type": "list",
+                "rows": 3,
+                "initial": [
+                  "s1 owns the buffer"
+                ]
+              }
+            ],
+            "steps": [
+              {
+                "at": "owns",
+                "nodes": {
+                  "s1": "active"
+                },
+                "edges": {
+                  "s1-heap": "relax"
+                },
+                "note": "~BadString() { delete[] data_; }"
+              },
+              {
+                "at": "copy",
+                "show": [
+                  "s2"
+                ],
+                "add": [
+                  {
+                    "from": "s2",
+                    "to": "heap"
+                  }
+                ],
+                "nodes": {
+                  "s1": "base",
+                  "s2": "active"
+                },
+                "edges": {
+                  "s1-heap": "base",
+                  "s2-heap": "relax"
+                },
+                "panels": {
+                  "events": [
+                    "s1 owns the buffer",
+                    "s2 = s1: pointer copied"
+                  ]
+                },
+                "note": "Implicit copy: shallow, member-wise"
+              },
+              {
+                "at": "share",
+                "nodes": {
+                  "s2": "base",
+                  "heap": "queued"
+                },
+                "edges": {
+                  "s2-heap": "base"
+                },
+                "note": "Two owners, one allocation"
+              },
+              {
+                "at": "destroyed",
+                "nodes": {
+                  "s2": "dim",
+                  "heap": "dim"
+                },
+                "remove": [
+                  "s2-heap"
+                ],
+                "panels": {
+                  "events": [
+                    "s1 owns the buffer",
+                    "s2 = s1: pointer copied",
+                    "~s2: delete[] → freed"
+                  ]
+                },
+                "note": "The copy frees the buffer"
+              },
+              {
+                "at": "again",
+                "nodes": {
+                  "s1": "active"
+                },
+                "edges": {
+                  "s1-heap": "relax"
+                },
+                "panels": {
+                  "events": [
+                    "s2 = s1: pointer copied",
+                    "~s2: delete[] → freed",
+                    "~s1: delete[] again ✗"
+                  ]
+                },
+                "note": "s1 now points at freed memory"
+              },
+              {
+                "at": "undefined",
+                "nodes": {
+                  "s1": "queued"
+                },
+                "note": "Double free: undefined behavior"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "That is the rule of three, extended to five in C plus plus eleven. If you write any of the destructor, the copy constructor, or copy assignment, you almost certainly need all of them. And for speed, add the move constructor and move assignment too.",
+          "props": {
+            "title": "The five <em>special members</em>",
+            "items": [
+              {
+                "at": "destructor",
+                "text": "Destructor",
+                "code": "~T()"
+              },
+              {
+                "at": "constructor",
+                "text": "Copy constructor: deep copy",
+                "code": "T(const T&)"
+              },
+              {
+                "at": "assignment",
+                "text": "Copy assignment: copy-and-swap",
+                "code": "T& operator=(const T&)"
+              },
+              {
+                "at": "speed",
+                "text": "Move constructor: steal, null the source",
+                "code": "T(T&&) noexcept"
+              },
+              {
+                "at": "assignment#2",
+                "text": "Move assignment",
+                "code": "T& operator=(T&&) noexcept"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "The rule of zero",
+      "question": "How do you avoid writing any of the five special members?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. How do you avoid writing any of the five special members at all? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How do you avoid writing <em>any</em> of the five?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "The rule of zero is the modern default. Don't manage resources in your class at all. Hold them in members that already manage themselves: string, vector, unique pointer. Then the compiler-generated copy, move, and destructor are all correct, and you write none of them. Keep the rule of five for the rare low-level class whose only job is owning a resource.",
+          "props": {
+            "title": "Five functions, <em>or none</em>",
+            "left": {
+              "at": "rare",
+              "label": "Rule of five",
+              "title": "You own the raw resource",
+              "code": "class GoodString {\n  char* data_; size_t size_;\npublic:\n  ~GoodString();\n  GoodString(const GoodString&);\n  GoodString& operator=(const GoodString&);\n  GoodString(GoodString&&) noexcept;\n  GoodString& operator=(GoodString&&) noexcept;\n};",
+              "body": "Rare: low-level owning types only."
+            },
+            "right": {
+              "at": "hold",
+              "label": "Rule of zero",
+              "title": "Members own themselves",
+              "tone": "good",
+              "code": "class Profile {\n  int id_;\n  std::string name_;\n  std::vector<int> scores_;\n  std::unique_ptr<Cache> cache_;\n  // no special members at all\n};",
+              "body": "Copy, move, destroy: all generated correctly."
+            },
+            "verdict": {
+              "at": "none",
+              "text": "Compose from types that already manage themselves.",
+              "code": "the default"
+            }
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Acquire in the constructor, and release in the destructor. Destructors run during stack unwinding, so cleanup is automatic. If you manage a raw resource, write all five special members. Otherwise, follow the rule of zero.",
+          "props": {
+            "title": "RAII, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "acquire",
+                "text": "Acquire in the constructor, release in the destructor.",
+                "code": "RAII"
+              },
+              {
+                "at": "unwinding",
+                "text": "Destructors run during stack unwinding.",
+                "code": "exception safe"
+              },
+              {
+                "at": "raw",
+                "text": "Own a raw resource? Write all five.",
+                "code": "rule of five"
+              },
+              {
+                "at": "otherwise",
+                "text": "Otherwise: compose and write none.",
+                "code": "rule of zero"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

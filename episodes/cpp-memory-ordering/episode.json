@@ -1,0 +1,443 @@
+{
+  "slug": "cpp-memory-ordering",
+  "series": "cpp",
+  "title": "Memory ordering and atomics",
+  "kicker": "C++ · Memory ordering",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/cpp/concurrency/memory-barrier.md",
+  "summary": "Why another thread can see a flag before the data it guards, how release and acquire fix it, and what std::atomic can hold lock-free.",
+  "captionFixes": [
+    {
+      "match": [
+        "standard",
+        "atomic"
+      ],
+      "display": "std::atomic"
+    },
+    {
+      "match": [
+        "seek",
+        "CST"
+      ],
+      "display": "seq_cst"
+    },
+    {
+      "match": [
+        "a",
+        "timicity"
+      ],
+      "display": "atomicity"
+    },
+    {
+      "match": [
+        "earlier",
+        "rights"
+      ],
+      "display": "earlier writes"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Why reordering breaks threads",
+      "question": "How can another thread see a flag set before the data it guards?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Memory ordering, question one. How can another thread see a ready flag, but not the data written before it? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How can a thread see the <em>flag</em> but not the <em>data</em> written before it?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Thread one writes the data, then sets a ready flag. Thread two waits for the flag, then reads the data. But the compiler or the CPU may reorder thread one's writes, because within one thread nobody can tell the difference. Thread two sees ready, and reads stale data. The fix: store the flag with release, and load it with acquire. Everything written before the release is then visible after the acquire that reads it.",
+          "props": {
+            "title": "Legal for one thread, <em>wrong for two</em>",
+            "nodes": [
+              {
+                "id": "h1",
+                "label": "Thread 1",
+                "x": 290,
+                "y": 260,
+                "w": 220,
+                "h": 54
+              },
+              {
+                "id": "h2",
+                "label": "Thread 2",
+                "x": 880,
+                "y": 260,
+                "w": 220,
+                "h": 54
+              },
+              {
+                "id": "wd",
+                "label": "data = 42;",
+                "x": 290,
+                "y": 400,
+                "w": 340,
+                "h": 64
+              },
+              {
+                "id": "wr",
+                "label": "ready = true;",
+                "x": 290,
+                "y": 560,
+                "w": 340,
+                "h": 64
+              },
+              {
+                "id": "rr",
+                "label": "while (!ready);",
+                "x": 880,
+                "y": 400,
+                "w": 340,
+                "h": 64
+              },
+              {
+                "id": "rd",
+                "label": "print(data);",
+                "x": 880,
+                "y": 560,
+                "w": 340,
+                "h": 64
+              }
+            ],
+            "edges": [],
+            "panels": [
+              {
+                "key": "seen",
+                "label": "Thread 2 prints",
+                "type": "list",
+                "initial": [
+                  "?"
+                ]
+              }
+            ],
+            "steps": [
+              {
+                "at": "writes",
+                "nodes": {
+                  "wd": "active"
+                },
+                "note": "Program order: data first…"
+              },
+              {
+                "at": "sets",
+                "nodes": {
+                  "wd": "base",
+                  "wr": "active"
+                },
+                "note": "…then the flag"
+              },
+              {
+                "at": "waits",
+                "nodes": {
+                  "wr": "base",
+                  "rr": "active"
+                },
+                "note": "Spin until ready"
+              },
+              {
+                "at": "reads",
+                "nodes": {
+                  "rr": "base",
+                  "rd": "active"
+                },
+                "note": "Then read data"
+              },
+              {
+                "at": "reorder",
+                "nodes": {
+                  "rd": "base",
+                  "wr": "queued"
+                },
+                "move": {
+                  "wr": [
+                    290,
+                    400
+                  ],
+                  "wd": [
+                    290,
+                    560
+                  ]
+                },
+                "note": "Reordered: the flag store can come first"
+              },
+              {
+                "at": "sees",
+                "add": [
+                  {
+                    "from": "wr",
+                    "to": "rr"
+                  }
+                ],
+                "nodes": {
+                  "rr": "active"
+                },
+                "edges": {
+                  "wr-rr": "relax"
+                },
+                "note": "Thread 2 sees ready == true"
+              },
+              {
+                "at": "stale",
+                "nodes": {
+                  "rr": "base",
+                  "rd": "queued"
+                },
+                "panels": {
+                  "seen": [
+                    "0  ✗ stale"
+                  ]
+                },
+                "note": "…and reads data before 42 lands"
+              },
+              {
+                "at": "fix",
+                "nodes": {
+                  "wr": "base",
+                  "rd": "base"
+                },
+                "move": {
+                  "wr": [
+                    290,
+                    560
+                  ],
+                  "wd": [
+                    290,
+                    400
+                  ]
+                },
+                "edges": {
+                  "wr-rr": "base"
+                },
+                "panels": {
+                  "seen": [
+                    "?"
+                  ]
+                },
+                "note": "ready.store(true, memory_order_release)"
+              },
+              {
+                "at": "acquire",
+                "nodes": {
+                  "wr": "active",
+                  "rr": "active"
+                },
+                "edges": {
+                  "wr-rr": "tree"
+                },
+                "note": "ready.load(memory_order_acquire): synchronizes-with"
+              },
+              {
+                "at": "everything",
+                "nodes": {
+                  "wr": "base",
+                  "rr": "base",
+                  "wd": "done",
+                  "rd": "done"
+                },
+                "panels": {
+                  "seen": [
+                    "42  ✓"
+                  ]
+                },
+                "note": "Writes before release are visible after acquire"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "The memory orders",
+      "question": "relaxed, acquire, release, seq_cst: what does each guarantee?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. Relaxed, acquire, release, and sequentially consistent: what does each one guarantee? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "<em>relaxed</em>, <em>acquire</em>, <em>release</em>, <em>seq_cst</em>: what does each guarantee?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Relaxed guarantees only atomicity, and no ordering at all, which is fine for counters. Release, on a store, keeps earlier writes from moving after it. Acquire, on a load, keeps later reads from moving before it. Together, they publish data from one thread to another. Sequentially consistent, the default, adds a single global order of all such operations, and costs the most.",
+          "props": {
+            "title": "Four orders, <em>weakest to strongest</em>",
+            "items": [
+              {
+                "at": "relaxed",
+                "label": "relaxed",
+                "title": "Atomic only",
+                "body": "No ordering. Counters, statistics.",
+                "code": "fetch_add(1, relaxed)"
+              },
+              {
+                "at": "release",
+                "label": "release · store",
+                "title": "Earlier writes stay before",
+                "body": "Publishes everything above it.",
+                "code": "flag.store(true, release)"
+              },
+              {
+                "at": "acquire",
+                "label": "acquire · load",
+                "title": "Later reads stay after",
+                "body": "Sees everything published.",
+                "code": "flag.load(acquire)"
+              },
+              {
+                "at": "default",
+                "label": "seq_cst · default",
+                "title": "One global order",
+                "body": "Easiest to reason about; slowest.",
+                "code": "x.store(v)"
+              }
+            ]
+          }
+        },
+        {
+          "type": "code",
+          "say": "In code, the producer fills the vector, then stores the flag with release. The consumer spins on an acquire load. Once it sees true, every element is visible, without a mutex.",
+          "props": {
+            "title": "Publish with <em>release / acquire</em>",
+            "file": "publish.cpp",
+            "tag": "lock-free handoff",
+            "size": 22,
+            "width": 1080,
+            "code": "std::vector<int> data;\nstd::atomic<bool> ready{false};\nvoid producer() {\n    data = {1, 2, 3};\n    ready.store(true, std::memory_order_release);\n}\nvoid consumer() {\n    while (!ready.load(std::memory_order_acquire))\n        std::this_thread::yield();\n    for (int x : data) std::cout << x;  // 1 2 3\n}",
+            "highlights": [
+              {
+                "at": "fills",
+                "lines": "4",
+                "note": "Plain, non-atomic writes"
+              },
+              {
+                "at": "stores",
+                "lines": "5",
+                "note": "release: publish everything above"
+              },
+              {
+                "at": "spins",
+                "lines": "8-9",
+                "note": "acquire: pairs with the release"
+              },
+              {
+                "at": "visible",
+                "lines": "10",
+                "note": "Guaranteed to see 1 2 3"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "What std::atomic can hold",
+      "question": "Which types can std::atomic hold lock-free, and why?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. Which types can standard atomic hold lock-free, and why? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Which types can <em>std::atomic</em> hold lock-free, and why?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Standard atomic needs a trivially copyable type, because compare-and-swap compares and copies raw bits, with no idea of constructors. Lock-free is not guaranteed, so check is always lock free. The object must be small and aligned, so it fits inside one cache line. Straddle two lines, and the CPU falls back to a bus-wide split lock, which is slower than a mutex.",
+          "props": {
+            "title": "Bits, size, and <em>alignment</em>",
+            "items": [
+              {
+                "at": "trivially",
+                "label": "Requirement",
+                "title": "Trivially copyable",
+                "body": "CAS compares and copies raw bytes.",
+                "code": "lock cmpxchg"
+              },
+              {
+                "at": "check",
+                "label": "Not promised",
+                "title": "Lock-free?",
+                "body": "May fall back to an internal lock.",
+                "code": "is_always_lock_free"
+              },
+              {
+                "at": "aligned",
+                "label": "Hardware",
+                "title": "Small and aligned",
+                "body": "8 or 16 bytes, inside one 64 B line.",
+                "code": "alignas(16)"
+              },
+              {
+                "at": "straddle",
+                "label": "Worst case",
+                "title": "Split lock",
+                "body": "Locks the bus for every core.",
+                "code": "slower than a mutex"
+              }
+            ]
+          }
+        },
+        {
+          "type": "compare",
+          "say": "A plain struct of two ints qualifies. Add a user-defined destructor, and it no longer does, because copying its bytes would no longer copy its meaning.",
+          "props": {
+            "title": "Trivially copyable, <em>or not</em>",
+            "left": {
+              "at": "plain",
+              "label": "OK for std::atomic",
+              "title": "struct Point",
+              "tone": "good",
+              "code": "struct Point { int x; int y; };\nstd::atomic<Point> p;  // lock-free on x86-64"
+            },
+            "right": {
+              "at": "destructor",
+              "label": "Not allowed",
+              "title": "User-defined destructor",
+              "tone": "bad",
+              "code": "struct Owner {\n    int* data;\n    ~Owner() { delete data; }  // not trivial\n};"
+            }
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Compilers and CPUs reorder freely within a thread. Pair a release store with an acquire load to publish data. The default ordering is the strongest, and the slowest. And atomics need small, trivially copyable types.",
+          "props": {
+            "title": "Memory ordering, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "reorder",
+                "text": "Reordering is legal within a thread.",
+                "code": "compiler + CPU"
+              },
+              {
+                "at": "pair",
+                "text": "Release store + acquire load publishes data.",
+                "code": "synchronizes-with"
+              },
+              {
+                "at": "strongest",
+                "text": "seq_cst is the default: strongest, slowest.",
+                "code": "one global order"
+              },
+              {
+                "at": "small",
+                "text": "std::atomic<T>: small, trivially copyable T.",
+                "code": "lock-free"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
