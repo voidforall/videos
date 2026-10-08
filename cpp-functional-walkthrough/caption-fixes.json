@@ -1,0 +1,23 @@
+{
+  "lowercase": ["lambda", "lambdas", "lambda's"],
+  "all": [
+    { "match": ["standard", "function,"], "display": "std::function," },
+    { "match": ["standard", "function"], "display": "std::function" },
+    { "match": ["try", "with", "lock"], "display": "try_with_lock" },
+    { "match": ["with", "lock."], "display": "with_lock." },
+    { "match": ["lock", "guard,"], "display": "lock_guard," }
+  ],
+  "01": [{ "match": ["Lambda's"], "display": "lambdas," }],
+  "02": [
+    { "match": ["copy", "if"], "display": "copy_if" },
+    { "match": ["Const", "expa"], "display": "constexpr" },
+    { "match": ["static", "assert"], "display": "static_assert" }
+  ],
+  "05": [
+    { "match": ["pass"], "display": "path," },
+    { "match": ["C++", "17"], "display": "C++17's" },
+    { "match": ["production", "rule."], "display": "The production rule:" }
+  ],
+  "06": [{ "match": ["Lambdas", "call"], "display": "lambda's call" }],
+  "08": [{ "match": ["keep", "resources"], "display": "scope resources" }]
+}

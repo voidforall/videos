@@ -4,8 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#faf9f5" />
-    <meta name="description" content="A concise animated walkthrough of eight practical C++ object-oriented programming interview topics." />
-    <title>C++ OOP interview walkthrough</title>
+    <meta name="description" content="Concise animated walkthroughs of practical C++ interview topics: object-oriented design and functional programming." />
+    <title>C++ interview walkthroughs</title>
     <style>
       :root {
         color-scheme: light;
@@ -104,6 +104,24 @@
 
       .meta span { font-size: 15px; line-height: 1.4; }
 
+      .entry + .entry { margin-top: clamp(56px, 9vw, 112px); }
+
+      h2 {
+        max-width: 880px;
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(34px, 5vw, 64px);
+        font-weight: 400;
+        line-height: 1.02;
+        letter-spacing: -.03em;
+      }
+
+      .source {
+        margin-top: 16px;
+        color: rgba(20,20,19,.62);
+        font-size: 14px;
+      }
+
       footer {
         display: flex;
         justify-content: space-between;
@@ -114,6 +132,7 @@
       }
 
       a { color: inherit; text-underline-offset: 3px; }
+      .lede code { font: .9em ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
       a:hover { color: var(--coral); }
 
       @media (max-width: 680px) {
@@ -122,30 +141,72 @@
         .player { border-radius: 9px; }
         .meta { grid-template-columns: 1fr; }
         .meta div + div { border-left: 0; border-top: 1px solid rgba(250,249,245,.16); }
-        footer { flex-direction: column; gap: 8px; }
+        .entry + .entry { margin-top: clamp(56px, 9vw, 112px); }
+
+      h2 {
+        max-width: 880px;
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(34px, 5vw, 64px);
+        font-weight: 400;
+        line-height: 1.02;
+        letter-spacing: -.03em;
+      }
+
+      .source {
+        margin-top: 16px;
+        color: rgba(20,20,19,.62);
+        font-size: 14px;
+      }
+
+      footer { flex-direction: column; gap: 8px; }
       }
     </style>
   </head>
   <body>
     <main>
-      <p class="eyebrow">Technical field notes · 01</p>
-      <h1>C++ OOP interview walkthrough</h1>
-      <p class="lede">Eight practical mental models—from resource ownership and interfaces to initialization and the object model—in one focused review.</p>
+      <p class="eyebrow">Technical field notes</p>
+      <h1>C++ interview walkthroughs</h1>
+      <p class="lede">Short, focused reviews of the C++ topics interviewers actually probe—each one a map of practical mental models, not trivia.</p>
 
-      <section class="player" aria-label="Video player">
-        <video controls playsinline preload="metadata" poster="cpp-oop-walkthrough-poster.jpg">
-          <source src="cpp-oop-walkthrough.mp4" type="video/mp4" />
-          Your browser does not support HTML video. <a href="cpp-oop-walkthrough.mp4">Download the MP4</a>.
-        </video>
-        <div class="meta">
-          <div><small>Duration</small><span>3 minutes 27 seconds</span></div>
-          <div><small>Format</small><span>1080p · captions included</span></div>
-          <div><small>Narration</small><span>Local Kokoro TTS · Emma</span></div>
-        </div>
-      </section>
+      <article class="entry">
+        <p class="eyebrow">02 · Functional programming</p>
+        <h2>C++ functional programming walkthrough</h2>
+        <p class="lede">Pure functions, higher-order locking, type erasure behind <code>std::function</code>, capture pitfalls, mutable and recursive lambdas, and generic lambdas.</p>
+        <section class="player" aria-label="C++ functional programming video player">
+          <video controls playsinline preload="metadata" poster="cpp-functional-walkthrough-poster.jpg">
+            <source src="cpp-functional-walkthrough.mp4" type="video/mp4" />
+            Your browser does not support HTML video. <a href="cpp-functional-walkthrough.mp4">Download the MP4</a>.
+          </video>
+          <div class="meta">
+            <div><small>Duration</small><span>4 minutes 12 seconds</span></div>
+            <div><small>Format</small><span>1080p · captions included</span></div>
+            <div><small>Narration</small><span>Local Kokoro TTS · Emma</span></div>
+          </div>
+        </section>
+        <p class="source">Based on the C++ functional programming notes in <a href="https://github.com/voidforall/ai-docs/blob/main/interview/cpp-functional.md">ai-docs</a>.</p>
+      </article>
+
+      <article class="entry">
+        <p class="eyebrow">01 · Object-oriented design</p>
+        <h2>C++ OOP interview walkthrough</h2>
+        <p class="lede">Eight practical mental models—from resource ownership and interfaces to initialization and the object model—in one focused review.</p>
+        <section class="player" aria-label="C++ OOP video player">
+          <video controls playsinline preload="metadata" poster="cpp-oop-walkthrough-poster.jpg">
+            <source src="cpp-oop-walkthrough.mp4" type="video/mp4" />
+            Your browser does not support HTML video. <a href="cpp-oop-walkthrough.mp4">Download the MP4</a>.
+          </video>
+          <div class="meta">
+            <div><small>Duration</small><span>3 minutes 27 seconds</span></div>
+            <div><small>Format</small><span>1080p · captions included</span></div>
+            <div><small>Narration</small><span>Local Kokoro TTS · Emma</span></div>
+          </div>
+        </section>
+        <p class="source">Based on the C++ OOP interview notes in <a href="https://github.com/voidforall/ai-docs/blob/main/interview/cpp-oop.md">ai-docs</a>.</p>
+      </article>
 
       <footer>
-        <span>Based on the C++ OOP interview notes in <a href="https://github.com/voidforall/ai-docs/blob/main/interview/cpp-oop.md">ai-docs</a>.</span>
+        <span>Generated with local text-to-speech and code-driven animation.</span>
         <a href="https://github.com/voidforall/videos">View source on GitHub</a>
       </footer>
     </main>

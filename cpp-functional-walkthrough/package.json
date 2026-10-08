@@ -1,0 +1,18 @@
+{
+  "name": "cpp-functional-walkthrough",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "tts": "../.venv/bin/python tools/tts.py",
+    "timeline": "python3 tools/build_timeline.py",
+    "dev": "node tools/serve.mjs",
+    "render": "node tools/render.mjs"
+  },
+  "dependencies": {
+    "gsap": "3.13.0"
+  },
+  "devDependencies": {
+    "puppeteer": "^24.0.0"
+  }
+}

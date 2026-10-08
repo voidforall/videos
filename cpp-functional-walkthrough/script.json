@@ -1,0 +1,49 @@
+{
+  "voice": "bf_emma",
+  "lang": "en-gb",
+  "speed": 1.0,
+  "sentencePause": 0.28,
+  "lineGap": 0.6,
+  "lines": [
+    {
+      "id": "01",
+      "scene": "Functions as values",
+      "text": "Functional programming in C plus plus is a style, not a separate language. It rests on three pillars. Pure functions return the same output for the same input. Immutable data is transformed instead of modified. And higher-order functions take or return other functions. Since C plus plus eleven, lambdas, standard function, the algorithm header, and const expr make that style practical. Let's walk through seven questions interviewers actually ask."
+    },
+    {
+      "id": "02",
+      "scene": "Map, filter, reduce",
+      "text": "Start with the toolkit. Transform is map, copy if is filter, and accumulate is reduce, each one driven by a small lambda. Const expr pushes pure computation to compile time, so a static assert can prove that factorial of five is one hundred and twenty. And a lambda that returns a lambda gives you currying: multiply by two produces a brand new function that doubles. Functional and object-oriented styles are not rivals. C plus plus is multi-paradigm, and good code mixes both."
+    },
+    {
+      "id": "03",
+      "scene": "Scope the lock to a lambda",
+      "text": "Question two: build a safe locking interface with a higher-order function. Manual lock and unlock breaks the moment the work throws or returns early, and the mutex stays locked forever. Instead, write with lock. It takes a mutex and a callable, creates a lock guard, invokes the callable, and returns its result. The critical section is now exactly the lambda body. The lock is always released, even on exceptions, and callers cannot forget to unlock. A try with lock variant returns an optional, which is empty when the lock is busy."
+    },
+    {
+      "id": "04",
+      "scene": "Type erasure, by hand",
+      "text": "Question three: what is standard function, and how would you build one? It is a type-erased wrapper for any callable with a given signature. The trick is a non-template abstract base, with virtual invoke and clone, plus a templated holder that stores the real lambda, function pointer, or functor. The wrapper owns a unique pointer to that base. Clone gives it value semantics, and decay strips references so the holder owns a clean copy. The price is a heap allocation and a virtual call, softened in real libraries by small buffer optimization. Use it for stored callbacks, and templates on hot paths."
+    },
+    {
+      "id": "05",
+      "scene": "Name every capture",
+      "text": "Question four: capture modes. Empty brackets capture nothing, equals copies, ampersand references, and you can mix them per variable. The defaults hide two traps. Capture by reference, return the lambda, and the local it points to is already destroyed: a dangling reference. Capture by value in a hot path, and you may silently copy an entire order book. Capturing this has the same lifetime risk, while C plus plus seventeen's star this takes a snapshot instead. The production rule: name every capture, so lifetimes are visible in review."
+    },
+    {
+      "id": "06",
+      "scene": "State inside the lambda",
+      "text": "Question five: mutable lambdas. A lambda's call operator is const by default, so a captured copy cannot change. Mark it mutable, and the lambda may modify its own copy. Call the counter twice, and it returns one, then two, while the original variable still reads zero. That makes mutable a natural fit for generators, round-robin dispatchers, and lambdas that own a moved-in unique pointer. The state lives inside the lambda object, not in shared scope."
+    },
+    {
+      "id": "07",
+      "scene": "A lambda has no name",
+      "text": "Question six: recursive lambdas. A lambda has no name, so it cannot call itself directly. The easy fix stores it in a standard function that captures itself by reference, but every recursive call pays for type erasure. The zero-overhead fix passes the lambda to itself: a generic lambda takes auto reference self, and calls self with self. A named functor struct is the most explicit option, and it can be stored without a wrapper. On a critical path, choose self-passing or the struct."
+    },
+    {
+      "id": "08",
+      "scene": "auto makes a template",
+      "text": "Question seven: generic lambdas. An auto parameter turns the call operator into a template, so the compiler stamps out a version for each argument type, fully inlined. C plus plus twenty adds explicit template parameters, which can force both arguments to share one type. Pass a generic comparator straight to sort, and it inlines, unlike standard function, which pays a virtual call per comparison. That is the walkthrough. Keep functions pure, pass behavior as values, scope resources with higher-order functions, name your captures, and save type erasure for when you truly need storage."
+    }
+  ]
+}
