@@ -4,7 +4,7 @@
 // lists (heap, queue, order). Steps change node/edge states, panels, and structure.
 // props: {
 //   title, directed?: true,
-//   nodes: [{ id, label?, x, y, hidden? }],             // centers, frame px; hidden until a step shows it
+//   nodes: [{ id, label?, x, y, w?, h?, hidden? }],     // centers, frame px; w/h make a box (memory layouts)
 //   edges: [{ from, to, w? }],                           // key "from-to"
 //   panels: [{ key, label, type: "table" | "list", initial: {id: v} | [..] }],
 //   steps: [{ at, note?,
@@ -30,7 +30,7 @@ registerTemplate("graph", {
         const ids = p.columns ?? props.nodes.map((n) => n.id).sort((x, y) => x.localeCompare(y, undefined, { numeric: true }));
         const cells = ids.map((id) => {
           const values = [p.initial?.[id] ?? "", ...props.steps.map((s) => s.panels?.[p.key]?.[id])];
-          return `<div class="gr-col"><span class="gr-th">${esc(props.nodes.find((n) => n.id === id).label ?? id)}</span><span class="gr-td">${
+          return `<div class="gr-col"><span class="gr-th">${esc(props.nodes.find((n) => n.id === id)?.label ?? id)}</span><span class="gr-td">${
             values.map((v, i) => (v == null ? "" : `<b class="gr-v" data-step="${i - 1}" data-id="${esc(id)}">${esc(v)}</b>`)).join("")}</span></div>`;
         }).join("");
         return `<div class="card paper gr-panel" data-panel="${esc(p.key)}"><p class="label">${esc(p.label)}</p><div class="gr-table">${cells}</div></div>`;
@@ -45,7 +45,11 @@ registerTemplate("graph", {
         ${edgeSvg}
       </svg>
       ${labels}
-      ${props.nodes.map((n) => `<div class="gr-node gr-base" data-id="${esc(n.id)}" style="left:${n.x - R}px;top:${n.y - R}px;width:${R * 2}px;height:${R * 2}px">${esc(n.label ?? n.id)}</div>`).join("")}
+      ${props.nodes.map((n) => {
+        const [hw, hh] = graphHalf(n);
+        return `<div class="gr-node gr-base${n.w ? " gr-box" : ""}" data-id="${esc(n.id)}" style="left:${n.x - hw}px;top:${n.y - hh}px;width:${hw * 2}px;height:${hh * 2}px">${
+          esc(n.label ?? n.id).replace(/\n/g, "<br>")}</div>`;
+      }).join("")}
       <div class="gr-side">${panelHtml}</div>
       <div class="card gr-note"><p class="label">Step</p><div class="ar-slot gr-note-slot">${
         props.steps.map((s, i) => (s.note ? `<span class="ar-swap gr-note-${i}">${esc(s.note)}</span>` : "")).join("")}</div></div>`;
@@ -73,16 +77,26 @@ registerTemplate("graph", {
       dim: { stroke: "rgba(20,20,19,0.12)", strokeWidth: 3 },
     };
 
-    // geometry of edge u→v between circle borders, plus arrowhead + weight label anchor
+    const spec = Object.fromEntries(props.nodes.map((n) => [n.id, n]));
+    // distance from a node's center to its border along direction (ux, uy): circle or box
+    const reach = (id, ux, uy) => {
+      const n = spec[id];
+      if (!n.w) return R;
+      const [hw, hh] = graphHalf(n);
+      return Math.min(ux ? hw / Math.abs(ux) : Infinity, uy ? hh / Math.abs(uy) : Infinity);
+    };
+    // geometry of edge u→v between node borders, plus arrowhead + weight label anchor
     const geom = (key) => {
       const [u, v] = key.split("-");
       const [x1, y1] = pos[u];
       const [x2, y2] = pos[v];
       const len = Math.hypot(x2 - x1, y2 - y1) || 1;
       const [ux, uy] = [(x2 - x1) / len, (y2 - y1) / len];
-      const a = [x1 + ux * R, y1 + uy * R];
-      const tip = [x2 - ux * (R + 2), y2 - uy * (R + 2)];
-      const b = directed ? [tip[0] - ux * 14, tip[1] - uy * 14] : [x2 - ux * R, y2 - uy * R];
+      const ru = reach(u, ux, uy);
+      const rv = reach(v, ux, uy);
+      const a = [x1 + ux * ru, y1 + uy * ru];
+      const tip = [x2 - ux * (rv + 2), y2 - uy * (rv + 2)];
+      const b = directed ? [tip[0] - ux * 14, tip[1] - uy * 14] : [x2 - ux * rv, y2 - uy * rv];
       const [px, py] = [-uy, ux];
       const head = directed
         ? `${tip[0]},${tip[1]} ${tip[0] - ux * 22 + px * 11},${tip[1] - uy * 22 + py * 11} ${tip[0] - ux * 22 - px * 11},${tip[1] - uy * 22 - py * 11}`
@@ -96,11 +110,11 @@ registerTemplate("graph", {
       if (at == null) {
         gsap.set(line, vars);
         gsap.set(head, { attr: { points: g.head } });
-        if (w) gsap.set(w, { left: g.label[0] - 22, top: g.label[1] - 18 });
+        if (w) gsap.set(w, { left: g.label[0], top: g.label[1], xPercent: -50, yPercent: -50 });
       } else {
         tl.to(line, { ...vars, duration: dur, ease: "power2.inOut" }, at);
         tl.to(head, { attr: { points: g.head }, duration: dur, ease: "power2.inOut" }, at);
-        if (w) tl.to(w, { left: g.label[0] - 22, top: g.label[1] - 18, duration: dur, ease: "power2.inOut" }, at);
+        if (w) tl.to(w, { left: g.label[0], top: g.label[1], duration: dur, ease: "power2.inOut" }, at);
       }
     };
     const styleEdge = (key, state, at) => {
@@ -155,7 +169,8 @@ registerTemplate("graph", {
       for (const [id, [x, y]] of moved) {
         nodeEl(id);
         pos[id] = [x, y];
-        tl.to(nodeEl(id), { left: x - R, top: y - R, duration: 0.6, ease: "power2.inOut" }, at);
+        const [hw, hh] = graphHalf(spec[id]);
+        tl.to(nodeEl(id), { left: x - hw, top: y - hh, duration: 0.6, ease: "power2.inOut" }, at);
       }
       if (moved.length) {
         const touched = new Set(moved.map(([id]) => id));
@@ -177,7 +192,9 @@ registerTemplate("graph", {
       for (const [id, state] of Object.entries(s.nodes ?? {})) {
         if (!["active", "done", "queued", "dim", "base"].includes(state)) throw new Error(`graph: unknown node state "${state}"`);
         const node = nodeEl(id);
-        tl.set(node, { className: `gr-node gr-${state}` }, at);
+        tl.set(node, { className: `gr-node gr-${state}${spec[id].w ? " gr-box" : ""}` }, at);
+        // opacity is tweened, not classed: entrance animations leave an inline opacity behind
+        tl.to(node, { opacity: state === "dim" ? 0.35 : 1, duration: 0.3 }, at);
         tl.fromTo(node, { scale: 1.08 }, { scale: 1, duration: 0.35, ease: "power2.out", immediateRender: false }, at);
       }
       for (const [key, state] of Object.entries(s.edges ?? {})) styleEdge(key, state, at);
@@ -213,3 +230,4 @@ registerTemplate("graph", {
 });
 
 const GRAPH_R = 44;
+const graphHalf = (n) => (n.w ? [n.w / 2, (n.h ?? 64) / 2] : [GRAPH_R, GRAPH_R]);

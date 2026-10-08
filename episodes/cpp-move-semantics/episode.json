@@ -1,0 +1,519 @@
+{
+  "slug": "cpp-move-semantics",
+  "series": "cpp",
+  "title": "Move semantics",
+  "kicker": "C++ · Move semantics",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/cpp/std-move.md",
+  "summary": "std::move is only a cast: value categories, the mistakes that silently copy, and when std::forward takes over.",
+  "captionFixes": [
+    {
+      "match": [
+        "standard",
+        "move"
+      ],
+      "display": "std::move"
+    },
+    {
+      "match": [
+        "standard",
+        "forward"
+      ],
+      "display": "std::forward"
+    },
+    {
+      "match": [
+        "standard",
+        "exchange"
+      ],
+      "display": "std::exchange"
+    },
+    {
+      "match": [
+        "R",
+        "value"
+      ],
+      "display": "rvalue"
+    },
+    {
+      "match": [
+        "L",
+        "value"
+      ],
+      "display": "lvalue"
+    },
+    {
+      "match": [
+        "no",
+        "except"
+      ],
+      "display": "noexcept"
+    },
+    {
+      "match": [
+        "moved",
+        "from"
+      ],
+      "display": "moved-from"
+    },
+    {
+      "match": [
+        "write",
+        "overload"
+      ],
+      "display": "right overload"
+    },
+    {
+      "match": [
+        "is",
+        "1"
+      ],
+      "display": "is one"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "std::move is a cast",
+      "question": "What does std::move actually do at runtime?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Move semantics, question one. What does standard move actually do at runtime? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What does <em>std::move</em> actually do at runtime?"
+          }
+        },
+        {
+          "type": "code",
+          "say": "Here is the whole implementation. It takes any reference, strips the reference from the type, and returns a static cast to an rvalue reference. That is all. Nothing is copied and nothing is moved. The transfer happens later, when that rvalue selects a move constructor.",
+          "props": {
+            "title": "The whole of <em>std::move</em>",
+            "file": "<utility>",
+            "tag": "compile-time only",
+            "size": 24,
+            "width": 1180,
+            "code": "template <typename T>\nconstexpr std::remove_reference_t<T>&& move(T&& t) noexcept {\n    return static_cast<std::remove_reference_t<T>&&>(t);\n}",
+            "highlights": [
+              {
+                "at": "takes",
+                "lines": "2",
+                "note": "Accepts anything: a forwarding reference"
+              },
+              {
+                "at": "strips",
+                "lines": "2",
+                "note": "remove_reference_t drops & or &&"
+              },
+              {
+                "at": "returns",
+                "lines": "3",
+                "note": "Just a static_cast to T&&"
+              },
+              {
+                "at": "nothing",
+                "lines": "1-4",
+                "note": "No data is copied or moved here"
+              },
+              {
+                "at": "later",
+                "lines": "3",
+                "note": "The move constructor does the transfer"
+              }
+            ]
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Every expression has a value category. Some have identity: a named variable you can take the address of. Others are pure temporaries, like a literal, or a function returning by value. The third kind sits in between: it has identity, but it is expiring, so its resources can be stolen. Standard move turns the first kind into the expiring kind. And because that is an rvalue, the move constructor can bind to it.",
+          "props": {
+            "title": "Value categories, <em>and where move lands</em>",
+            "nodes": [
+              {
+                "id": "expr",
+                "label": "expression",
+                "x": 600,
+                "y": 270,
+                "w": 240,
+                "h": 60
+              },
+              {
+                "id": "gl",
+                "label": "glvalue",
+                "x": 380,
+                "y": 430,
+                "w": 200,
+                "h": 60
+              },
+              {
+                "id": "rv",
+                "label": "rvalue",
+                "x": 820,
+                "y": 430,
+                "w": 200,
+                "h": 60
+              },
+              {
+                "id": "lv",
+                "label": "lvalue",
+                "x": 220,
+                "y": 620,
+                "w": 200,
+                "h": 60
+              },
+              {
+                "id": "xv",
+                "label": "xvalue",
+                "x": 600,
+                "y": 620,
+                "w": 200,
+                "h": 60
+              },
+              {
+                "id": "pr",
+                "label": "prvalue",
+                "x": 980,
+                "y": 620,
+                "w": 200,
+                "h": 60
+              }
+            ],
+            "edges": [
+              {
+                "from": "expr",
+                "to": "gl"
+              },
+              {
+                "from": "expr",
+                "to": "rv"
+              },
+              {
+                "from": "gl",
+                "to": "lv"
+              },
+              {
+                "from": "gl",
+                "to": "xv"
+              },
+              {
+                "from": "rv",
+                "to": "xv"
+              },
+              {
+                "from": "rv",
+                "to": "pr"
+              }
+            ],
+            "panels": [
+              {
+                "key": "ex",
+                "label": "Examples",
+                "type": "list",
+                "rows": 2,
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "every",
+                "nodes": {
+                  "expr": "active"
+                },
+                "note": "Every expression: a type + a value category"
+              },
+              {
+                "at": "identity",
+                "nodes": {
+                  "expr": "base",
+                  "lv": "active"
+                },
+                "edges": {
+                  "gl-lv": "relax"
+                },
+                "panels": {
+                  "ex": [
+                    "x",
+                    "*p",
+                    "arr[i]",
+                    "++i"
+                  ]
+                },
+                "note": "lvalue: has identity, you can take &x"
+              },
+              {
+                "at": "temporaries",
+                "nodes": {
+                  "lv": "base",
+                  "pr": "active"
+                },
+                "edges": {
+                  "gl-lv": "base",
+                  "rv-pr": "relax"
+                },
+                "panels": {
+                  "ex": [
+                    "42",
+                    "f()",
+                    "a + b",
+                    "i++"
+                  ]
+                },
+                "note": "prvalue: a pure temporary"
+              },
+              {
+                "at": "between",
+                "nodes": {
+                  "pr": "base",
+                  "xv": "active"
+                },
+                "edges": {
+                  "rv-pr": "base",
+                  "gl-xv": "relax",
+                  "rv-xv": "relax"
+                },
+                "panels": {
+                  "ex": [
+                    "std::move(x)",
+                    "rvalue.member"
+                  ]
+                },
+                "note": "xvalue: identity, but expiring"
+              },
+              {
+                "at": "turns",
+                "nodes": {
+                  "lv": "queued"
+                },
+                "edges": {
+                  "gl-xv": "base",
+                  "rv-xv": "base"
+                },
+                "add": [
+                  {
+                    "from": "lv",
+                    "to": "xv",
+                    "w": "std::move"
+                  }
+                ],
+                "note": "std::move: lvalue → xvalue"
+              },
+              {
+                "at": "bind",
+                "nodes": {
+                  "rv": "done",
+                  "xv": "done"
+                },
+                "edges": {
+                  "rv-xv": "tree",
+                  "lv-xv": "relax"
+                },
+                "note": "xvalue is an rvalue → T&& binds → move ctor"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Three silent mistakes",
+      "question": "Name three ways std::move quietly goes wrong.",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. Name three ways standard move quietly goes wrong. Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Name three ways <em>std::move</em> quietly goes wrong."
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Mistake one: moving a return value. Returning a local by name lets the compiler build it directly in the caller's memory, at zero cost. Wrapping it in standard move forces a real move, and blocks that optimization.",
+          "props": {
+            "title": "Mistake one: <em>moving a return</em>",
+            "left": {
+              "at": "wrapping",
+              "label": "Don't",
+              "title": "Blocks NRVO",
+              "tone": "bad",
+              "code": "std::string make() {\n    std::string result = \"hello\";\n    return std::move(result);  // forces a move\n}"
+            },
+            "right": {
+              "at": "returning",
+              "label": "Do",
+              "title": "NRVO or implicit move",
+              "tone": "good",
+              "code": "std::string make() {\n    std::string result = \"hello\";\n    return result;  // built in the caller\n}"
+            }
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Mistake two: moving a const object. Standard move then yields a const rvalue, which cannot bind to the move constructor. So the copy constructor quietly wins. It compiles, and it copies. Drop the const if you mean to move.",
+          "props": {
+            "title": "Mistake two: <em>moving a const</em>",
+            "left": {
+              "at": "const",
+              "label": "Silent copy",
+              "title": "const T&& → copy",
+              "tone": "bad",
+              "code": "const std::string s = \"data\";\nstd::string t = std::move(s);  // COPY ctor",
+              "body": "Benchmark: ~7.5 ms, same as a deep copy."
+            },
+            "right": {
+              "at": "drop",
+              "label": "Real move",
+              "title": "Non-const source",
+              "tone": "good",
+              "code": "std::string s = \"data\";\nstd::string t = std::move(s);  // move ctor",
+              "body": "Benchmark: ~1.1 ms, about 7× faster."
+            },
+            "verdict": {
+              "at": "copies",
+              "text": "const + std::move = a copy.",
+              "code": "no warning"
+            }
+          }
+        },
+        {
+          "type": "points",
+          "say": "Mistake three: using a moved-from object. It is valid but unspecified, so destroy it or assign to it, nothing else. And a bonus rule: mark move operations no-except, or a vector will copy instead of move when it grows. Inside a move constructor, standard exchange steals a member and resets it in one step.",
+          "props": {
+            "title": "Mistake three, <em>plus two rules</em>",
+            "items": [
+              {
+                "at": "unspecified",
+                "label": "Moved-from",
+                "title": "Valid but unspecified",
+                "body": "Only destroy or reassign it.",
+                "code": "v = {};  // ok"
+              },
+              {
+                "at": "bonus",
+                "label": "noexcept",
+                "title": "Or vector copies",
+                "body": "Reallocation needs a no-throw move.",
+                "code": "T(T&&) noexcept"
+              },
+              {
+                "at": "steals",
+                "label": "Idiom",
+                "title": "std::exchange",
+                "body": "Steal and reset in one step.",
+                "code": "p_(std::exchange(o.p_, nullptr))"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "std::move vs std::forward",
+      "question": "When do you use std::forward instead of std::move?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. When do you use standard forward instead of standard move? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "When do you use <em>std::forward</em> instead of <em>std::move</em>?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Standard move is an unconditional cast. Use it when you are done with an object. Standard forward is conditional. Inside a template that takes a forwarding reference, it casts back to an rvalue only if the caller passed an rvalue, so the right overload is chosen.",
+          "props": {
+            "title": "Always rvalue, or <em>as received</em>",
+            "left": {
+              "at": "unconditional",
+              "label": "std::move",
+              "title": "Unconditional cast",
+              "code": "void sink(Widget w);\nsink(std::move(widget));  // done with it",
+              "body": "Normal code: transfer ownership."
+            },
+            "right": {
+              "at": "conditional",
+              "label": "std::forward<T>",
+              "title": "Preserves the category",
+              "code": "template <typename T>\nvoid relay(T&& arg) {\n    target(std::forward<T>(arg));\n}",
+              "body": "Templates with forwarding references only."
+            }
+          }
+        },
+        {
+          "type": "points",
+          "say": "This works through reference collapsing. When an lvalue is passed, T is deduced as an lvalue reference, and T double-ampersand collapses to an lvalue reference. If either side is an lvalue reference, the result is one. Only rvalue reference on rvalue reference stays an rvalue reference.",
+          "props": {
+            "title": "Reference <em>collapsing</em>",
+            "items": [
+              {
+                "at": "collapsing",
+                "label": "& + &",
+                "title": "T& &  → T&",
+                "body": "Lvalue wins.",
+                "code": "lvalue"
+              },
+              {
+                "at": "deduced",
+                "label": "& + &&",
+                "title": "T& && → T&",
+                "body": "Lvalue passed in: T = Widget&.",
+                "code": "lvalue"
+              },
+              {
+                "at": "either",
+                "label": "&& + &",
+                "title": "T&& & → T&",
+                "body": "Any & makes it &.",
+                "code": "lvalue"
+              },
+              {
+                "at": "only",
+                "label": "&& + &&",
+                "title": "T&& && → T&&",
+                "body": "The only rvalue result.",
+                "code": "rvalue"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Standard move only casts. Don't move return values, or const objects. Mark moves no-except. Forward exactly once per argument, and only in templates. And treat moved-from objects as dead.",
+          "props": {
+            "title": "Move semantics, <em>in five lines</em>",
+            "items": [
+              {
+                "at": "casts",
+                "text": "std::move only casts to an rvalue.",
+                "code": "static_cast<T&&>"
+              },
+              {
+                "at": "return",
+                "text": "Don't move return values or const objects.",
+                "code": "NRVO · silent copy"
+              },
+              {
+                "at": "mark",
+                "text": "Mark move operations noexcept.",
+                "code": "vector growth"
+              },
+              {
+                "at": "once",
+                "text": "std::forward once per argument, in templates.",
+                "code": "T&& + deduced T"
+              },
+              {
+                "at": "dead",
+                "text": "Treat moved-from objects as dead.",
+                "code": "destroy / reassign"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

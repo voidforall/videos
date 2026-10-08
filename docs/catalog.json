@@ -56,42 +56,6 @@
       ]
     },
     {
-      "series": "cpp",
-      "slug": "cpp-functional-walkthrough",
-      "title": "C++ functional programming walkthrough",
-      "kicker": "C++ · Functional programming",
-      "summary": "Pure functions, higher-order locking, type erasure behind std::function, capture pitfalls, mutable and recursive lambdas, and generic lambdas.",
-      "source": "https://github.com/voidforall/ai-docs/blob/main/interview/cpp-functional.md",
-      "clips": [
-        {
-          "id": "01",
-          "title": "Full walkthrough",
-          "question": "Seven C++ functional programming interview questions in one review.",
-          "duration": 252,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-functional-walkthrough/cpp-functional-walkthrough-01.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-functional-walkthrough/cpp-functional-walkthrough-01.jpg"
-        }
-      ]
-    },
-    {
-      "series": "cpp",
-      "slug": "cpp-oop-walkthrough",
-      "title": "C++ OOP interview walkthrough",
-      "kicker": "C++ · Object-oriented design",
-      "summary": "Eight practical mental models—from resource ownership and interfaces to initialization and the object model.",
-      "source": "https://github.com/voidforall/ai-docs/blob/main/interview/cpp-oop.md",
-      "clips": [
-        {
-          "id": "01",
-          "title": "Full walkthrough",
-          "question": "Eight C++ OOP interview topics in one review.",
-          "duration": 207,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-oop-walkthrough/cpp-oop-walkthrough-01.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-oop-walkthrough/cpp-oop-walkthrough-01.jpg"
-        }
-      ]
-    },
-    {
       "slug": "algorithm-binary-search",
       "series": "algorithm",
       "title": "Binary search",
@@ -360,6 +324,144 @@
           "duration": 38,
           "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-trie/algorithm-trie-03.mp4",
           "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-trie/algorithm-trie-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "cpp-move-semantics",
+      "series": "cpp",
+      "title": "Move semantics",
+      "kicker": "C++ · Move semantics",
+      "summary": "std::move is only a cast: value categories, the mistakes that silently copy, and when std::forward takes over.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/cpp/std-move.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "std::move is a cast",
+          "question": "What does std::move actually do at runtime?",
+          "duration": 53,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-move-semantics/cpp-move-semantics-01.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-move-semantics/cpp-move-semantics-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Three silent mistakes",
+          "question": "Name three ways std::move quietly goes wrong.",
+          "duration": 57,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-move-semantics/cpp-move-semantics-02.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-move-semantics/cpp-move-semantics-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "std::move vs std::forward",
+          "question": "When do you use std::forward instead of std::move?",
+          "duration": 59,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-move-semantics/cpp-move-semantics-03.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-move-semantics/cpp-move-semantics-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "cpp-smart-pointers",
+      "series": "cpp",
+      "title": "Smart pointers",
+      "kicker": "C++ · Smart pointers",
+      "summary": "unique_ptr, shared_ptr, and weak_ptr as ownership statements: the control block, make_shared, and how signatures pass ownership.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/cpp/smart-pointers.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Three kinds of ownership",
+          "question": "unique_ptr, shared_ptr, weak_ptr: what ownership does each express?",
+          "duration": 48,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-smart-pointers/cpp-smart-pointers-01.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-smart-pointers/cpp-smart-pointers-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Inside shared_ptr",
+          "question": "What does a shared_ptr hold, and when are the object and its control block freed?",
+          "duration": 54,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-smart-pointers/cpp-smart-pointers-02.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-smart-pointers/cpp-smart-pointers-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Passing smart pointers",
+          "question": "How should a function take a smart pointer parameter?",
+          "duration": 44,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-smart-pointers/cpp-smart-pointers-03.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-smart-pointers/cpp-smart-pointers-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "cpp-virtual-functions",
+      "series": "cpp",
+      "title": "Virtual functions",
+      "kicker": "C++ · Virtual functions",
+      "summary": "How a virtual call finds its target through the vptr and vtable, why destructors must be virtual, and what dispatch costs.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/cpp/virtual-functions.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "vptr and vtable",
+          "question": "How does a virtual call find the right function at runtime?",
+          "duration": 38,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-virtual-functions/cpp-virtual-functions-01.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-virtual-functions/cpp-virtual-functions-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Destructors and constructors",
+          "question": "Why must a polymorphic base have a virtual destructor, and what happens when a constructor calls a virtual function?",
+          "duration": 48,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-virtual-functions/cpp-virtual-functions-02.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-virtual-functions/cpp-virtual-functions-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "The cost of dispatch",
+          "question": "What does dynamic dispatch cost, and how can you avoid it?",
+          "duration": 56,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-virtual-functions/cpp-virtual-functions-03.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-virtual-functions/cpp-virtual-functions-03.jpg"
+        }
+      ]
+    },
+    {
+      "series": "cpp",
+      "slug": "cpp-functional-walkthrough",
+      "title": "C++ functional programming walkthrough",
+      "kicker": "C++ · Functional programming",
+      "summary": "Pure functions, higher-order locking, type erasure behind std::function, capture pitfalls, mutable and recursive lambdas, and generic lambdas.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/interview/cpp-functional.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Full walkthrough",
+          "question": "Seven C++ functional programming interview questions in one review.",
+          "duration": 252,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-functional-walkthrough/cpp-functional-walkthrough-01.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-functional-walkthrough/cpp-functional-walkthrough-01.jpg"
+        }
+      ]
+    },
+    {
+      "series": "cpp",
+      "slug": "cpp-oop-walkthrough",
+      "title": "C++ OOP interview walkthrough",
+      "kicker": "C++ · Object-oriented design",
+      "summary": "Eight practical mental models—from resource ownership and interfaces to initialization and the object model.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/interview/cpp-oop.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Full walkthrough",
+          "question": "Eight C++ OOP interview topics in one review.",
+          "duration": 207,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-oop-walkthrough/cpp-oop-walkthrough-01.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-oop-walkthrough/cpp-oop-walkthrough-01.jpg"
         }
       ]
     }

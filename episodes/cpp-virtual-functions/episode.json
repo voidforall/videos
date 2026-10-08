@@ -1,0 +1,485 @@
+{
+  "slug": "cpp-virtual-functions",
+  "series": "cpp",
+  "title": "Virtual functions",
+  "kicker": "C++ · Virtual functions",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/cpp/virtual-functions.md",
+  "summary": "How a virtual call finds its target through the vptr and vtable, why destructors must be virtual, and what dispatch costs.",
+  "captionFixes": [
+    {
+      "match": [
+        "V",
+        "pointer"
+      ],
+      "display": "vptr"
+    },
+    {
+      "match": [
+        "v",
+        "pointer"
+      ],
+      "display": "vptr"
+    },
+    {
+      "match": [
+        "V",
+        "table"
+      ],
+      "display": "vtable"
+    },
+    {
+      "match": [
+        "v",
+        "table"
+      ],
+      "display": "vtable"
+    },
+    {
+      "match": [
+        "V-table"
+      ],
+      "display": "vtable"
+    },
+    {
+      "match": [
+        "V-pointer"
+      ],
+      "display": "vptr"
+    },
+    {
+      "match": [
+        "animal"
+      ],
+      "display": "Animal"
+    },
+    {
+      "match": [
+        "dog"
+      ],
+      "display": "Dog"
+    },
+    {
+      "match": [
+        "dog's"
+      ],
+      "display": "Dog's"
+    },
+    {
+      "match": [
+        "base's"
+      ],
+      "display": "Base's"
+    },
+    {
+      "match": [
+        "derived's"
+      ],
+      "display": "Derived's"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "vptr and vtable",
+      "question": "How does a virtual call find the right function at runtime?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Virtual functions, question one. How does a virtual call find the right function at runtime? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How does a <em>virtual call</em> find the right function at runtime?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Every polymorphic object carries a hidden pointer, the v pointer, set by the constructor. It points to one table per class, the v table, which lists the final override of each virtual function. Dog overrides speak, but inherits move from Animal. Now call speak through an Animal pointer. Step one: load the v pointer from the object. Step two: index the table at the speak slot. Step three: call whatever function is there, which is Dog's speak.",
+          "props": {
+            "title": "Two loads and an <em>indirect call</em>",
+            "nodes": [
+              {
+                "id": "ptr",
+                "label": "Animal* a",
+                "x": 160,
+                "y": 300,
+                "w": 180,
+                "h": 64
+              },
+              {
+                "id": "vptr",
+                "label": "vptr",
+                "x": 470,
+                "y": 300,
+                "w": 220,
+                "h": 60
+              },
+              {
+                "id": "age",
+                "label": "age",
+                "x": 470,
+                "y": 360,
+                "w": 220,
+                "h": 60
+              },
+              {
+                "id": "bark",
+                "label": "barkVolume",
+                "x": 470,
+                "y": 420,
+                "w": 220,
+                "h": 60
+              },
+              {
+                "id": "ti",
+                "label": "&type_info",
+                "x": 800,
+                "y": 300,
+                "w": 260,
+                "h": 60
+              },
+              {
+                "id": "dtor",
+                "label": "&Dog::~Dog",
+                "x": 800,
+                "y": 360,
+                "w": 260,
+                "h": 60
+              },
+              {
+                "id": "speak",
+                "label": "&Dog::speak",
+                "x": 800,
+                "y": 420,
+                "w": 260,
+                "h": 60
+              },
+              {
+                "id": "move",
+                "label": "&Animal::move",
+                "x": 800,
+                "y": 480,
+                "w": 260,
+                "h": 60
+              },
+              {
+                "id": "fn",
+                "label": "Dog::speak()",
+                "x": 1068,
+                "y": 470,
+                "w": 204,
+                "h": 70,
+                "hidden": true
+              }
+            ],
+            "edges": [
+              {
+                "from": "ptr",
+                "to": "vptr"
+              },
+              {
+                "from": "vptr",
+                "to": "ti"
+              }
+            ],
+            "panels": [
+              {
+                "key": "layout",
+                "label": "Dog object · Dog vtable",
+                "type": "list",
+                "rows": 2,
+                "initial": [
+                  "object: vptr + members",
+                  "vtable: one per class"
+                ]
+              },
+              {
+                "key": "call",
+                "label": "a->speak()",
+                "type": "list",
+                "rows": 3,
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "hidden",
+                "nodes": {
+                  "vptr": "active"
+                },
+                "note": "vptr: hidden, 8 bytes, set by the constructor"
+              },
+              {
+                "at": "table",
+                "nodes": {
+                  "vptr": "base",
+                  "ti": "queued",
+                  "dtor": "queued",
+                  "speak": "queued",
+                  "move": "queued"
+                },
+                "edges": {
+                  "vptr-ti": "relax"
+                },
+                "note": "One vtable per class, shared by every Dog"
+              },
+              {
+                "at": "overrides",
+                "nodes": {
+                  "ti": "base",
+                  "dtor": "base",
+                  "speak": "done",
+                  "move": "base"
+                },
+                "edges": {
+                  "vptr-ti": "base"
+                },
+                "note": "speak slot → Dog::speak (overridden)"
+              },
+              {
+                "at": "inherits",
+                "nodes": {
+                  "move": "dim"
+                },
+                "note": "move slot → Animal::move (inherited)"
+              },
+              {
+                "at": "call",
+                "nodes": {
+                  "move": "base",
+                  "speak": "base",
+                  "ptr": "active"
+                },
+                "note": "a->speak() through a base pointer"
+              },
+              {
+                "at": "load",
+                "nodes": {
+                  "ptr": "base",
+                  "vptr": "active"
+                },
+                "edges": {
+                  "ptr-vptr": "tree",
+                  "vptr-ti": "relax"
+                },
+                "panels": {
+                  "call": [
+                    "1. load a->vptr"
+                  ]
+                },
+                "note": "mov rax, [a]"
+              },
+              {
+                "at": "index",
+                "nodes": {
+                  "vptr": "base",
+                  "speak": "active"
+                },
+                "panels": {
+                  "call": [
+                    "1. load a->vptr",
+                    "2. vtable[2]"
+                  ]
+                },
+                "note": "mov rax, [rax + 16]"
+              },
+              {
+                "at": "whatever",
+                "show": [
+                  "fn"
+                ],
+                "nodes": {
+                  "speak": "done",
+                  "fn": "done"
+                },
+                "add": [
+                  {
+                    "from": "speak",
+                    "to": "fn"
+                  }
+                ],
+                "panels": {
+                  "call": [
+                    "1. load a->vptr",
+                    "2. vtable[2]",
+                    "3. call → Dog::speak"
+                  ]
+                },
+                "note": "call rax → Woof"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Destructors and constructors",
+      "question": "Why must a polymorphic base have a virtual destructor, and what happens when a constructor calls a virtual function?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. Why must a polymorphic base class have a virtual destructor? And what happens when a constructor calls a virtual function? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Why a <em>virtual destructor</em>? And virtual calls in a <em>constructor</em>?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Delete a Dog through an Animal pointer. If the destructor is not virtual, only the base destructor runs, and Dog's resources leak. Formally, that is undefined behavior. Make the base destructor virtual, and destruction starts at Dog, then continues into Animal.",
+          "props": {
+            "title": "delete through a <em>base pointer</em>",
+            "left": {
+              "at": "not",
+              "label": "Non-virtual",
+              "title": "Only ~Animal runs",
+              "tone": "bad",
+              "code": "struct Animal { ~Animal(); };\nAnimal* a = new Dog;\ndelete a;  // ~Dog skipped: leak, UB",
+              "body": "Undefined behavior."
+            },
+            "right": {
+              "at": "make",
+              "label": "Virtual",
+              "title": "~Dog, then ~Animal",
+              "tone": "good",
+              "code": "struct Animal { virtual ~Animal() = default; };\nAnimal* a = new Dog;\ndelete a;  // ~Dog, then ~Animal",
+              "body": "Any class with virtual functions."
+            }
+          }
+        },
+        {
+          "type": "code",
+          "say": "Constructors are the other trap. While Base's constructor runs, the v pointer still points to Base's table, so a virtual call inside it reaches Base's version. Only when Derived's constructor starts does the v pointer switch. So never expect polymorphic behavior from a constructor or a destructor.",
+          "props": {
+            "title": "During construction, <em>you are the base</em>",
+            "file": "construct.cpp",
+            "tag": "vptr changes per stage",
+            "size": 22,
+            "width": 1080,
+            "code": "struct Base {\n    Base() { foo(); }                 // vptr → Base vtable\n    virtual void foo() { puts(\"Base::foo\"); }\n};\nstruct Derived : Base {\n    Derived() { foo(); }              // vptr → Derived vtable\n    void foo() override { puts(\"Derived::foo\"); }\n};\nDerived d;  // prints Base::foo, then Derived::foo",
+            "highlights": [
+              {
+                "at": "while",
+                "lines": "2-3",
+                "note": "Inside Base(): the object is still a Base"
+              },
+              {
+                "at": "switch",
+                "lines": "6-7",
+                "note": "Derived() starts: vptr now → Derived"
+              },
+              {
+                "at": "never",
+                "lines": "9",
+                "note": "No polymorphism in ctors or dtors"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "The cost of dispatch",
+      "question": "What does dynamic dispatch cost, and how can you avoid it?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. What does dynamic dispatch cost, and how can you avoid it? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What does dynamic dispatch <em>cost</em>, and how do you avoid it?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Each object pays one extra pointer, eight bytes. Each class pays one table. Each call adds an indirect jump that usually blocks inlining. And calls across mixed types can defeat branch prediction.",
+          "props": {
+            "title": "Where the cost <em>goes</em>",
+            "items": [
+              {
+                "at": "object",
+                "label": "Per object",
+                "title": "+8 bytes",
+                "body": "The vptr on 64-bit.",
+                "code": "sizeof grows"
+              },
+              {
+                "at": "class",
+                "label": "Per class",
+                "title": "One vtable",
+                "body": "Read-only, shared by all instances.",
+                "code": ".rodata"
+              },
+              {
+                "at": "jump",
+                "label": "Per call",
+                "title": "No inlining",
+                "body": "An indirect call through a loaded pointer.",
+                "code": "call [rax+16]"
+              },
+              {
+                "at": "mixed",
+                "label": "Hot loops",
+                "title": "Branch misses",
+                "body": "Mixed types defeat prediction.",
+                "code": "sort by type"
+              }
+            ]
+          }
+        },
+        {
+          "type": "compare",
+          "say": "When the type is known at compile time, use static polymorphism instead. Templates, or the curiously recurring template pattern, resolve the call at compile time, and the compiler can inline it. Keep virtual functions for open-ended sets of types that are only known at run time.",
+          "props": {
+            "title": "Runtime or <em>compile time</em>",
+            "left": {
+              "at": "keep",
+              "label": "Dynamic (virtual)",
+              "title": "Open set of types",
+              "code": "struct Shape {\n  virtual double area() const = 0;\n  virtual ~Shape() = default;\n};",
+              "body": "Plugins, heterogeneous containers."
+            },
+            "right": {
+              "at": "templates",
+              "label": "Static (CRTP)",
+              "title": "Resolved at compile time",
+              "tone": "good",
+              "code": "template <class D> struct Shape {\n  double area() const {\n    return static_cast<const D*>(this)->area_impl();\n  }\n};",
+              "body": "Inlinable; no vptr, no vtable."
+            }
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. A virtual call loads the v pointer, indexes the v table, and calls through it. Give polymorphic bases a virtual destructor. Don't rely on virtual calls in constructors. And when the type is known at compile time, prefer static dispatch.",
+          "props": {
+            "title": "Virtual functions, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "loads",
+                "text": "Load the vptr, index the vtable, call through it.",
+                "code": "2 loads + call"
+              },
+              {
+                "at": "destructor",
+                "text": "Polymorphic base → virtual destructor.",
+                "code": "virtual ~Base()"
+              },
+              {
+                "at": "rely",
+                "text": "No virtual dispatch inside ctors and dtors.",
+                "code": "base vptr"
+              },
+              {
+                "at": "prefer",
+                "text": "Known type at compile time? Prefer static dispatch.",
+                "code": "templates · CRTP"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

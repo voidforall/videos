@@ -1,0 +1,458 @@
+{
+  "slug": "cpp-smart-pointers",
+  "series": "cpp",
+  "title": "Smart pointers",
+  "kicker": "C++ · Smart pointers",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/cpp/smart-pointers.md",
+  "summary": "unique_ptr, shared_ptr, and weak_ptr as ownership statements: the control block, make_shared, and how signatures pass ownership.",
+  "captionFixes": [
+    {
+      "match": [
+        "unique",
+        "pointer"
+      ],
+      "display": "unique_ptr"
+    },
+    {
+      "match": [
+        "shared",
+        "pointer"
+      ],
+      "display": "shared_ptr"
+    },
+    {
+      "match": [
+        "weak",
+        "pointer"
+      ],
+      "display": "weak_ptr"
+    },
+    {
+      "match": [
+        "unique",
+        "pointers"
+      ],
+      "display": "unique_ptrs"
+    },
+    {
+      "match": [
+        "shared",
+        "pointers"
+      ],
+      "display": "shared_ptrs"
+    },
+    {
+      "match": [
+        "make",
+        "shared"
+      ],
+      "display": "make_shared"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Three kinds of ownership",
+      "question": "unique_ptr, shared_ptr, weak_ptr: what ownership does each express?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Smart pointers, question one. Unique pointer, shared pointer, and weak pointer: what kind of ownership does each one express? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "<em>unique_ptr</em>, <em>shared_ptr</em>, <em>weak_ptr</em>: what ownership does each express?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "A unique pointer is exclusive ownership. It cannot be copied, only moved, and it costs nothing over a raw pointer, so it is the default. A shared pointer is shared ownership through a reference count, and the last owner deletes the object. A weak pointer only observes. It adds no strong count, and you lock it to get a temporary owner, which is how you break reference cycles.",
+          "props": {
+            "title": "Three ownership <em>statements</em>",
+            "items": [
+              {
+                "at": "exclusive",
+                "label": "unique_ptr",
+                "title": "Exclusive owner",
+                "body": "Move-only; zero overhead. The default.",
+                "code": "std::make_unique<T>()"
+              },
+              {
+                "at": "count",
+                "label": "shared_ptr",
+                "title": "Shared owners",
+                "body": "Atomic reference count; the last owner deletes.",
+                "code": "std::make_shared<T>()"
+              },
+              {
+                "at": "observes",
+                "label": "weak_ptr",
+                "title": "Observer",
+                "body": "No strong count; lock() to use. Breaks cycles.",
+                "code": "w.lock()"
+              }
+            ]
+          }
+        },
+        {
+          "type": "code",
+          "say": "In code, a unique pointer can only be moved, never copied. Copying a shared pointer bumps the count, and leaving the scope drops it again. A weak pointer must be locked before use, and the lock fails once the object is gone.",
+          "props": {
+            "title": "Ownership <em>in code</em>",
+            "file": "owners.cpp",
+            "tag": "RAII",
+            "size": 22,
+            "width": 1080,
+            "code": "auto u = std::make_unique<Resource>();\n// auto u2 = u;              // error: not copyable\nauto u2 = std::move(u);       // ownership transferred\nauto s1 = std::make_shared<Resource>();\n{\n    auto s2 = s1;             // use_count() == 2\n}                             // back to 1\nstd::weak_ptr<Resource> w = s1;\nif (auto locked = w.lock())   // null once destroyed\n    locked->action();",
+            "highlights": [
+              {
+                "at": "moved",
+                "lines": "2-3",
+                "note": "unique_ptr: move, never copy"
+              },
+              {
+                "at": "bumps",
+                "lines": "6",
+                "note": "Copy → strong count 2"
+              },
+              {
+                "at": "leaving",
+                "lines": "7",
+                "note": "Scope exit → back to 1"
+              },
+              {
+                "at": "locked",
+                "lines": "8-9",
+                "note": "weak_ptr → lock() for a temporary owner"
+              },
+              {
+                "at": "fails",
+                "lines": "9-10",
+                "note": "lock() returns null after destruction"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Inside shared_ptr",
+      "question": "What does a shared_ptr hold, and when are the object and its control block freed?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. What does a shared pointer actually hold, and when are the object and its control block freed? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What does a <em>shared_ptr</em> hold, and when is each part freed?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "A shared pointer holds two pointers: one to the object, and one to a control block with the counts. Copy it, and the strong count goes to two. A weak pointer points only at the control block, and raises the weak count. When the copy is destroyed, strong drops back to one. Reset the last owner, and strong hits zero, so the object is deleted right away. The control block survives while a weak pointer remains, and lock now returns null. Only when the weak count reaches zero is the block freed.",
+          "props": {
+            "title": "Two pointers, <em>two counts</em>",
+            "nodes": [
+              {
+                "id": "s1",
+                "label": "s1",
+                "x": 190,
+                "y": 320,
+                "w": 180,
+                "h": 64
+              },
+              {
+                "id": "s2",
+                "label": "s2 (copy)",
+                "x": 190,
+                "y": 500,
+                "w": 180,
+                "h": 64,
+                "hidden": true
+              },
+              {
+                "id": "wp",
+                "label": "w (weak)",
+                "x": 190,
+                "y": 680,
+                "w": 180,
+                "h": 64,
+                "hidden": true
+              },
+              {
+                "id": "obj",
+                "label": "Resource\n(the object)",
+                "x": 760,
+                "y": 320,
+                "w": 300,
+                "h": 100
+              },
+              {
+                "id": "cb",
+                "label": "control block\nstrong · weak · deleter",
+                "x": 760,
+                "y": 600,
+                "w": 340,
+                "h": 110
+              }
+            ],
+            "edges": [
+              {
+                "from": "s1",
+                "to": "obj"
+              },
+              {
+                "from": "s1",
+                "to": "cb"
+              }
+            ],
+            "panels": [
+              {
+                "key": "counts",
+                "label": "Counts",
+                "type": "table",
+                "columns": [
+                  "strong",
+                  "weak"
+                ],
+                "initial": {
+                  "strong": "1",
+                  "weak": "0"
+                }
+              }
+            ],
+            "steps": [
+              {
+                "at": "holds",
+                "nodes": {
+                  "s1": "active"
+                },
+                "edges": {
+                  "s1-obj": "relax",
+                  "s1-cb": "relax"
+                },
+                "note": "Object pointer + control-block pointer"
+              },
+              {
+                "at": "copy",
+                "show": [
+                  "s2"
+                ],
+                "nodes": {
+                  "s1": "base",
+                  "s2": "active"
+                },
+                "edges": {
+                  "s1-obj": "base",
+                  "s1-cb": "base",
+                  "s2-obj": "relax",
+                  "s2-cb": "relax"
+                },
+                "panels": {
+                  "counts": {
+                    "strong": "2"
+                  }
+                },
+                "note": "auto s2 = s1;  strong = 2",
+                "add": [
+                  {
+                    "from": "s2",
+                    "to": "obj"
+                  },
+                  {
+                    "from": "s2",
+                    "to": "cb"
+                  }
+                ]
+              },
+              {
+                "at": "raises",
+                "show": [
+                  "wp"
+                ],
+                "nodes": {
+                  "s2": "base",
+                  "wp": "queued"
+                },
+                "edges": {
+                  "s2-obj": "base",
+                  "s2-cb": "base",
+                  "wp-cb": "relax"
+                },
+                "panels": {
+                  "counts": {
+                    "weak": "1"
+                  }
+                },
+                "note": "weak_ptr w = s1;  weak = 1",
+                "add": [
+                  {
+                    "from": "wp",
+                    "to": "cb"
+                  }
+                ]
+              },
+              {
+                "at": "destroyed",
+                "nodes": {
+                  "s2": "dim"
+                },
+                "remove": [
+                  "s2-obj",
+                  "s2-cb"
+                ],
+                "edges": {
+                  "wp-cb": "base"
+                },
+                "panels": {
+                  "counts": {
+                    "strong": "1"
+                  }
+                },
+                "note": "s2 leaves scope: strong = 1"
+              },
+              {
+                "at": "reset",
+                "nodes": {
+                  "s1": "dim",
+                  "obj": "dim"
+                },
+                "remove": [
+                  "s1-obj",
+                  "s1-cb"
+                ],
+                "panels": {
+                  "counts": {
+                    "strong": "0"
+                  }
+                },
+                "note": "s1.reset(): strong = 0 → object deleted"
+              },
+              {
+                "at": "survives",
+                "nodes": {
+                  "cb": "active"
+                },
+                "note": "Control block lives on: weak = 1"
+              },
+              {
+                "at": "null",
+                "nodes": {
+                  "wp": "active"
+                },
+                "edges": {
+                  "wp-cb": "relax"
+                },
+                "note": "w.lock() → nullptr"
+              },
+              {
+                "at": "freed",
+                "nodes": {
+                  "wp": "dim",
+                  "cb": "dim"
+                },
+                "remove": [
+                  "wp-cb"
+                ],
+                "panels": {
+                  "counts": {
+                    "weak": "0"
+                  }
+                },
+                "note": "weak = 0 → control block freed"
+              }
+            ]
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Prefer make shared. It puts the object and the control block in a single allocation instead of two, and it is exception safe. The trade-off: the object's memory is only released when the last weak pointer is gone as well.",
+          "props": {
+            "title": "Why <em>make_shared</em>",
+            "left": {
+              "at": "instead",
+              "label": "shared_ptr<T>(new T)",
+              "title": "Two allocations",
+              "code": "std::shared_ptr<Widget> p(new Widget(args));\n// new Widget  +  new control block",
+              "body": "Separate blocks; extra allocation and indirection."
+            },
+            "right": {
+              "at": "prefer",
+              "label": "std::make_shared<T>",
+              "title": "One allocation",
+              "tone": "good",
+              "code": "auto p = std::make_shared<Widget>(args);\n// [ control block | Widget ] together",
+              "body": "Fewer allocations, better locality, exception safe."
+            },
+            "verdict": {
+              "at": "released",
+              "text": "Trade-off: memory waits for the last weak_ptr.",
+              "code": "weak keeps the block"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Passing smart pointers",
+      "question": "How should a function take a smart pointer parameter?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. How should a function take a smart pointer parameter? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How should a function take a <em>smart pointer</em>?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Let the signature say what happens to ownership. Taking a unique pointer by value makes the function a sink, so callers must move it in. Taking a shared pointer by value means the function keeps a share, and the count goes up. A const reference to a shared pointer means it might keep one, without paying for the count. And if it only uses the object, take a plain reference or a raw pointer. That is the best default.",
+          "props": {
+            "title": "The signature <em>is the contract</em>",
+            "items": [
+              {
+                "at": "sink",
+                "label": "Sink",
+                "title": "unique_ptr<T> by value",
+                "body": "Takes ownership; caller must std::move.",
+                "code": "f(std::move(p))"
+              },
+              {
+                "at": "keeps",
+                "label": "Share",
+                "title": "shared_ptr<T> by value",
+                "body": "Keeps a copy; count goes up.",
+                "code": "atomic ++"
+              },
+              {
+                "at": "might",
+                "label": "Maybe",
+                "title": "const shared_ptr<T>&",
+                "body": "Might keep one; no count bump.",
+                "code": "no atomic op"
+              },
+              {
+                "at": "uses",
+                "label": "Observe",
+                "title": "T& or T*",
+                "body": "Just uses it. The default.",
+                "code": "decoupled"
+              }
+            ]
+          }
+        },
+        {
+          "type": "statement",
+          "say": "One more interview favorite. The reference count is thread safe, but the shared pointer instance itself is not, and neither is the object it points to.",
+          "props": {
+            "text": "The count is atomic. <em>Nothing else is.</em>",
+            "sub": "Copying shared_ptrs across threads is safe. Writing the same shared_ptr instance needs a mutex or std::atomic<std::shared_ptr> (C++20), and the object needs its own synchronization.",
+            "subAt": "neither"
+          }
+        }
+      ]
+    }
+  ]
+}
