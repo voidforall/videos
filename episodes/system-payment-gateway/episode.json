@@ -1,0 +1,778 @@
+{
+  "slug": "system-payment-gateway",
+  "series": "system",
+  "title": "Payment gateway API",
+  "kicker": "System design · Payment gateway",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/system/design-interview/payment-gateway-api.md",
+  "summary": "A Stripe-style API: idempotency keys against double charges, tokenization to shrink PCI scope, at-least-once webhooks, and REST vs GraphQL.",
+  "captionFixes": [
+    {
+      "match": [
+        "deduce"
+      ],
+      "display": "dedupe"
+    },
+    {
+      "match": [
+        "id"
+      ],
+      "display": "ID"
+    },
+    {
+      "match": [
+        "back-off"
+      ],
+      "display": "backoff"
+    },
+    {
+      "match": [
+        "back",
+        "off"
+      ],
+      "display": "backoff"
+    },
+    {
+      "match": [
+        "a",
+        "post"
+      ],
+      "display": "a POST"
+    },
+    {
+      "match": [
+        "Every",
+        "post"
+      ],
+      "display": "Every POST"
+    },
+    {
+      "match": [
+        "to",
+        "recap"
+      ],
+      "display": "To recap"
+    },
+    {
+      "match": [
+        "merchant",
+        "server"
+      ],
+      "display": "merchant's server"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Idempotency keys",
+      "question": "A charge request times out and the client retries. How do you avoid charging twice?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Payment gateway, question one. A charge request times out, and the client retries. How do you make sure the card is not charged twice? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "The client <em>retries</em> a timed-out charge. How do you not charge twice?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "The client generates a unique idempotency key, and sends it as a header with the charge. The API records the key before doing any work, then charges the card, and stores the response under that key. Now the response is lost, in a network timeout. The client cannot know whether it was charged, so it retries, with the same key. The API finds the key, and replays the stored response, without charging again. The card is charged exactly once.",
+          "props": {
+            "title": "Same key, <em>same answer</em>",
+            "nodes": [
+              {
+                "id": "client",
+                "label": "Merchant\nserver",
+                "x": 180,
+                "y": 470,
+                "w": 200,
+                "h": 90
+              },
+              {
+                "id": "api",
+                "label": "Payment\nAPI",
+                "x": 660,
+                "y": 470,
+                "w": 200,
+                "h": 90
+              },
+              {
+                "id": "store",
+                "label": "Idempotency\nkeys",
+                "x": 1050,
+                "y": 300,
+                "w": 240,
+                "h": 90
+              },
+              {
+                "id": "card",
+                "label": "Card network",
+                "x": 1050,
+                "y": 640,
+                "w": 240,
+                "h": 70
+              }
+            ],
+            "edges": [
+              {
+                "from": "client",
+                "to": "api",
+                "w": "POST /charges"
+              },
+              {
+                "from": "api",
+                "to": "store"
+              },
+              {
+                "from": "api",
+                "to": "card"
+              }
+            ],
+            "panels": [
+              {
+                "key": "key",
+                "label": "Stored under k_7f3",
+                "type": "list",
+                "initial": []
+              },
+              {
+                "key": "charges",
+                "label": "Card charged",
+                "type": "list",
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "header",
+                "nodes": {
+                  "client": "active"
+                },
+                "edges": {
+                  "client-api": "relax"
+                },
+                "note": "Header: Idempotency-Key: k_7f3"
+              },
+              {
+                "at": "records",
+                "nodes": {
+                  "client": "base",
+                  "api": "active"
+                },
+                "edges": {
+                  "client-api": "base",
+                  "api-store": "relax"
+                },
+                "panels": {
+                  "key": [
+                    "in progress"
+                  ]
+                },
+                "note": "Insert the key first (unique constraint)"
+              },
+              {
+                "at": "charges",
+                "nodes": {
+                  "api": "base",
+                  "card": "active"
+                },
+                "edges": {
+                  "api-store": "base",
+                  "api-card": "relax"
+                },
+                "panels": {
+                  "charges": [
+                    "$50 × 1"
+                  ]
+                },
+                "note": "Charge the card"
+              },
+              {
+                "at": "stores",
+                "nodes": {
+                  "card": "base",
+                  "store": "done"
+                },
+                "edges": {
+                  "api-card": "base",
+                  "api-store": "relax"
+                },
+                "panels": {
+                  "key": [
+                    "200 · ch_42"
+                  ]
+                },
+                "note": "Save the response under the key"
+              },
+              {
+                "at": "lost",
+                "add": [
+                  {
+                    "from": "api",
+                    "to": "client",
+                    "w": "200 ch_42"
+                  }
+                ],
+                "nodes": {
+                  "store": "base"
+                },
+                "edges": {
+                  "api-store": "base",
+                  "api-client": "dim"
+                },
+                "note": "The response is lost: timeout"
+              },
+              {
+                "at": "retries",
+                "nodes": {
+                  "client": "active"
+                },
+                "edges": {
+                  "client-api": "relax"
+                },
+                "note": "Retry with the same key"
+              },
+              {
+                "at": "finds",
+                "nodes": {
+                  "client": "base",
+                  "store": "active"
+                },
+                "edges": {
+                  "client-api": "base",
+                  "api-store": "relax"
+                },
+                "note": "Key found: no new charge"
+              },
+              {
+                "at": "replays",
+                "nodes": {
+                  "store": "base",
+                  "client": "done"
+                },
+                "edges": {
+                  "api-store": "base",
+                  "api-client": "tree"
+                },
+                "note": "Replay the stored 200 · ch_42"
+              },
+              {
+                "at": "exactly",
+                "nodes": {
+                  "card": "done"
+                },
+                "panels": {
+                  "charges": [
+                    "$50 × 1 ✓"
+                  ]
+                },
+                "note": "Charged exactly once"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "Four details interviewers probe. The key is generated by the client, usually a random UUID per operation. If the same key arrives with a different body, reject it, rather than replaying. If the first request is still in flight, return a conflict, so two retries can never race. And keys expire, after about twenty-four hours.",
+          "props": {
+            "title": "The <em>fine print</em>",
+            "items": [
+              {
+                "at": "generated",
+                "label": "Who makes it",
+                "title": "The client",
+                "body": "A random UUID per logical operation.",
+                "code": "Idempotency-Key"
+              },
+              {
+                "at": "different",
+                "label": "Same key, new body",
+                "title": "Reject",
+                "body": "Parameters must match the original request.",
+                "code": "error, not replay"
+              },
+              {
+                "at": "flight",
+                "label": "Still running",
+                "title": "Conflict",
+                "body": "Concurrent retries must not both proceed.",
+                "code": "409 Conflict"
+              },
+              {
+                "at": "expire",
+                "label": "Retention",
+                "title": "~24 hours",
+                "body": "Longer than any client's retry window.",
+                "code": "TTL 24h"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Tokenization and PCI scope",
+      "question": "How do you keep raw card numbers out of most of your system?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. How do you keep raw card numbers out of almost all of your system, and why does it matter? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How do you keep <em>raw card numbers</em> out of your system?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "The checkout page sends the card number straight to the card vault, never through the merchant. The vault stores it encrypted, and returns a token. The merchant's server only ever sees that token. To take a payment, it calls the payment service with the token. When the charge must reach the card network, the vault swaps the token back for the card, inside its own boundary. So only the vault is in PCI scope. Everything else handles tokens that are useless to a thief.",
+          "props": {
+            "title": "Only the vault <em>sees the card</em>",
+            "nodes": [
+              {
+                "id": "page",
+                "label": "Checkout page\n(browser)",
+                "x": 240,
+                "y": 300,
+                "w": 290,
+                "h": 90
+              },
+              {
+                "id": "vault",
+                "label": "Card vault",
+                "x": 860,
+                "y": 300,
+                "w": 260,
+                "h": 90
+              },
+              {
+                "id": "merchant",
+                "label": "Merchant\nserver",
+                "x": 240,
+                "y": 630,
+                "w": 290,
+                "h": 90
+              },
+              {
+                "id": "pay",
+                "label": "Payment\nservice",
+                "x": 860,
+                "y": 630,
+                "w": 260,
+                "h": 90
+              },
+              {
+                "id": "network",
+                "label": "Card network",
+                "x": 1500,
+                "y": 300,
+                "w": 280,
+                "h": 70
+              }
+            ],
+            "edges": [],
+            "panels": [],
+            "steps": [
+              {
+                "at": "straight",
+                "add": [
+                  {
+                    "from": "page",
+                    "to": "vault",
+                    "w": "4242 4242 …"
+                  }
+                ],
+                "nodes": {
+                  "page": "active"
+                },
+                "edges": {
+                  "page-vault": "relax"
+                },
+                "note": "The card number goes only to the vault"
+              },
+              {
+                "at": "returns",
+                "add": [
+                  {
+                    "from": "vault",
+                    "to": "page",
+                    "w": "tok_1J2x"
+                  }
+                ],
+                "nodes": {
+                  "page": "base",
+                  "vault": "active"
+                },
+                "edges": {
+                  "page-vault": "base",
+                  "vault-page": "relax"
+                },
+                "note": "Vault stores it encrypted, returns a token"
+              },
+              {
+                "at": "ever",
+                "add": [
+                  {
+                    "from": "page",
+                    "to": "merchant",
+                    "w": "tok_1J2x"
+                  }
+                ],
+                "nodes": {
+                  "vault": "base",
+                  "merchant": "active"
+                },
+                "edges": {
+                  "vault-page": "base",
+                  "page-merchant": "relax"
+                },
+                "note": "The merchant only ever holds the token"
+              },
+              {
+                "at": "calls",
+                "add": [
+                  {
+                    "from": "merchant",
+                    "to": "pay",
+                    "w": "charge(tok_1J2x)"
+                  }
+                ],
+                "nodes": {
+                  "merchant": "base",
+                  "pay": "active"
+                },
+                "edges": {
+                  "page-merchant": "base",
+                  "merchant-pay": "relax"
+                },
+                "note": "Charge by token"
+              },
+              {
+                "at": "swaps",
+                "add": [
+                  {
+                    "from": "pay",
+                    "to": "vault",
+                    "w": "detokenize"
+                  },
+                  {
+                    "from": "vault",
+                    "to": "network",
+                    "w": "card"
+                  }
+                ],
+                "nodes": {
+                  "pay": "base",
+                  "vault": "active",
+                  "network": "active"
+                },
+                "edges": {
+                  "merchant-pay": "base",
+                  "pay-vault": "relax",
+                  "vault-network": "relax"
+                },
+                "note": "Only the vault turns the token back into a card"
+              },
+              {
+                "at": "scope",
+                "nodes": {
+                  "vault": "queued",
+                  "network": "base",
+                  "page": "done",
+                  "merchant": "done",
+                  "pay": "done"
+                },
+                "edges": {
+                  "pay-vault": "base",
+                  "vault-network": "base"
+                },
+                "note": "PCI scope: the vault (dashed); the rest holds only tokens"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Reliable webhooks",
+      "question": "How do you reliably notify a merchant that a payment succeeded?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. How do you reliably notify a merchant that a payment succeeded, even when their server is down? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How do you <em>reliably</em> tell a merchant a payment succeeded?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "When a charge succeeds, the payment service writes an event, in the same transaction as the charge, and puts it on a durable queue. A webhook worker posts the event to the merchant's endpoint. If the endpoint fails, or times out, the worker retries with exponential backoff: after one minute, then five, then thirty, for up to three days. Delivery is at least once, so the merchant must deduplicate by event ID. And every event stays in a log, so merchants can reconcile anything they missed.",
+          "props": {
+            "title": "Retry until <em>acknowledged</em>",
+            "nodes": [
+              {
+                "id": "pay",
+                "label": "Payment\nservice",
+                "x": 220,
+                "y": 410,
+                "w": 230,
+                "h": 90
+              },
+              {
+                "id": "queue",
+                "label": "Durable queue",
+                "x": 640,
+                "y": 410,
+                "w": 250,
+                "h": 70
+              },
+              {
+                "id": "worker",
+                "label": "Webhook\nworker",
+                "x": 1070,
+                "y": 410,
+                "w": 230,
+                "h": 90
+              },
+              {
+                "id": "merchant",
+                "label": "Merchant\nendpoint",
+                "x": 1560,
+                "y": 410,
+                "w": 250,
+                "h": 90
+              },
+              {
+                "id": "log",
+                "label": "Event log",
+                "x": 900,
+                "y": 650,
+                "w": 250,
+                "h": 70
+              }
+            ],
+            "edges": [
+              {
+                "from": "pay",
+                "to": "log"
+              },
+              {
+                "from": "pay",
+                "to": "queue",
+                "w": "evt_9"
+              },
+              {
+                "from": "queue",
+                "to": "worker"
+              },
+              {
+                "from": "worker",
+                "to": "merchant",
+                "w": "POST evt_9"
+              }
+            ],
+            "panels": [],
+            "steps": [
+              {
+                "at": "writes",
+                "nodes": {
+                  "pay": "active",
+                  "log": "active"
+                },
+                "edges": {
+                  "pay-log": "relax"
+                },
+                "note": "Write the event with the charge, atomically"
+              },
+              {
+                "at": "durable",
+                "nodes": {
+                  "log": "base",
+                  "queue": "active"
+                },
+                "edges": {
+                  "pay-log": "base",
+                  "pay-queue": "relax"
+                },
+                "note": "Enqueue it durably"
+              },
+              {
+                "at": "posts",
+                "nodes": {
+                  "pay": "base",
+                  "queue": "base",
+                  "worker": "active"
+                },
+                "edges": {
+                  "pay-queue": "base",
+                  "queue-worker": "relax",
+                  "worker-merchant": "relax"
+                },
+                "note": "Worker POSTs evt_9 to the merchant"
+              },
+              {
+                "at": "fails",
+                "nodes": {
+                  "merchant": "dim"
+                },
+                "edges": {
+                  "queue-worker": "base",
+                  "worker-merchant": "dim"
+                },
+                "note": "500 or timeout: not delivered"
+              },
+              {
+                "at": "backoff",
+                "nodes": {
+                  "worker": "queued"
+                },
+                "note": "Retry after 1 min, 5 min, 30 min … up to 3 days"
+              },
+              {
+                "at": "once",
+                "nodes": {
+                  "worker": "base",
+                  "merchant": "done"
+                },
+                "edges": {
+                  "worker-merchant": "tree"
+                },
+                "note": "At least once: dedupe on the event ID"
+              },
+              {
+                "at": "reconcile",
+                "add": [
+                  {
+                    "from": "merchant",
+                    "to": "log",
+                    "w": "GET /events"
+                  }
+                ],
+                "nodes": {
+                  "log": "active"
+                },
+                "edges": {
+                  "merchant-log": "relax"
+                },
+                "note": "Missed something? Re-fetch from the event log"
+              }
+            ]
+          }
+        },
+        {
+          "type": "code",
+          "say": "On the merchant's side, verify the signature first, so you know the event really came from the gateway. If you have already processed this event ID, acknowledge it, and do nothing. Otherwise, do the work and record the ID, in one transaction. And return two hundred quickly, or the gateway keeps retrying.",
+          "props": {
+            "title": "The merchant <em>dedupes</em>",
+            "file": "webhooks.py",
+            "tag": "merchant side",
+            "lang": "python",
+            "size": 23,
+            "width": 1120,
+            "code": "def handle_webhook(request):\n    event = verify_and_parse(request)        # check the signature\n    if processed.exists(event.id):\n        return 200                           # duplicate: ack, do nothing\n    with db.transaction():\n        fulfil_order(event.data)\n        processed.insert(event.id)\n    return 200                               # ack fast, retries stop",
+            "highlights": [
+              {
+                "at": "signature",
+                "lines": "2",
+                "note": "Reject forged events"
+              },
+              {
+                "at": "already",
+                "lines": "3-4",
+                "note": "Seen this ID? Ack and skip"
+              },
+              {
+                "at": "transaction",
+                "lines": "5-7",
+                "note": "Work + record ID atomically"
+              },
+              {
+                "at": "quickly",
+                "lines": "8",
+                "note": "A 2xx stops the retries"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "04",
+      "title": "REST or GraphQL",
+      "question": "Would you expose the payment API as REST or GraphQL?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question four. Would you expose the payment API as REST, or as GraphQL? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "<em>REST</em> or <em>GraphQL</em> for a payment API?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "For the public payment API, REST wins. Each operation is a clear resource creation, like a POST to charges, which maps cleanly onto idempotency keys, caching and rate limits. GraphQL shines elsewhere: a merchant dashboard that wants sales totals, top customers and recent payments in one query. But one mutation doing several things can fail in murky ways, and arbitrary queries need cost limits.",
+          "props": {
+            "title": "Money over <em>REST</em>, dashboards over GraphQL",
+            "left": {
+              "at": "wins",
+              "label": "Public payment API",
+              "title": "REST",
+              "tone": "good",
+              "code": "POST /v1/charges\nPOST /v1/charges/{id}/capture\nPOST /v1/refunds",
+              "body": "One resource per operation: idempotency, caching and rate limits stay simple."
+            },
+            "right": {
+              "at": "shines",
+              "label": "Merchant dashboard",
+              "title": "GraphQL",
+              "code": "{ sales(range: WEEK) { total }\n  topCustomers(n: 5) { name } }",
+              "body": "Exactly the data needed, one round trip; needs query cost limits."
+            },
+            "verdict": {
+              "at": "murky",
+              "text": "Multi-step mutations fail in murky ways: keep money on REST.",
+              "code": "REST + GraphQL"
+            }
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Every POST takes an idempotency key, so retries never double charge. Card numbers go only to the vault; everything else holds tokens. Webhooks are at least once, with backoff, so merchants dedupe by event ID. An append-only ledger of debits and credits is the source of truth. And use REST for the payment API, GraphQL for dashboards.",
+          "props": {
+            "title": "Payment gateway, <em>in five lines</em>",
+            "items": [
+              {
+                "at": "retries",
+                "text": "Idempotency keys make retries safe.",
+                "code": "Idempotency-Key"
+              },
+              {
+                "at": "vault",
+                "text": "Only the vault sees card numbers.",
+                "code": "tok_… everywhere else"
+              },
+              {
+                "at": "dedupe",
+                "text": "Webhooks: at least once, with backoff.",
+                "code": "dedupe on event ID"
+              },
+              {
+                "at": "ledger",
+                "text": "An append-only ledger is the source of truth.",
+                "code": "debits = credits"
+              },
+              {
+                "at": "dashboards",
+                "text": "REST for payments, GraphQL for dashboards.",
+                "code": "POST /v1/charges"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

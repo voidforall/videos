@@ -1,0 +1,585 @@
+{
+  "slug": "system-url-shortener",
+  "series": "system",
+  "title": "URL shortener",
+  "kicker": "System design · URL shortener",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/system/design-interview/url-shortener.md",
+  "summary": "The classic warm-up: a cache-first redirect path, 301 vs 302, collision-free Base62 codes, and scaling a 100:1 read-heavy service.",
+  "captionFixes": [
+    {
+      "match": [
+        "get",
+        "request"
+      ],
+      "display": "GET request"
+    },
+    {
+      "match": [
+        "location",
+        "header"
+      ],
+      "display": "Location header"
+    },
+    {
+      "match": [
+        "too",
+        "long"
+      ],
+      "display": "two long"
+    },
+    {
+      "match": [
+        "two",
+        "approaches"
+      ],
+      "display": "Two approaches"
+    },
+    {
+      "match": [
+        "1662s"
+      ],
+      "display": "16 sixty-twos"
+    },
+    {
+      "match": [
+        "G8"
+      ],
+      "display": "g8"
+    },
+    {
+      "match": [
+        "of",
+        "ID"
+      ],
+      "display": "of IDs"
+    },
+    {
+      "match": [
+        "Rights"
+      ],
+      "display": "Writes"
+    },
+    {
+      "match": [
+        "id"
+      ],
+      "display": "ID"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "The redirect path",
+      "question": "Walk through what happens when someone clicks a short link.",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "URL shortener, question one. Walk through what happens when someone clicks a short link, and which redirect status you return. Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What happens when someone <em>clicks</em> a short link?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "A click sends a GET request for the short code to a web server. The server checks the cache first. On a hit, it has the long URL immediately. On a miss, it reads the database, then fills the cache, so the next click is a hit. Then it responds with a redirect, whose Location header carries the long URL. And if the code is not in the database at all, it returns not found.",
+          "props": {
+            "title": "Cache first, <em>then</em> the database",
+            "nodes": [
+              {
+                "id": "client",
+                "label": "Browser",
+                "x": 210,
+                "y": 470,
+                "w": 220,
+                "h": 70
+              },
+              {
+                "id": "web",
+                "label": "Web server",
+                "x": 860,
+                "y": 470,
+                "w": 260,
+                "h": 70
+              },
+              {
+                "id": "cache",
+                "label": "Cache",
+                "x": 1420,
+                "y": 310,
+                "w": 260,
+                "h": 70
+              },
+              {
+                "id": "db",
+                "label": "Database",
+                "x": 1420,
+                "y": 630,
+                "w": 260,
+                "h": 70
+              }
+            ],
+            "edges": [
+              {
+                "from": "client",
+                "to": "web",
+                "w": "GET /g8"
+              },
+              {
+                "from": "web",
+                "to": "cache"
+              },
+              {
+                "from": "web",
+                "to": "db"
+              }
+            ],
+            "panels": [],
+            "steps": [
+              {
+                "at": "sends",
+                "nodes": {
+                  "client": "active"
+                },
+                "edges": {
+                  "client-web": "relax"
+                },
+                "note": "GET /g8 reaches a web server"
+              },
+              {
+                "at": "first",
+                "nodes": {
+                  "client": "base",
+                  "web": "active"
+                },
+                "edges": {
+                  "client-web": "base",
+                  "web-cache": "relax"
+                },
+                "note": "Look up g8 in the cache first"
+              },
+              {
+                "at": "immediately",
+                "nodes": {
+                  "web": "base",
+                  "cache": "done"
+                },
+                "note": "Hit: long URL in well under a millisecond"
+              },
+              {
+                "at": "miss",
+                "nodes": {
+                  "cache": "queued",
+                  "db": "active"
+                },
+                "edges": {
+                  "web-cache": "base",
+                  "web-db": "relax"
+                },
+                "note": "Miss: read the mapping from the database…"
+              },
+              {
+                "at": "fills",
+                "nodes": {
+                  "db": "done",
+                  "cache": "done"
+                },
+                "edges": {
+                  "web-db": "base",
+                  "web-cache": "relax"
+                },
+                "note": "…then fill the cache for the next click"
+              },
+              {
+                "at": "redirect",
+                "add": [
+                  {
+                    "from": "web",
+                    "to": "client",
+                    "w": "redirect → long URL"
+                  }
+                ],
+                "nodes": {
+                  "cache": "base",
+                  "db": "base",
+                  "client": "done"
+                },
+                "edges": {
+                  "web-cache": "base",
+                  "web-client": "relax"
+                },
+                "note": "Redirect: the browser follows Location"
+              },
+              {
+                "at": "found",
+                "nodes": {
+                  "db": "dim",
+                  "client": "base"
+                },
+                "edges": {
+                  "web-client": "base"
+                },
+                "note": "Unknown code → 404 Not Found"
+              }
+            ]
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Which redirect? A three oh one is permanent. Browsers cache it, so repeat clicks never reach you: cheaper, but you lose click analytics. A three oh two is temporary, so every click comes back through your servers, and you can count it.",
+          "props": {
+            "title": "301 or <em>302</em>?",
+            "left": {
+              "at": "permanent",
+              "label": "301",
+              "title": "Moved permanently",
+              "body": "Browsers cache it: repeat clicks skip your servers. Least load, but clicks go uncounted."
+            },
+            "right": {
+              "at": "temporary",
+              "label": "302",
+              "title": "Found (temporary)",
+              "tone": "good",
+              "body": "Every click comes back through you, so you can count, geo-locate and expire links."
+            },
+            "verdict": {
+              "at": "count",
+              "text": "Need analytics? 302. Pure offload? 301.",
+              "code": "Location: <long URL>"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Generating short codes",
+      "question": "How do you generate a short code that never collides?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. How do you generate a short code, and make sure two long URLs never get the same one? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How do you generate a short code that <em>never collides</em>?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Two approaches. Hash the long URL, and keep the first seven characters: simple, but different URLs can collide, so every write must check and retry. Or take a unique number from a counter, and encode it in base sixty-two. Unique by construction, with no collision checks.",
+          "props": {
+            "title": "Hash and check, or <em>count and encode</em>",
+            "lang": "python",
+            "left": {
+              "at": "Hash",
+              "label": "Hash + truncate",
+              "title": "Collisions possible",
+              "tone": "bad",
+              "code": "code = md5(url).hexdigest()[:7]\nif db.exists(code):   # collision!\n    retry_with_salt()"
+            },
+            "right": {
+              "at": "counter",
+              "label": "Counter + Base62",
+              "title": "Unique by construction",
+              "tone": "good",
+              "code": "id = counter.next()   # 1000\ncode = base62(id)     # \"g8\""
+            },
+            "verdict": {
+              "at": "construction",
+              "text": "A unique ID encodes to a unique code: no checks.",
+              "code": "id → [0-9a-zA-Z]"
+            }
+          }
+        },
+        {
+          "type": "code",
+          "say": "Base sixty-two uses the digits, then lower case, then upper case letters. Repeatedly divide by sixty-two, and each remainder picks a character. For example, one thousand is sixteen sixty-twos plus eight, which encodes as g, eight. Seven characters cover three and a half trillion codes. At scale, the counter is a distributed ID service, or each server reserves a block of IDs, so writes never contend.",
+          "props": {
+            "title": "Base62: <em>remainders</em> pick characters",
+            "file": "base62.py",
+            "tag": "encode",
+            "lang": "python",
+            "size": 22,
+            "width": 1120,
+            "code": "ALPHABET = \"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\"\n\ndef base62(n):\n    digits = []\n    while n:\n        n, r = divmod(n, 62)\n        digits.append(ALPHABET[r])\n    return \"\".join(reversed(digits)) or \"0\"\n\nbase62(1000)    # 1000 = 16·62 + 8 → \"g8\"\n62 ** 7         # 3.5 trillion 7-char codes\nblock = counter.reserve(1000)   # per-server ID range",
+            "highlights": [
+              {
+                "at": "digits",
+                "lines": "1",
+                "note": "0-9, a-z, A-Z: 62 URL-safe symbols"
+              },
+              {
+                "at": "divide",
+                "lines": "5-7",
+                "note": "Each remainder picks one character"
+              },
+              {
+                "at": "example",
+                "lines": "10",
+                "note": "16 → 'g', 8 → '8'"
+              },
+              {
+                "at": "trillion",
+                "lines": "11",
+                "note": "62⁷ ≈ 3.5 × 10¹²"
+              },
+              {
+                "at": "reserves",
+                "lines": "12",
+                "note": "Lease ID blocks: no shared hot counter"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Scaling the read path",
+      "question": "Reads outnumber writes 100 to 1. How do you scale the service?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. Redirects outnumber new links a hundred to one. How do you scale the service? Pause and sketch it out.",
+          "pauseAfter": 4,
+          "props": {
+            "question": "Reads outnumber writes <em>100 : 1</em>. How do you scale?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Start with a load balancer in front of a fleet of stateless web servers. Add a cache: popular codes stay hot, and least recently used eviction drops the rest, so most redirects never touch the database. Writes go to a primary, and read replicas absorb the cache misses. When the table outgrows one machine, shard it by short code. And record clicks asynchronously, through a queue, so analytics never slow the redirect.",
+          "props": {
+            "title": "Scale the <em>reads</em>",
+            "nodes": [
+              {
+                "id": "client",
+                "label": "Clients",
+                "x": 190,
+                "y": 470,
+                "w": 200,
+                "h": 70
+              },
+              {
+                "id": "lb",
+                "label": "Load\nbalancer",
+                "x": 520,
+                "y": 470,
+                "w": 220,
+                "h": 90,
+                "hidden": true
+              },
+              {
+                "id": "web",
+                "label": "Web servers ×N\n(stateless)",
+                "x": 900,
+                "y": 470,
+                "w": 300,
+                "h": 90
+              },
+              {
+                "id": "cache",
+                "label": "Cache · LRU",
+                "x": 1420,
+                "y": 270,
+                "w": 280,
+                "h": 70,
+                "hidden": true
+              },
+              {
+                "id": "replica",
+                "label": "Read replicas",
+                "x": 1420,
+                "y": 470,
+                "w": 280,
+                "h": 70,
+                "hidden": true
+              },
+              {
+                "id": "primary",
+                "label": "DB primary",
+                "x": 1420,
+                "y": 660,
+                "w": 280,
+                "h": 70,
+                "hidden": true
+              },
+              {
+                "id": "queue",
+                "label": "Queue → analytics",
+                "x": 900,
+                "y": 670,
+                "w": 320,
+                "h": 70,
+                "hidden": true
+              }
+            ],
+            "edges": [
+              {
+                "from": "client",
+                "to": "web"
+              }
+            ],
+            "panels": [],
+            "steps": [
+              {
+                "at": "balancer",
+                "show": [
+                  "lb"
+                ],
+                "remove": [
+                  "client-web"
+                ],
+                "add": [
+                  {
+                    "from": "client",
+                    "to": "lb"
+                  },
+                  {
+                    "from": "lb",
+                    "to": "web"
+                  }
+                ],
+                "nodes": {
+                  "lb": "active"
+                },
+                "note": "Load balancer → any stateless web server"
+              },
+              {
+                "at": "cache",
+                "show": [
+                  "cache"
+                ],
+                "add": [
+                  {
+                    "from": "web",
+                    "to": "cache",
+                    "w": "~90% hits"
+                  }
+                ],
+                "nodes": {
+                  "lb": "base",
+                  "cache": "active"
+                },
+                "edges": {
+                  "web-cache": "relax"
+                },
+                "note": "Hot codes stay cached; LRU evicts the rest"
+              },
+              {
+                "at": "primary",
+                "show": [
+                  "primary"
+                ],
+                "add": [
+                  {
+                    "from": "web",
+                    "to": "primary",
+                    "w": "writes"
+                  }
+                ],
+                "nodes": {
+                  "cache": "base",
+                  "primary": "active"
+                },
+                "edges": {
+                  "web-cache": "base",
+                  "web-primary": "relax"
+                },
+                "note": "New links are written to the primary"
+              },
+              {
+                "at": "replicas",
+                "show": [
+                  "replica"
+                ],
+                "add": [
+                  {
+                    "from": "primary",
+                    "to": "replica"
+                  },
+                  {
+                    "from": "web",
+                    "to": "replica",
+                    "w": "misses"
+                  }
+                ],
+                "nodes": {
+                  "primary": "base",
+                  "replica": "active"
+                },
+                "edges": {
+                  "web-primary": "base",
+                  "web-replica": "relax"
+                },
+                "note": "Replicas serve the cache misses"
+              },
+              {
+                "at": "shard",
+                "nodes": {
+                  "replica": "queued",
+                  "primary": "queued"
+                },
+                "edges": {
+                  "web-replica": "base"
+                },
+                "note": "Too big for one machine? Shard by short_code"
+              },
+              {
+                "at": "asynchronously",
+                "show": [
+                  "queue"
+                ],
+                "add": [
+                  {
+                    "from": "web",
+                    "to": "queue",
+                    "w": "click event"
+                  }
+                ],
+                "nodes": {
+                  "replica": "base",
+                  "primary": "base",
+                  "queue": "active"
+                },
+                "edges": {
+                  "web-queue": "relax"
+                },
+                "note": "Count clicks off the hot path"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Writes allocate a unique ID, encode it in base sixty-two, and store the mapping. Reads check the cache, then the database, then redirect. Choose three oh two when you need analytics. And scale the read path with caching and replicas, then shard by short code.",
+          "props": {
+            "title": "URL shortener, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "allocate",
+                "text": "Write: unique ID → Base62 → store the mapping.",
+                "code": "1000 → g8"
+              },
+              {
+                "at": "check",
+                "text": "Read: cache, then database, then redirect.",
+                "code": "404 if unknown"
+              },
+              {
+                "at": "analytics",
+                "text": "302 keeps every click countable; 301 offloads.",
+                "code": "Location header"
+              },
+              {
+                "at": "caching",
+                "text": "Scale reads: cache, replicas, shard by code.",
+                "code": "100 : 1 reads"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

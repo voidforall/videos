@@ -5,7 +5,7 @@
 // props: {
 //   title, directed?: true,
 //   nodes: [{ id, label?, x, y, w?, h?, hidden? }],     // centers, frame px; w/h make a box (memory layouts)
-//   edges: [{ from, to, w? }],                           // key "from-to"
+//   edges: [{ from, to, w? }],                           // key "from-to"; u→v + v→u draw side by side
 //   panels: [{ key, label, type: "table" | "list", initial: {id: v} | [..] }],
 //   steps: [{ at, note?,
 //             nodes?: { id: "active" | "done" | "queued" | "dim" | "base" },
@@ -78,6 +78,9 @@ registerTemplate("graph", {
     };
 
     const spec = Object.fromEntries(props.nodes.map((n) => [n.id, n]));
+    // u→v and v→u both declared (request / response): draw them side by side, not on top of each other
+    const declared = new Set([...props.edges, ...props.steps.flatMap((s) => s.add ?? [])].map((e) => `${e.from}-${e.to}`));
+    const PAIR_GAP = 12;
     // distance from a node's center to its border along direction (ux, uy): circle or box
     const reach = (id, ux, uy) => {
       const n = spec[id];
@@ -98,10 +101,12 @@ registerTemplate("graph", {
       const tip = [x2 - ux * (rv + 2), y2 - uy * (rv + 2)];
       const b = directed ? [tip[0] - ux * 14, tip[1] - uy * 14] : [x2 - ux * rv, y2 - uy * rv];
       const [px, py] = [-uy, ux];
+      const off = declared.has(`${v}-${u}`) ? PAIR_GAP : 0;
+      for (const p of [a, tip, b]) { p[0] += px * off; p[1] += py * off; }
       const head = directed
         ? `${tip[0]},${tip[1]} ${tip[0] - ux * 22 + px * 11},${tip[1] - uy * 22 + py * 11} ${tip[0] - ux * 22 - px * 11},${tip[1] - uy * 22 - py * 11}`
         : `${tip[0]},${tip[1]} ${tip[0]},${tip[1]} ${tip[0]},${tip[1]}`;
-      return { x1: a[0], y1: a[1], x2: b[0], y2: b[1], head, label: [(x1 + x2) / 2 + px * 26, (y1 + y2) / 2 + py * 26] };
+      return { x1: a[0], y1: a[1], x2: b[0], y2: b[1], head, label: [(x1 + x2) / 2 + px * (26 + off), (y1 + y2) / 2 + py * (26 + off)] };
     };
     const placeEdge = (key, at, dur) => {
       const { line, head, w } = edgeEl(key);

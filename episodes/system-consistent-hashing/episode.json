@@ -1,0 +1,425 @@
+{
+  "slug": "system-consistent-hashing",
+  "series": "system",
+  "title": "Consistent hashing",
+  "kicker": "System design · Consistent hashing",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/system/building-blocks/consistent-hashing.md",
+  "summary": "Why hash mod N reshuffles everything, how a hash ring moves only one arc of keys, and how virtual nodes keep the load even.",
+  "captionFixes": [
+    {
+      "match": [
+        "#mod4"
+      ],
+      "display": "hash mod 4"
+    },
+    {
+      "match": [
+        "#mod5"
+      ],
+      "display": "hash mod 5"
+    },
+    {
+      "match": [
+        "hash",
+        "of",
+        "key"
+      ],
+      "display": "hash(key)"
+    },
+    {
+      "match": [
+        "n"
+      ],
+      "display": "N"
+    },
+    {
+      "match": [
+        "n+1"
+      ],
+      "display": "N+1"
+    },
+    {
+      "match": [
+        "keys",
+        "owner"
+      ],
+      "display": "key's owner"
+    },
+    {
+      "match": [
+        "These",
+        "three"
+      ],
+      "display": "Its three"
+    },
+    {
+      "match": [
+        "Here",
+        "it"
+      ],
+      "display": "Here, A"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Why not hash mod N?",
+      "question": "Why does hash(key) mod N break down when you add a server?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Consistent hashing, question one. Why does hash of key, mod N, break down when you add a server? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Why does <em>hash(key) % N</em> break when you add a server?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "With four servers, each key goes to its hash mod four. Add a fifth server, and the same keys now go to their hash mod five. Four of these six keys land on a different server. In general, growing from N to N plus one servers moves about N out of N plus one keys. For a cache, that is almost a full flush.",
+          "props": {
+            "title": "Change N, <em>move almost everything</em>",
+            "lang": "python",
+            "left": {
+              "at": "each",
+              "label": "N = 4",
+              "title": "hash % 4",
+              "code": "keys = [10, 23, 36, 47, 58, 61]\n[k % 4 for k in keys]\n# → [2, 3, 0, 3, 2, 1]"
+            },
+            "right": {
+              "at": "fifth",
+              "label": "N = 5",
+              "title": "hash % 5",
+              "tone": "bad",
+              "code": "[k % 5 for k in keys]\n# → [0, 3, 1, 2, 3, 1]\n# moved: 10, 36, 47, 58"
+            },
+            "verdict": {
+              "at": "general",
+              "text": "N → N+1 servers remaps about N/(N+1) of all keys.",
+              "code": "4 → 5: ~80% move"
+            }
+          }
+        },
+        {
+          "type": "statement",
+          "say": "Consistent hashing fixes exactly this. Adding a server moves only the keys it takes over, about one in N plus one, and every other key stays where it is.",
+          "props": {
+            "text": "Add a server: only <em>~1/(N+1)</em> of keys move.",
+            "at": "fixes",
+            "sub": "Every other key stays where it is.",
+            "subAt": "every"
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "The hash ring",
+      "question": "How does consistent hashing decide which server owns a key?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. How does consistent hashing decide which server owns a key, and what moves when servers come and go? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Which server <em>owns</em> a key, and what moves when servers come and go?"
+          }
+        },
+        {
+          "type": "ring",
+          "say": "Hash every server and every key onto the same ring. To find a key's owner, walk clockwise from the key to the first server. Key three lands just before B, so B owns it. Key seven walks past zero, and wraps around to A. Now a new server, D, joins the ring. It takes over only the keys between B and D: here, just one key. Every other key stays put. Then server B leaves. Its three keys move on clockwise, to D, and again, nothing else moves.",
+          "props": {
+            "title": "Walk <em>clockwise</em> to the owner",
+            "servers": [
+              {
+                "id": "A",
+                "pos": 10
+              },
+              {
+                "id": "B",
+                "pos": 40
+              },
+              {
+                "id": "C",
+                "pos": 72
+              },
+              {
+                "id": "D",
+                "pos": 55,
+                "hidden": true
+              }
+            ],
+            "keys": [
+              {
+                "id": "k1",
+                "pos": 4
+              },
+              {
+                "id": "k2",
+                "pos": 18
+              },
+              {
+                "id": "k3",
+                "pos": 27
+              },
+              {
+                "id": "k4",
+                "pos": 33
+              },
+              {
+                "id": "k5",
+                "pos": 49
+              },
+              {
+                "id": "k6",
+                "pos": 62
+              },
+              {
+                "id": "k7",
+                "pos": 81
+              },
+              {
+                "id": "k8",
+                "pos": 92
+              }
+            ],
+            "load": {
+              "label": "Keys per server"
+            },
+            "steps": [
+              {
+                "at": "walk",
+                "lookup": [
+                  "k3"
+                ],
+                "note": "k3: walk clockwise to the first server → B"
+              },
+              {
+                "at": "wraps",
+                "lookup": [
+                  "k7"
+                ],
+                "note": "k7: past 0, wrap around → A"
+              },
+              {
+                "at": "joins",
+                "show": [
+                  "D"
+                ],
+                "note": "D joins: takes only k5, between B and D"
+              },
+              {
+                "at": "leaves",
+                "remove": [
+                  "B"
+                ],
+                "note": "B leaves: k2, k3, k4 move on to D"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Virtual nodes",
+      "question": "Why is a ring with few servers unbalanced, and how do virtual nodes fix it?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. With only a few servers, why is the ring often unbalanced, and how do virtual nodes fix it? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Why is a small ring <em>unbalanced</em>, and how do <em>virtual nodes</em> help?"
+          }
+        },
+        {
+          "type": "ring",
+          "say": "With three servers, positions land wherever the hash puts them. Here, A owns almost the whole ring: ten of the twelve keys. That is a hot spot. The fix is virtual nodes. Each physical server is hashed many times, under different names, so it owns many small arcs instead of one big one. As more virtual nodes join, the load evens out, at four keys each. And when a server fails, its arcs are scattered, so its keys spread across the survivors, instead of piling onto one server.",
+          "props": {
+            "title": "Many small arcs, <em>even load</em>",
+            "servers": [
+              {
+                "id": "A1",
+                "pos": 8,
+                "label": "A",
+                "group": "A"
+              },
+              {
+                "id": "B1",
+                "pos": 20,
+                "label": "B",
+                "group": "B"
+              },
+              {
+                "id": "C1",
+                "pos": 30,
+                "label": "C",
+                "group": "C"
+              },
+              {
+                "id": "B2",
+                "label": "B·2",
+                "group": "B",
+                "pos": 45,
+                "hidden": true
+              },
+              {
+                "id": "C2",
+                "label": "C·2",
+                "group": "C",
+                "pos": 55,
+                "hidden": true
+              },
+              {
+                "id": "A2",
+                "label": "A·2",
+                "group": "A",
+                "pos": 70,
+                "hidden": true
+              },
+              {
+                "id": "C3",
+                "label": "C·3",
+                "group": "C",
+                "pos": 85,
+                "hidden": true
+              },
+              {
+                "id": "B3",
+                "label": "B·3",
+                "group": "B",
+                "pos": 92,
+                "hidden": true
+              }
+            ],
+            "keys": [
+              {
+                "id": "k1",
+                "label": "",
+                "pos": 3
+              },
+              {
+                "id": "k2",
+                "label": "",
+                "pos": 13
+              },
+              {
+                "id": "k3",
+                "label": "",
+                "pos": 25
+              },
+              {
+                "id": "k4",
+                "label": "",
+                "pos": 35
+              },
+              {
+                "id": "k5",
+                "label": "",
+                "pos": 41
+              },
+              {
+                "id": "k6",
+                "label": "",
+                "pos": 50
+              },
+              {
+                "id": "k7",
+                "label": "",
+                "pos": 59
+              },
+              {
+                "id": "k8",
+                "label": "",
+                "pos": 65
+              },
+              {
+                "id": "k9",
+                "label": "",
+                "pos": 75
+              },
+              {
+                "id": "k10",
+                "label": "",
+                "pos": 81
+              },
+              {
+                "id": "k11",
+                "label": "",
+                "pos": 88
+              },
+              {
+                "id": "k12",
+                "label": "",
+                "pos": 96
+              }
+            ],
+            "load": {
+              "label": "Keys per server"
+            },
+            "steps": [
+              {
+                "at": "hot",
+                "note": "A owns 10 of 12 keys: a hot spot"
+              },
+              {
+                "at": "names",
+                "show": [
+                  "B2",
+                  "C2",
+                  "A2"
+                ],
+                "note": "Hash each server again: B·2, C·2, A·2"
+              },
+              {
+                "at": "evens",
+                "show": [
+                  "C3",
+                  "B3"
+                ],
+                "note": "More virtual nodes: 4 keys each"
+              },
+              {
+                "at": "fails",
+                "remove": [
+                  "B"
+                ],
+                "note": "B fails: its 4 keys spread over A and C"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Mod N hashing remaps almost every key when N changes. Consistent hashing puts servers and keys on one ring, and each key belongs to the next server clockwise. Adding or removing a server moves only one arc. And virtual nodes balance the load, and spread a failed server's keys. That is why Dynamo and Cassandra both partition data this way.",
+          "props": {
+            "title": "Consistent hashing, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "remaps",
+                "text": "Mod N remaps almost every key when N changes.",
+                "code": "~N/(N+1) move"
+              },
+              {
+                "at": "clockwise",
+                "text": "A key belongs to the next server clockwise.",
+                "code": "one shared ring"
+              },
+              {
+                "at": "arc",
+                "text": "Adding or removing a server moves one arc.",
+                "code": "~1/(N+1) move"
+              },
+              {
+                "at": "balance",
+                "text": "Virtual nodes even the load and spread failures.",
+                "code": "Dynamo · Cassandra"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

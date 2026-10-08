@@ -15,6 +15,11 @@
       "id": "python",
       "title": "Python",
       "blurb": "How the language really works: decorators and closures, generators and laziness, and the GIL behind every concurrency choice."
+    },
+    {
+      "id": "system",
+      "title": "System design",
+      "blurb": "Interview designs drawn as live diagrams: request paths, hash rings, and the failure cases that decide each trade-off."
     }
   ],
   "episodes": [
@@ -671,6 +676,116 @@
           "duration": 55,
           "video": "https://github.com/voidforall/videos/releases/download/ep-python-concurrency/python-concurrency-03.mp4",
           "poster": "https://github.com/voidforall/videos/releases/download/ep-python-concurrency/python-concurrency-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "system-url-shortener",
+      "series": "system",
+      "title": "URL shortener",
+      "kicker": "System design · URL shortener",
+      "summary": "The classic warm-up: a cache-first redirect path, 301 vs 302, collision-free Base62 codes, and scaling a 100:1 read-heavy service.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/system/design-interview/url-shortener.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "The redirect path",
+          "question": "Walk through what happens when someone clicks a short link.",
+          "duration": 50,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-system-url-shortener/system-url-shortener-01.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-url-shortener/system-url-shortener-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Generating short codes",
+          "question": "How do you generate a short code that never collides?",
+          "duration": 54,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-system-url-shortener/system-url-shortener-02.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-url-shortener/system-url-shortener-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Scaling the read path",
+          "question": "Reads outnumber writes 100 to 1. How do you scale the service?",
+          "duration": 54,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-system-url-shortener/system-url-shortener-03.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-url-shortener/system-url-shortener-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "system-consistent-hashing",
+      "series": "system",
+      "title": "Consistent hashing",
+      "kicker": "System design · Consistent hashing",
+      "summary": "Why hash mod N reshuffles everything, how a hash ring moves only one arc of keys, and how virtual nodes keep the load even.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/system/building-blocks/consistent-hashing.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Why not hash mod N?",
+          "question": "Why does hash(key) mod N break down when you add a server?",
+          "duration": 40,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-system-consistent-hashing/system-consistent-hashing-01.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-consistent-hashing/system-consistent-hashing-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "The hash ring",
+          "question": "How does consistent hashing decide which server owns a key?",
+          "duration": 40,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-system-consistent-hashing/system-consistent-hashing-02.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-consistent-hashing/system-consistent-hashing-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Virtual nodes",
+          "question": "Why is a ring with few servers unbalanced, and how do virtual nodes fix it?",
+          "duration": 63,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-system-consistent-hashing/system-consistent-hashing-03.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-consistent-hashing/system-consistent-hashing-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "system-payment-gateway",
+      "series": "system",
+      "title": "Payment gateway API",
+      "kicker": "System design · Payment gateway",
+      "summary": "A Stripe-style API: idempotency keys against double charges, tokenization to shrink PCI scope, at-least-once webhooks, and REST vs GraphQL.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/system/design-interview/payment-gateway-api.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Idempotency keys",
+          "question": "A charge request times out and the client retries. How do you avoid charging twice?",
+          "duration": 61,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-system-payment-gateway/system-payment-gateway-01.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-payment-gateway/system-payment-gateway-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Tokenization and PCI scope",
+          "question": "How do you keep raw card numbers out of most of your system?",
+          "duration": 39,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-system-payment-gateway/system-payment-gateway-02.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-payment-gateway/system-payment-gateway-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Reliable webhooks",
+          "question": "How do you reliably notify a merchant that a payment succeeded?",
+          "duration": 59,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-system-payment-gateway/system-payment-gateway-03.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-payment-gateway/system-payment-gateway-03.jpg"
+        },
+        {
+          "id": "04",
+          "title": "REST or GraphQL",
+          "question": "Would you expose the payment API as REST or GraphQL?",
+          "duration": 58,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-system-payment-gateway/system-payment-gateway-04.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-payment-gateway/system-payment-gateway-04.jpg"
         }
       ]
     }

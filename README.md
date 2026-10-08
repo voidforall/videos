@@ -1,6 +1,6 @@
 # Videos
 
-Short revision episodes (algorithms, C++, Python) for the notes in [ai-docs](https://github.com/voidforall/ai-docs): one clip per
+Short revision episodes (algorithms, C++, Python, system design) for the notes in [ai-docs](https://github.com/voidforall/ai-docs): one clip per
 question, each opening with the question and a pause to answer out loud before the explanation.
 
 **Watch:** https://voidforall.github.io/videos/

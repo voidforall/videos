@@ -36,7 +36,7 @@
 /* — code — */
 .tpl-code .cd-panel { left: 80px; top: 222px; }
 .tpl-code .cd-panel .code-body { padding: 18px 26px 22px 18px; }
-.tpl-code .cd-num { display: inline-block; width: 2.2em; font-style: normal; color: rgba(250, 249, 245, 0.28); }
+.tpl-code .cd-num { display: inline-block; width: 2.2em; font-style: normal; color: color-mix(in srgb, rgba(250, 249, 245, 0.28) var(--mix, 100%), rgba(20, 20, 19, 0.45)); }
 .tpl-code .cd-notes { top: 222px; right: 80px; list-style: none; display: flex; flex-direction: column; gap: 14px; }
 .tpl-code .cd-note { display: grid; grid-template-columns: 44px 1fr; column-gap: 16px; row-gap: 8px; padding: 18px 22px; border: 1px solid var(--hair); border-radius: 10px; background: var(--tile); font: 400 24px/1.35 var(--sans); }
 .tpl-code .cd-note code { grid-column: 2; font: 500 17px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: rgba(20, 20, 19, 0.5); }
@@ -64,7 +64,7 @@
 .tpl-recap .rc-num { font: 400 56px/1 var(--serif); color: rgba(20, 20, 19, 0.32); width: 70px; }
 .tpl-recap .rc-text { flex: 1; font: 400 44px/1.1 var(--serif); letter-spacing: -0.015em; }
 .tpl-recap .rc-code { font: 500 24px/1 var(--mono); color: rgba(20, 20, 19, 0.62); }
-.tpl-recap .rc-sign { right: 80px; top: 772px; font: 400 40px/1 var(--sans); color: var(--coral); }
+.tpl-recap .rc-sign { right: 80px; top: 112px; font: 400 52px/1 var(--sans); color: var(--coral); }
 .tpl-array .ar-ptr-m { color: var(--coral); }
 
 /* — stack — */
@@ -108,3 +108,29 @@
 .tpl-graph .gr-note { left: 80px; right: 80px; top: 764px; height: 100px; padding: 16px 26px; }
 .tpl-graph .gr-note .ar-slot { margin-top: 10px; height: 40px; }
 .tpl-graph .gr-note .ar-swap { font: 400 30px/1.2 var(--sans); }
+
+/* — ring — (ring centred at 600,535 r 250; load panel + note on the right) */
+.tpl-ring .rg-svg { left: 0; top: 0; width: 1920px; height: 1080px; overflow: visible; }
+.tpl-ring .rg-track { fill: none; stroke: var(--hair-strong); stroke-width: 4; }
+.tpl-ring .rg-dir { fill: none; stroke: rgba(20, 20, 19, 0.4); stroke-width: 2.5; stroke-linecap: round; }
+.tpl-ring .rg-dir-head { fill: rgba(20, 20, 19, 0.4); }
+.tpl-ring .rg-arc { fill: none; stroke: var(--coral); stroke-width: 10; stroke-linecap: round; opacity: 0.85; }
+.tpl-ring .rg-zero { font: 500 22px/1 var(--mono); color: rgba(20, 20, 19, 0.5); }
+.tpl-ring .rg-key { width: 22px; height: 22px; border-radius: 50%; border: 3px solid var(--cream); box-shadow: 0 0 0 1px var(--hair-strong); }
+.tpl-ring .rg-key-label { font: 500 21px/1 var(--mono); color: rgba(20, 20, 19, 0.7); white-space: nowrap; }
+.tpl-ring .rg-server { width: 38px; height: 38px; border-radius: 9px; border: 3px solid var(--cream); box-shadow: var(--shadow), 0 0 0 1px var(--hair-strong); }
+.tpl-ring .rg-server-label { padding: 7px 12px 6px; border: 2px solid; border-radius: 8px; background: var(--cream); font: 500 24px/1 var(--mono); white-space: nowrap; }
+.tpl-ring .rg-center { white-space: nowrap; }
+.tpl-ring .rg-side { left: 1100px; top: 222px; width: 740px; display: flex; flex-direction: column; gap: 24px; }
+.tpl-ring .rg-load { position: relative; padding: 22px 28px 20px; }
+.tpl-ring .rg-row { display: flex; align-items: center; gap: 18px; margin-top: 16px; }
+.tpl-ring .rg-name { width: 40px; font: 500 26px/1 var(--mono); }
+.tpl-ring .rg-bar { flex: 1; height: 26px; border-radius: 6px; background: var(--tile); overflow: hidden; }
+.tpl-ring .rg-bar i { display: block; height: 100%; width: 0; border-radius: 6px; }
+.tpl-ring .rg-num { position: relative; width: 44px; height: 30px; }
+.tpl-ring .rg-count { position: absolute; inset: 0; display: grid; place-items: center end; font: 500 26px/1 var(--mono); opacity: 0; visibility: hidden; }
+.tpl-ring .rg-moved { position: relative; height: 26px; margin-top: 16px; font: 500 21px/1 var(--mono); color: rgba(20, 20, 19, 0.62); }
+.tpl-ring .rg-moved span { position: absolute; left: 0; top: 0; opacity: 0; visibility: hidden; }
+.tpl-ring .rg-note { position: relative; height: 164px; padding: 22px 28px; }
+.tpl-ring .rg-note .ar-slot { margin-top: 12px; height: 84px; }
+.tpl-ring .rg-note .ar-swap { font: 400 32px/1.3 var(--sans); }
