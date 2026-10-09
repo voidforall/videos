@@ -1,0 +1,556 @@
+{
+  "slug": "python-imports",
+  "series": "python",
+  "title": "The import system",
+  "kicker": "Python · Imports",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/python/import.md",
+  "summary": "import is a runtime loader with a cache: sys.modules first, finders and loaders on a miss, module code run once, partial modules in circular imports, packages and reload.",
+  "captionFixes": [
+    {
+      "match": [
+        "Imports",
+        "Question"
+      ],
+      "display": "Imports, question"
+    },
+    {
+      "match": [
+        "Modular",
+        "imports"
+      ],
+      "display": "Module a imports"
+    },
+    {
+      "match": [
+        "emptier",
+        "first"
+      ],
+      "display": "empty a first"
+    },
+    {
+      "match": [
+        "Fixer"
+      ],
+      "display": "Fixes."
+    },
+    {
+      "match": [
+        "a",
+        ".x"
+      ],
+      "display": "a.X"
+    },
+    {
+      "match": [
+        "a",
+        "dot",
+        "x"
+      ],
+      "display": "a.X"
+    },
+    {
+      "match": [
+        "x"
+      ],
+      "display": "X"
+    },
+    {
+      "match": [
+        "typings",
+        "type",
+        "checking"
+      ],
+      "display": "typing's TYPE_CHECKING"
+    },
+    {
+      "match": [
+        "import",
+        "lib"
+      ],
+      "display": "importlib"
+    },
+    {
+      "match": [
+        "is",
+        "modules"
+      ],
+      "display": "sys.modules"
+    },
+    {
+      "match": [
+        "sys",
+        "modules"
+      ],
+      "display": "sys.modules"
+    },
+    {
+      "match": [
+        "sys",
+        "path"
+      ],
+      "display": "sys.path"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "What import does",
+      "question": "What actually happens when Python runs import foo, the first time and the second?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Imports, question one. What actually happens when Python runs import foo, the first time, and the second time? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What happens on <em>import foo</em>, the first time and the second?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Every import starts at a cache. Python first checks sys modules for the name. On a miss, it creates an empty module object, and inserts it into the cache before running anything. Then finders locate the source: built-ins, frozen modules, then directories on sys path. The loader compiles it, caching bytecode, and executes it top to bottom, which fills in the module. A second import of the same name is a cache hit, so module code runs once per process.",
+          "props": {
+            "title": "A cache, then a <em>loader</em>",
+            "nodes": [
+              {
+                "id": "stmt",
+                "label": "import foo",
+                "x": 180,
+                "y": 470,
+                "w": 200,
+                "h": 64
+              },
+              {
+                "id": "cache",
+                "label": "sys.modules",
+                "x": 560,
+                "y": 290,
+                "w": 230,
+                "h": 64
+              },
+              {
+                "id": "find",
+                "label": "finders · sys.path",
+                "x": 560,
+                "y": 470,
+                "w": 290,
+                "h": 64
+              },
+              {
+                "id": "exec",
+                "label": "execute foo.py",
+                "x": 560,
+                "y": 650,
+                "w": 250,
+                "h": 64
+              },
+              {
+                "id": "mod",
+                "label": "<module foo>",
+                "x": 1000,
+                "y": 470,
+                "w": 230,
+                "h": 64,
+                "hidden": true
+              }
+            ],
+            "edges": [
+              {
+                "from": "stmt",
+                "to": "cache"
+              },
+              {
+                "from": "stmt",
+                "to": "find"
+              },
+              {
+                "from": "find",
+                "to": "exec"
+              }
+            ],
+            "panels": [
+              {
+                "key": "mods",
+                "label": "sys.modules",
+                "type": "list",
+                "rows": 1,
+                "initial": [
+                  "sys",
+                  "builtins",
+                  "…"
+                ]
+              }
+            ],
+            "steps": [
+              {
+                "at": "first",
+                "nodes": {
+                  "stmt": "active"
+                },
+                "edges": {
+                  "stmt-cache": "relax"
+                },
+                "note": "1. Look up sys.modules['foo']"
+              },
+              {
+                "at": "miss",
+                "nodes": {
+                  "stmt": "base",
+                  "cache": "queued"
+                },
+                "edges": {
+                  "stmt-cache": "base"
+                },
+                "note": "Miss"
+              },
+              {
+                "at": "inserts",
+                "show": [
+                  "mod"
+                ],
+                "add": [
+                  {
+                    "from": "cache",
+                    "to": "mod",
+                    "w": "empty, cached first"
+                  }
+                ],
+                "nodes": {
+                  "mod": "queued"
+                },
+                "edges": {
+                  "cache-mod": "relax"
+                },
+                "panels": {
+                  "mods": [
+                    "…",
+                    "foo → <empty module>"
+                  ]
+                },
+                "note": "2. Create an empty module and cache it — before running"
+              },
+              {
+                "at": "finders",
+                "nodes": {
+                  "cache": "base",
+                  "find": "active"
+                },
+                "edges": {
+                  "cache-mod": "base",
+                  "stmt-find": "relax"
+                },
+                "note": "3. Finders: built-in, frozen, then sys.path"
+              },
+              {
+                "at": "executes",
+                "add": [
+                  {
+                    "from": "exec",
+                    "to": "mod"
+                  }
+                ],
+                "nodes": {
+                  "find": "base",
+                  "exec": "active",
+                  "mod": "done"
+                },
+                "edges": {
+                  "stmt-find": "base",
+                  "find-exec": "relax",
+                  "exec-mod": "relax"
+                },
+                "panels": {
+                  "mods": [
+                    "…",
+                    "foo → <module foo>"
+                  ]
+                },
+                "note": "4. Compile (.pyc), run top-to-bottom, fill the module"
+              },
+              {
+                "at": "second",
+                "nodes": {
+                  "exec": "base",
+                  "cache": "done"
+                },
+                "edges": {
+                  "find-exec": "base",
+                  "exec-mod": "base",
+                  "stmt-cache": "tree",
+                  "cache-mod": "tree"
+                },
+                "note": "Next import: cache hit — the code runs once"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Circular imports",
+      "question": "a imports b and b imports a. Why does it fail with AttributeError instead of looping forever?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. Module a imports b, and module b imports a. Why does that fail with an attribute error, instead of looping forever? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "<em>a</em> imports <em>b</em>, <em>b</em> imports <em>a</em>: why AttributeError, not a loop?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Here is the classic cycle. a imports b at the top, before defining X. And b imports a, then reads a dot X.",
+          "props": {
+            "title": "The classic <em>cycle</em>",
+            "lang": "python",
+            "left": {
+              "at": "top",
+              "label": "a.py",
+              "title": "imports b first",
+              "code": "# a.py\nimport b\nX = 42"
+            },
+            "right": {
+              "at": "reads",
+              "label": "b.py",
+              "title": "reads a.X",
+              "tone": "bad",
+              "code": "# b.py\nimport a\nprint(a.X)   # AttributeError"
+            }
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Import a. Python caches an empty a first, then starts running it. a's first line imports b, so b is cached, and starts running. b's first line imports a: that's a cache hit, so there's no infinite loop. But it returns the partially initialised a, whose X has not been assigned yet. So b's print raises an attribute error.",
+          "props": {
+            "title": "A cache hit on a <em>half-built</em> module",
+            "nodes": [
+              {
+                "id": "A",
+                "label": "a.py",
+                "x": 240,
+                "y": 470,
+                "w": 200,
+                "h": 64
+              },
+              {
+                "id": "B",
+                "label": "b.py",
+                "x": 880,
+                "y": 470,
+                "w": 200,
+                "h": 64
+              }
+            ],
+            "edges": [],
+            "panels": [
+              {
+                "key": "mods",
+                "label": "sys.modules",
+                "type": "list",
+                "rows": 1,
+                "initial": []
+              },
+              {
+                "key": "ax",
+                "label": "a.X",
+                "type": "list",
+                "initial": [
+                  "not yet defined"
+                ]
+              }
+            ],
+            "steps": [
+              {
+                "at": "caches",
+                "nodes": {
+                  "A": "active"
+                },
+                "panels": {
+                  "mods": [
+                    "a → <partial>"
+                  ]
+                },
+                "note": "a is cached, then starts running"
+              },
+              {
+                "at": "first#2",
+                "add": [
+                  {
+                    "from": "A",
+                    "to": "B",
+                    "w": "import b"
+                  }
+                ],
+                "nodes": {
+                  "A": "queued",
+                  "B": "active"
+                },
+                "edges": {
+                  "A-B": "relax"
+                },
+                "panels": {
+                  "mods": [
+                    "a → <partial>",
+                    "b → <partial>"
+                  ]
+                },
+                "note": "a pauses at line 1: import b"
+              },
+              {
+                "at": "hit",
+                "add": [
+                  {
+                    "from": "B",
+                    "to": "A",
+                    "w": "import a"
+                  }
+                ],
+                "edges": {
+                  "A-B": "base",
+                  "B-A": "relax"
+                },
+                "note": "b imports a: cache hit, no loop"
+              },
+              {
+                "at": "partially",
+                "nodes": {
+                  "A": "dim"
+                },
+                "note": "…but a is half-built: X = 42 hasn't run"
+              },
+              {
+                "at": "raises",
+                "nodes": {
+                  "B": "queued"
+                },
+                "edges": {
+                  "B-A": "dim"
+                },
+                "note": "print(a.X) → AttributeError"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "Fixes. Import inside the function that needs it, so it runs later. Import the module, not the name, and read a dot X at call time. Move the shared pieces into a third module that both import. And for imports needed only by type hints, guard them with typing's TYPE CHECKING flag.",
+          "props": {
+            "title": "Breaking the <em>cycle</em>",
+            "items": [
+              {
+                "at": "inside",
+                "label": "Defer",
+                "title": "Import in the function",
+                "body": "Runs after both modules finish loading.",
+                "code": "def f(): import a"
+              },
+              {
+                "at": "name",
+                "label": "Late binding",
+                "title": "import a, use a.X later",
+                "body": "Not from a import X at the top.",
+                "code": "a.X at call time"
+              },
+              {
+                "at": "third",
+                "label": "Restructure",
+                "title": "Shared third module",
+                "body": "Both import it; no cycle.",
+                "code": "common.py"
+              },
+              {
+                "at": "hints",
+                "label": "Types only",
+                "title": "TYPE_CHECKING",
+                "body": "Imports skipped at runtime.",
+                "code": "if TYPE_CHECKING:"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Packages and reload",
+      "question": "What is a package, how do relative imports work, and what does reload really do?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. What makes a directory a package, how do relative imports work, and what does reload really do? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Packages, <em>relative</em> imports, and <em>reload</em>?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "A directory with dunder init dot py is a regular package, and importing it runs that file. Since Python three point three, a directory without one still imports, as a namespace package. Inside a package, a leading dot means relative to the current package, and two dots means its parent. And importlib reload re-executes a module into the same module object; but anything that already grabbed an old function or class keeps the old one.",
+          "props": {
+            "title": "Packages and <em>reload</em>",
+            "items": [
+              {
+                "at": "regular",
+                "label": "__init__.py",
+                "title": "Regular package",
+                "body": "Importing the package runs it.",
+                "code": "import mypkg"
+              },
+              {
+                "at": "namespace",
+                "label": "No __init__.py",
+                "title": "Namespace package",
+                "body": "Still importable since Python 3.3.",
+                "code": "PEP 420"
+              },
+              {
+                "at": "dot",
+                "label": "Relative",
+                "title": ". and ..",
+                "body": "Current package, then its parent.",
+                "code": "from ..sub import h"
+              },
+              {
+                "at": "reload",
+                "label": "reload()",
+                "title": "Re-run in place",
+                "body": "Old references keep the old objects.",
+                "code": "importlib.reload"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Import checks sys modules first, and runs module code only once. On a miss, the module is cached before it executes, which is why circular imports return half-built modules. Fix cycles by deferring or restructuring imports. And reload re-runs a module, without updating references others already hold.",
+          "props": {
+            "title": "Imports, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "once",
+                "text": "sys.modules first; module code runs once.",
+                "code": "cache"
+              },
+              {
+                "at": "half-built",
+                "text": "Cached before executing → partial modules in cycles.",
+                "code": "AttributeError"
+              },
+              {
+                "at": "deferring",
+                "text": "Fix cycles: defer, late-bind, restructure.",
+                "code": "import inside f()"
+              },
+              {
+                "at": "reload",
+                "text": "reload re-runs; old references stay old.",
+                "code": "importlib.reload"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

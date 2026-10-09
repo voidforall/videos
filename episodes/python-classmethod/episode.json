@@ -1,0 +1,211 @@
+{
+  "slug": "python-classmethod",
+  "series": "python",
+  "title": "classmethod vs staticmethod",
+  "kicker": "Python · Methods",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/python/classmethod-vs-staticmethod.md",
+  "summary": "Instance, class and static methods: what each receives, factories that respect subclasses through cls, and when a plain function is better.",
+  "captionFixes": [
+    {
+      "match": [
+        "Methods",
+        "Question"
+      ],
+      "display": "Methods, question"
+    },
+    {
+      "match": [
+        "Instance",
+        "Method"
+      ],
+      "display": "Instance method"
+    },
+    {
+      "match": [
+        "Class",
+        "Method"
+      ],
+      "display": "class method"
+    },
+    {
+      "match": [
+        "Static",
+        "Method"
+      ],
+      "display": "static method"
+    },
+    {
+      "match": [
+        "CLS"
+      ],
+      "display": "cls"
+    },
+    {
+      "match": [
+        "person"
+      ],
+      "display": "Person"
+    },
+    {
+      "match": [
+        "student"
+      ],
+      "display": "Student"
+    },
+    {
+      "match": [
+        "module",
+        "level"
+      ],
+      "display": "module-level"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Three kinds of method",
+      "question": "Instance, class, or static method: what does each receive, and when do you use it?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Methods, question one. Instance method, class method, or static method: what does each one receive, and when do you use it? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "<em>self</em>, <em>cls</em>, or nothing: which method, when?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "An instance method receives the instance, self, and works on its state. A class method receives the class itself, cls, so it can read class state, and build new instances: the classic alternative constructor. A static method receives nothing extra: it's a plain function, namespaced in the class because it belongs there logically.",
+          "props": {
+            "title": "What each one <em>receives</em>",
+            "items": [
+              {
+                "at": "instance",
+                "label": "Instance method",
+                "title": "self",
+                "body": "Reads and changes the object's state.",
+                "code": "obj.method()"
+              },
+              {
+                "at": "itself",
+                "label": "@classmethod",
+                "title": "cls",
+                "body": "Class state; alternative constructors.",
+                "code": "Cls.from_x(...)"
+              },
+              {
+                "at": "nothing",
+                "label": "@staticmethod",
+                "title": "nothing",
+                "body": "A plain function in the class namespace.",
+                "code": "Cls.util(...)"
+              }
+            ]
+          }
+        },
+        {
+          "type": "code",
+          "say": "Here, from birth year is a class method. It computes the age, and calls cls, not Person, to build the object. Is adult is a static method: a small utility that needs neither the instance nor the class. And because the factory uses cls, calling it on the Student subclass returns a Student.",
+          "props": {
+            "title": "A factory and a <em>utility</em>",
+            "file": "person.py",
+            "tag": "methods",
+            "lang": "python",
+            "size": 21,
+            "width": 1150,
+            "code": "from datetime import date\n\nclass Person:\n    def __init__(self, name, age):\n        self.name, self.age = name, age\n\n    @classmethod\n    def from_birth_year(cls, name, year):       # alternative constructor\n        return cls(name, date.today().year - year)\n\n    @staticmethod\n    def is_adult(age):                          # utility: no self, no cls\n        return age >= 18\n\nclass Student(Person):\n    pass\n\ns = Student.from_birth_year(\"Alice\", 2004)      # cls is Student\nPerson.is_adult(20)                             # True",
+            "highlights": [
+              {
+                "at": "computes",
+                "lines": "7-9",
+                "note": "Alternative constructor: builds via cls"
+              },
+              {
+                "at": "utility",
+                "lines": "11-13",
+                "note": "No self, no cls: a namespaced function"
+              },
+              {
+                "at": "subclass",
+                "lines": "18",
+                "note": "cls is Student → returns a Student"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "The subclass trap",
+      "question": "Why should a factory be a classmethod rather than a staticmethod?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. Why should a factory method be a class method, rather than a static method that calls the class by name? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Why a <em>classmethod</em> factory, not a static one?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "A static factory has to name the class it builds, so it hardcodes Person. Call it on Student, and you still get a Person back: the subclass is silently lost. A class method receives whichever class it was called on, so cls of name builds a Student when called on Student. Same code, correct type.",
+          "props": {
+            "title": "Hardcoded class, or <em>cls</em>",
+            "lang": "python",
+            "left": {
+              "at": "hardcodes",
+              "label": "@staticmethod",
+              "title": "Returns a Person",
+              "tone": "bad",
+              "code": "@staticmethod\ndef from_birth_year(name, year):\n    return Person(name, ...)\n\ntype(Student.from_birth_year(...))\n# Person  ✗"
+            },
+            "right": {
+              "at": "receives",
+              "label": "@classmethod",
+              "title": "Returns a Student",
+              "tone": "good",
+              "code": "@classmethod\ndef from_birth_year(cls, name, year):\n    return cls(name, ...)\n\ntype(Student.from_birth_year(...))\n# Student ✓"
+            },
+            "verdict": {
+              "at": "correct",
+              "text": "Factories take cls, so subclasses get their own type.",
+              "code": "cls(...)"
+            }
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Instance methods take self, and work on the object. Class methods take cls: use them for alternative constructors, and they respect subclasses. Static methods take nothing: utilities that belong with the class. And if a function needs neither, a module-level function is often cleaner still.",
+          "props": {
+            "title": "Methods, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "self",
+                "text": "Instance methods take self: object state.",
+                "code": "obj.m()"
+              },
+              {
+                "at": "constructors",
+                "text": "classmethod takes cls: alternative constructors.",
+                "code": "dict.fromkeys"
+              },
+              {
+                "at": "utilities",
+                "text": "staticmethod takes nothing: related utilities.",
+                "code": "Cls.util()"
+              },
+              {
+                "at": "cleaner",
+                "text": "Needs neither? A module function may be cleaner.",
+                "code": "def util()"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

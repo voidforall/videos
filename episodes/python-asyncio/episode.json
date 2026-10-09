@@ -1,0 +1,516 @@
+{
+  "slug": "python-asyncio",
+  "series": "python",
+  "title": "asyncio",
+  "kicker": "Python · asyncio",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/python/asyncio.md",
+  "summary": "Coroutines and the event loop: await suspends and yields to the loop, gather and TaskGroup run work concurrently, and the pitfalls that silently serialize or lose tasks.",
+  "captionFixes": [
+    {
+      "match": [
+        "Asensio",
+        "Question"
+      ],
+      "display": "asyncio, question"
+    },
+    {
+      "match": [
+        "Asensio"
+      ],
+      "display": "asyncio"
+    },
+    {
+      "match": [
+        "a",
+        "cinco"
+      ],
+      "display": "asyncio"
+    },
+    {
+      "match": [
+        "For",
+        "getting",
+        "a",
+        "wait"
+      ],
+      "display": "Forgetting await"
+    },
+    {
+      "match": [
+        "a",
+        "waiting"
+      ],
+      "display": "awaiting"
+    },
+    {
+      "match": [
+        "a",
+        "wait"
+      ],
+      "display": "await"
+    },
+    {
+      "match": [
+        "weekly"
+      ],
+      "display": "weakly"
+    },
+    {
+      "match": [
+        "weights"
+      ],
+      "display": "waits"
+    },
+    {
+      "match": [
+        "Shed",
+        "your",
+        "work"
+      ],
+      "display": "Schedule work"
+    },
+    {
+      "match": [
+        "library's"
+      ],
+      "display": "libraries,"
+    },
+    {
+      "match": [
+        "to",
+        "recap"
+      ],
+      "display": "To recap"
+    },
+    {
+      "match": [
+        "awaiting",
+        "one",
+        "coroutine"
+      ],
+      "display": "Awaiting one coroutine"
+    },
+    {
+      "match": [
+        "Three",
+        "tools",
+        "are",
+        "gather"
+      ],
+      "display": "Three tools. Gather"
+    },
+    {
+      "match": [
+        "python",
+        "311"
+      ],
+      "display": "Python 3.11"
+    },
+    {
+      "match": [
+        "task",
+        "group"
+      ],
+      "display": "TaskGroup"
+    },
+    {
+      "match": [
+        "return",
+        "exceptions"
+      ],
+      "display": "return_exceptions"
+    },
+    {
+      "match": [
+        "wait",
+        "for"
+      ],
+      "display": "wait_for"
+    },
+    {
+      "match": [
+        "it's",
+        "first"
+      ],
+      "display": "its first"
+    },
+    {
+      "match": [
+        "CPU",
+        "heavy"
+      ],
+      "display": "CPU-heavy"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Coroutines and the event loop",
+      "question": "What does calling an async function do, and what does await actually do?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "asyncio, question one. What happens when you call an async function, and what does await actually do? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What does calling an <em>async def</em> do, and what does <em>await</em> do?"
+          }
+        },
+        {
+          "type": "code",
+          "say": "Calling an async function runs none of its body: it returns a coroutine object. Something has to drive it, and that is the event loop, here started by asyncio run. Inside, await suspends the coroutine until the awaited thing is ready, and hands control back to the loop.",
+          "props": {
+            "title": "A coroutine, <em>driven</em> by the loop",
+            "file": "coro.py",
+            "tag": "async / await",
+            "lang": "python",
+            "size": 24,
+            "width": 1150,
+            "code": "async def say_after(delay, what):\n    await asyncio.sleep(delay)        # suspend: the loop runs others\n    print(what)\n\ncoro = say_after(1, \"hi\")             # runs nothing: a coroutine object\nasyncio.run(coro)                     # the event loop drives it",
+            "highlights": [
+              {
+                "at": "returns",
+                "lines": "5",
+                "note": "Calling it creates a coroutine; nothing runs"
+              },
+              {
+                "at": "drive",
+                "lines": "6",
+                "note": "The event loop drives it"
+              },
+              {
+                "at": "suspends",
+                "lines": "2",
+                "note": "await: suspend, yield to the loop"
+              }
+            ]
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Create task schedules two coroutines on the loop, but nothing runs yet. When main awaits, the loop runs task one, until its first await. Awaiting sleep suspends it, and yields control back to the loop. The loop moves on: task two runs, and suspends on its own sleep. Now both are waiting, and the loop just watches the timers, burning no CPU. At one second, task one resumes and prints hello. At two seconds, task two prints world. The total is about two seconds: the longest wait, not the sum.",
+          "props": {
+            "title": "One thread, <em>taking turns</em>",
+            "nodes": [
+              {
+                "id": "t1",
+                "label": "T1 · sleep(1)",
+                "x": 240,
+                "y": 300,
+                "w": 250,
+                "h": 64
+              },
+              {
+                "id": "t2",
+                "label": "T2 · sleep(2)",
+                "x": 240,
+                "y": 640,
+                "w": 250,
+                "h": 64
+              },
+              {
+                "id": "loop",
+                "label": "event loop",
+                "x": 760,
+                "y": 470,
+                "w": 250,
+                "h": 70
+              }
+            ],
+            "edges": [
+              {
+                "from": "loop",
+                "to": "t1"
+              },
+              {
+                "from": "t1",
+                "to": "loop"
+              },
+              {
+                "from": "loop",
+                "to": "t2"
+              },
+              {
+                "from": "t2",
+                "to": "loop"
+              }
+            ],
+            "panels": [
+              {
+                "key": "clock",
+                "label": "Clock",
+                "type": "list",
+                "initial": [
+                  "t = 0 s"
+                ]
+              },
+              {
+                "key": "out",
+                "label": "Output",
+                "type": "list",
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "schedules",
+                "nodes": {
+                  "t1": "queued",
+                  "t2": "queued"
+                },
+                "note": "create_task: both scheduled, not running"
+              },
+              {
+                "at": "runs",
+                "nodes": {
+                  "loop": "active",
+                  "t1": "active"
+                },
+                "edges": {
+                  "loop-t1": "relax"
+                },
+                "note": "The loop runs T1 until its first await"
+              },
+              {
+                "at": "yields",
+                "nodes": {
+                  "t1": "queued"
+                },
+                "edges": {
+                  "loop-t1": "base",
+                  "t1-loop": "relax"
+                },
+                "note": "await sleep(1): T1 suspends, yields to the loop"
+              },
+              {
+                "at": "moves",
+                "nodes": {
+                  "t2": "active"
+                },
+                "edges": {
+                  "t1-loop": "base",
+                  "loop-t2": "relax"
+                },
+                "note": "T2 runs, then suspends on sleep(2)"
+              },
+              {
+                "at": "watches",
+                "nodes": {
+                  "t2": "queued"
+                },
+                "edges": {
+                  "loop-t2": "base",
+                  "t2-loop": "relax"
+                },
+                "note": "Both waiting: the loop just watches timers"
+              },
+              {
+                "at": "hello",
+                "nodes": {
+                  "t1": "done"
+                },
+                "edges": {
+                  "t2-loop": "base",
+                  "loop-t1": "tree"
+                },
+                "panels": {
+                  "clock": [
+                    "t = 1 s"
+                  ],
+                  "out": [
+                    "hello"
+                  ]
+                },
+                "note": "1 s: T1 resumes, prints hello"
+              },
+              {
+                "at": "world",
+                "nodes": {
+                  "t2": "done",
+                  "loop": "base"
+                },
+                "edges": {
+                  "loop-t2": "tree"
+                },
+                "panels": {
+                  "clock": [
+                    "t = 2 s"
+                  ],
+                  "out": [
+                    "hello",
+                    "world"
+                  ]
+                },
+                "note": "2 s: T2 prints world"
+              },
+              {
+                "at": "longest",
+                "note": "≈ 2 s total: the longest wait, not the sum"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Sequential vs concurrent",
+      "question": "Why can await-ing two coroutines in a row take twice as long, and how do you fix it?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. Two coroutines each wait on the network. Why can awaiting them one after the other take twice as long, and how do you run them concurrently? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Why is <em>await</em>, <em>await</em> slow, and how do you run both at once?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Awaiting one coroutine and then the next runs them one after the other: the first must finish before the second even starts, so the waits add up, to three seconds. To overlap them, schedule both first, with create task or gather, and then wait. Now the total is the longest wait: two seconds.",
+          "props": {
+            "title": "Add the waits, or <em>overlap</em> them",
+            "lang": "python",
+            "left": {
+              "at": "after",
+              "label": "Sequential",
+              "title": "≈ 3 s: the sum",
+              "tone": "bad",
+              "code": "await say_after(1, \"hello\")\nawait say_after(2, \"world\")"
+            },
+            "right": {
+              "at": "overlap",
+              "label": "Concurrent",
+              "title": "≈ 2 s: the max",
+              "tone": "good",
+              "code": "await asyncio.gather(\n    say_after(1, \"hello\"),\n    say_after(2, \"world\"))"
+            },
+            "verdict": {
+              "at": "longest",
+              "text": "Schedule everything first, then await.",
+              "code": "create_task · gather"
+            }
+          }
+        },
+        {
+          "type": "points",
+          "say": "Three tools. Gather returns the results in argument order. If one raises, the first exception propagates, but the others keep running, unless you pass return exceptions. Task group, since Python three eleven, is structured concurrency: if one task fails, its siblings are cancelled, and the errors are raised together. And add timeouts with asyncio timeout, or wait for.",
+          "props": {
+            "title": "Running things <em>together</em>",
+            "items": [
+              {
+                "at": "order",
+                "label": "gather",
+                "title": "Results in order",
+                "body": "Matches the argument order.",
+                "code": "await gather(a, b)"
+              },
+              {
+                "at": "raises",
+                "label": "Errors",
+                "title": "First one wins",
+                "body": "Others keep running; or return_exceptions=True.",
+                "code": "return_exceptions"
+              },
+              {
+                "at": "structured",
+                "label": "TaskGroup",
+                "title": "Structured",
+                "body": "A failure cancels the siblings (3.11+).",
+                "code": "async with TaskGroup()"
+              },
+              {
+                "at": "timeouts",
+                "label": "Timeouts",
+                "title": "Bound the wait",
+                "body": "Cancel slow work cleanly.",
+                "code": "asyncio.timeout(5)"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Pitfalls",
+      "question": "What are the classic asyncio mistakes?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. What are the classic asyncio mistakes, the ones that silently run nothing, or freeze everything? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "The classic <em>asyncio</em> mistakes?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Four classics. Forgetting await: you get a coroutine object that never runs, and only a warning. Calling blocking code, like time sleep or requests, freezes the whole loop; use the async version, or asyncio to thread. Fire-and-forget tasks need a reference, because the loop only holds them weakly, and they can be garbage collected mid-flight. And CPU-heavy work still blocks the loop: send it to a process pool.",
+          "props": {
+            "title": "Four <em>classics</em>",
+            "items": [
+              {
+                "at": "classics",
+                "label": "No await",
+                "title": "Never runs",
+                "body": "Just a coroutine object and a warning.",
+                "code": "never awaited"
+              },
+              {
+                "at": "blocking",
+                "label": "Blocking calls",
+                "title": "Frozen loop",
+                "body": "time.sleep, requests: use async or to_thread.",
+                "code": "asyncio.to_thread"
+              },
+              {
+                "at": "reference",
+                "label": "Lost tasks",
+                "title": "Keep a reference",
+                "body": "The loop holds tasks weakly.",
+                "code": "tasks.add(t)"
+              },
+              {
+                "at": "still",
+                "label": "CPU work",
+                "title": "Process pool",
+                "body": "Coroutines don't parallelize compute.",
+                "code": "run_in_executor"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Calling an async function only creates a coroutine. Await suspends it and yields to the event loop. Schedule work first, with gather or a task group, so waits overlap. And never block the loop: use async libraries, threads for blocking calls, processes for CPU.",
+          "props": {
+            "title": "asyncio, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "creates",
+                "text": "Calling async def only creates a coroutine.",
+                "code": "coroutine object"
+              },
+              {
+                "at": "yields",
+                "text": "await suspends and yields to the loop.",
+                "code": "one thread"
+              },
+              {
+                "at": "overlap",
+                "text": "Schedule first so waits overlap.",
+                "code": "gather · TaskGroup"
+              },
+              {
+                "at": "block",
+                "text": "Never block the loop.",
+                "code": "to_thread · processes"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

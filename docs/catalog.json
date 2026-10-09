@@ -1225,6 +1225,126 @@
           "poster": "media/system-youtube-03.jpg"
         }
       ]
+    },
+    {
+      "slug": "python-copy",
+      "series": "python",
+      "title": "Shallow vs deep copy",
+      "kicker": "Python · Copying",
+      "summary": "Assignment aliases, a shallow copy shares nested objects, a deep copy copies them recursively, with the memo that keeps shared references and cycles intact.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/python/shallow-vs-deep-copy.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Alias vs shallow copy",
+          "question": "b = a or b = copy.copy(a): what does each create, and what happens when you mutate b's nested list?",
+          "duration": 57,
+          "video": "media/python-copy-01.mp4",
+          "poster": "media/python-copy-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Deep copy",
+          "question": "What does copy.deepcopy do differently, and what are its costs and limits?",
+          "duration": 64,
+          "video": "media/python-copy-02.mp4",
+          "poster": "media/python-copy-02.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "python-asyncio",
+      "series": "python",
+      "title": "asyncio",
+      "kicker": "Python · asyncio",
+      "summary": "Coroutines and the event loop: await suspends and yields to the loop, gather and TaskGroup run work concurrently, and the pitfalls that silently serialize or lose tasks.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/python/asyncio.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Coroutines and the event loop",
+          "question": "What does calling an async function do, and what does await actually do?",
+          "duration": 58,
+          "video": "media/python-asyncio-01.mp4",
+          "poster": "media/python-asyncio-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Sequential vs concurrent",
+          "question": "Why can await-ing two coroutines in a row take twice as long, and how do you fix it?",
+          "duration": 54,
+          "video": "media/python-asyncio-02.mp4",
+          "poster": "media/python-asyncio-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Pitfalls",
+          "question": "What are the classic asyncio mistakes?",
+          "duration": 54,
+          "video": "media/python-asyncio-03.mp4",
+          "poster": "media/python-asyncio-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "python-classmethod",
+      "series": "python",
+      "title": "classmethod vs staticmethod",
+      "kicker": "Python · Methods",
+      "summary": "Instance, class and static methods: what each receives, factories that respect subclasses through cls, and when a plain function is better.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/python/classmethod-vs-staticmethod.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Three kinds of method",
+          "question": "Instance, class, or static method: what does each receive, and when do you use it?",
+          "duration": 50,
+          "video": "media/python-classmethod-01.mp4",
+          "poster": "media/python-classmethod-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "The subclass trap",
+          "question": "Why should a factory be a classmethod rather than a staticmethod?",
+          "duration": 50,
+          "video": "media/python-classmethod-02.mp4",
+          "poster": "media/python-classmethod-02.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "python-imports",
+      "series": "python",
+      "title": "The import system",
+      "kicker": "Python · Imports",
+      "summary": "import is a runtime loader with a cache: sys.modules first, finders and loaders on a miss, module code run once, partial modules in circular imports, packages and reload.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/python/import.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "What import does",
+          "question": "What actually happens when Python runs import foo, the first time and the second?",
+          "duration": 40,
+          "video": "media/python-imports-01.mp4",
+          "poster": "media/python-imports-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Circular imports",
+          "question": "a imports b and b imports a. Why does it fail with AttributeError instead of looping forever?",
+          "duration": 60,
+          "video": "media/python-imports-02.mp4",
+          "poster": "media/python-imports-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Packages and reload",
+          "question": "What is a package, how do relative imports work, and what does reload really do?",
+          "duration": 59,
+          "video": "media/python-imports-03.mp4",
+          "poster": "media/python-imports-03.jpg"
+        }
+      ]
     }
   ]
 }

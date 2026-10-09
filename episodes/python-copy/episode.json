@@ -1,0 +1,594 @@
+{
+  "slug": "python-copy",
+  "series": "python",
+  "title": "Shallow vs deep copy",
+  "kicker": "Python · Copying",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/python/shallow-vs-deep-copy.md",
+  "summary": "Assignment aliases, a shallow copy shares nested objects, a deep copy copies them recursively, with the memo that keeps shared references and cycles intact.",
+  "captionFixes": [
+    {
+      "match": [
+        "Copying",
+        "question"
+      ],
+      "display": "Copying, question"
+    },
+    {
+      "match": [
+        "A",
+        "points"
+      ],
+      "display": "a points"
+    },
+    {
+      "match": [
+        "A",
+        "still"
+      ],
+      "display": "a still"
+    },
+    {
+      "match": [
+        "a",
+        "copy's",
+        "nothing"
+      ],
+      "display": "a copies nothing"
+    },
+    {
+      "match": [
+        "her"
+      ],
+      "display": "a"
+    },
+    {
+      "match": [
+        "one",
+        "in",
+        "a",
+        "list"
+      ],
+      "display": "one inner list"
+    },
+    {
+      "match": [
+        "bytes"
+      ],
+      "display": "bites"
+    },
+    {
+      "match": [
+        "dicts"
+      ],
+      "display": "dict's"
+    },
+    {
+      "match": [
+        "Deep",
+        "Copy",
+        "do"
+      ],
+      "display": "deepcopy do"
+    },
+    {
+      "match": [
+        "customise"
+      ],
+      "display": "customize"
+    },
+    {
+      "match": [
+        "dunder",
+        "deep",
+        "copy"
+      ],
+      "display": "dunder deepcopy"
+    },
+    {
+      "match": [
+        "B"
+      ],
+      "display": "b"
+    },
+    {
+      "match": [
+        "B's"
+      ],
+      "display": "b's"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Alias vs shallow copy",
+      "question": "b = a or b = copy.copy(a): what does each create, and what happens when you mutate b's nested list?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Copying, question one. A list holds a nested list. What do b equals a, and b equals copy dot copy of a, each create? And what happens when you change the nested list through b? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "<em>b = a</em> vs <em>copy.copy(a)</em>: what happens when b's nested list changes?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Names point to objects. a points to a list, whose third element points to an inner list. Assigning b equals a copies nothing: b is an alias, the same object. A shallow copy makes a new outer list, but its slots still point to the same inner list. So when you mutate the inner list through b, setting its first item to five, the change is visible through a as well, because there was only ever one inner list.",
+          "props": {
+            "title": "New outer list, <em>shared</em> inner list",
+            "nodes": [
+              {
+                "id": "a",
+                "label": "a",
+                "x": 170,
+                "y": 330,
+                "w": 110,
+                "h": 60
+              },
+              {
+                "id": "b",
+                "label": "b",
+                "x": 170,
+                "y": 610,
+                "w": 110,
+                "h": 60,
+                "hidden": true
+              },
+              {
+                "id": "o1",
+                "label": "list [1, 2, •]",
+                "x": 560,
+                "y": 330,
+                "w": 260,
+                "h": 64
+              },
+              {
+                "id": "o2",
+                "label": "list [1, 2, •]",
+                "x": 560,
+                "y": 610,
+                "w": 260,
+                "h": 64,
+                "hidden": true
+              },
+              {
+                "id": "in",
+                "label": "[3, 4]",
+                "x": 990,
+                "y": 470,
+                "w": 170,
+                "h": 64
+              },
+              {
+                "id": "in5",
+                "label": "[5, 4]",
+                "x": 990,
+                "y": 470,
+                "w": 170,
+                "h": 64,
+                "hidden": true
+              }
+            ],
+            "edges": [
+              {
+                "from": "a",
+                "to": "o1"
+              },
+              {
+                "from": "o1",
+                "to": "in"
+              }
+            ],
+            "panels": [
+              {
+                "key": "code",
+                "label": "Code",
+                "type": "list",
+                "rows": 1,
+                "initial": [
+                  "a = [1, 2, [3, 4]]"
+                ]
+              },
+              {
+                "key": "eq",
+                "label": "a is b",
+                "type": "list",
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "points",
+                "edges": {
+                  "a-o1": "relax",
+                  "o1-in": "relax"
+                },
+                "note": "a → outer list → inner list"
+              },
+              {
+                "at": "alias",
+                "show": [
+                  "b"
+                ],
+                "add": [
+                  {
+                    "from": "b",
+                    "to": "o1"
+                  }
+                ],
+                "edges": {
+                  "a-o1": "base",
+                  "o1-in": "base",
+                  "b-o1": "relax"
+                },
+                "panels": {
+                  "code": [
+                    "b = a"
+                  ],
+                  "eq": [
+                    "True: one object"
+                  ]
+                },
+                "note": "b = a: an alias, no copy"
+              },
+              {
+                "at": "shallow",
+                "show": [
+                  "o2"
+                ],
+                "remove": [
+                  "b-o1"
+                ],
+                "add": [
+                  {
+                    "from": "b",
+                    "to": "o2"
+                  },
+                  {
+                    "from": "o2",
+                    "to": "in"
+                  }
+                ],
+                "nodes": {
+                  "in": "queued"
+                },
+                "edges": {
+                  "b-o2": "relax",
+                  "o2-in": "relax"
+                },
+                "panels": {
+                  "code": [
+                    "b = copy.copy(a)"
+                  ],
+                  "eq": [
+                    "False: new outer list"
+                  ]
+                },
+                "note": "Shallow: new outer list, same inner list"
+              },
+              {
+                "at": "mutate",
+                "show": [
+                  "in5"
+                ],
+                "nodes": {
+                  "in5": "active"
+                },
+                "edges": {
+                  "b-o2": "base",
+                  "o2-in": "tree"
+                },
+                "panels": {
+                  "code": [
+                    "b[2][0] = 5"
+                  ]
+                },
+                "note": "Mutate the inner list through b…"
+              },
+              {
+                "at": "visible",
+                "nodes": {
+                  "in5": "done"
+                },
+                "edges": {
+                  "a-o1": "tree",
+                  "o1-in": "tree"
+                },
+                "panels": {
+                  "code": [
+                    "a → [1, 2, [5, 4]]"
+                  ]
+                },
+                "note": "…and a sees it too: one shared inner list"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "Shallow copies are everywhere. Slicing a list, calling list on it, its copy method, a dict's copy, or unpacking into a new dict: all copy only the outer container. That is cheap, and fine when the contents are immutable. It bites only when nested objects are mutated.",
+          "props": {
+            "title": "Shallow copies <em>everywhere</em>",
+            "items": [
+              {
+                "at": "Slicing",
+                "label": "Lists",
+                "title": "a[:] · list(a)",
+                "body": "New list, same element objects.",
+                "code": "a.copy()"
+              },
+              {
+                "at": "dict's",
+                "label": "Dicts",
+                "title": "d.copy() · {**d}",
+                "body": "New dict, same values.",
+                "code": "dict(d)"
+              },
+              {
+                "at": "cheap",
+                "label": "Cost",
+                "title": "O(n) references",
+                "body": "Copies pointers, not the objects.",
+                "code": "copy.copy"
+              },
+              {
+                "at": "bites",
+                "label": "Trap",
+                "title": "Mutable nesting",
+                "body": "Inner lists and dicts stay shared.",
+                "code": "b[2][0] = 5"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Deep copy",
+      "question": "What does copy.deepcopy do differently, and what are its costs and limits?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. What does deep copy do differently, and what are its costs and its limits? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What does <em>deepcopy</em> do differently, and what does it cost?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "A deep copy recurses. It copies the outer list, then every mutable object inside it, so b gets its own inner list. Now mutating b's inner list changes only b's copy. a still sees three and four.",
+          "props": {
+            "title": "Copies <em>all the way down</em>",
+            "nodes": [
+              {
+                "id": "a",
+                "label": "a",
+                "x": 170,
+                "y": 330,
+                "w": 110,
+                "h": 60
+              },
+              {
+                "id": "b",
+                "label": "b",
+                "x": 170,
+                "y": 610,
+                "w": 110,
+                "h": 60,
+                "hidden": true
+              },
+              {
+                "id": "o1",
+                "label": "list [1, 2, •]",
+                "x": 560,
+                "y": 330,
+                "w": 260,
+                "h": 64
+              },
+              {
+                "id": "o2",
+                "label": "list [1, 2, •]",
+                "x": 560,
+                "y": 610,
+                "w": 260,
+                "h": 64,
+                "hidden": true
+              },
+              {
+                "id": "in",
+                "label": "[3, 4]",
+                "x": 990,
+                "y": 330,
+                "w": 170,
+                "h": 64
+              },
+              {
+                "id": "inB",
+                "label": "[3, 4]",
+                "x": 990,
+                "y": 610,
+                "w": 170,
+                "h": 64,
+                "hidden": true
+              },
+              {
+                "id": "inB5",
+                "label": "[5, 4]",
+                "x": 990,
+                "y": 610,
+                "w": 170,
+                "h": 64,
+                "hidden": true
+              }
+            ],
+            "edges": [
+              {
+                "from": "a",
+                "to": "o1"
+              },
+              {
+                "from": "o1",
+                "to": "in"
+              }
+            ],
+            "panels": [
+              {
+                "key": "code",
+                "label": "Code",
+                "type": "list",
+                "rows": 1,
+                "initial": [
+                  "a = [1, 2, [3, 4]]"
+                ]
+              }
+            ],
+            "steps": [
+              {
+                "at": "recurses",
+                "show": [
+                  "b",
+                  "o2"
+                ],
+                "add": [
+                  {
+                    "from": "b",
+                    "to": "o2"
+                  }
+                ],
+                "edges": {
+                  "b-o2": "relax"
+                },
+                "panels": {
+                  "code": [
+                    "b = copy.deepcopy(a)"
+                  ]
+                },
+                "note": "Copy the outer list…"
+              },
+              {
+                "at": "own",
+                "show": [
+                  "inB"
+                ],
+                "add": [
+                  {
+                    "from": "o2",
+                    "to": "inB"
+                  }
+                ],
+                "edges": {
+                  "b-o2": "base",
+                  "o2-inB": "relax"
+                },
+                "note": "…and every mutable object inside it"
+              },
+              {
+                "at": "changes",
+                "show": [
+                  "inB5"
+                ],
+                "nodes": {
+                  "inB5": "active"
+                },
+                "edges": {
+                  "o2-inB": "base"
+                },
+                "panels": {
+                  "code": [
+                    "b[2][0] = 5"
+                  ]
+                },
+                "note": "Mutate b's inner list"
+              },
+              {
+                "at": "still",
+                "nodes": {
+                  "inB5": "base",
+                  "in": "done"
+                },
+                "edges": {
+                  "a-o1": "tree",
+                  "o1-in": "tree"
+                },
+                "panels": {
+                  "code": [
+                    "a → [1, 2, [3, 4]]"
+                  ]
+                },
+                "note": "a is untouched"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "Four details. Deep copy keeps a memo of objects already copied, so shared references stay shared inside the copy, and cycles don't recurse forever. Immutable atoms like ints and strings aren't copied at all. Classes can customize it, with dunder copy and dunder deepcopy. And some objects can't be copied meaningfully: files, sockets, locks.",
+          "props": {
+            "title": "Deep copy, <em>in detail</em>",
+            "items": [
+              {
+                "at": "memo",
+                "label": "Memo dict",
+                "title": "Shared stays shared",
+                "body": "Each object copied once; cycles are safe.",
+                "code": "memo[id(x)]"
+              },
+              {
+                "at": "Immutable",
+                "label": "Atoms",
+                "title": "Not copied",
+                "body": "ints, strs, None are reused as-is.",
+                "code": "x is copy(x)"
+              },
+              {
+                "at": "customize",
+                "label": "Hooks",
+                "title": "__deepcopy__",
+                "body": "Classes control their own copying.",
+                "code": "__copy__"
+              },
+              {
+                "at": "files",
+                "label": "Limits",
+                "title": "Uncopyable",
+                "body": "Files, sockets, locks.",
+                "code": "TypeError"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Assignment never copies: it aliases. A shallow copy duplicates only the outer container, and shares everything nested. A deep copy recurses, with a memo for shared references and cycles. Choose shallow for immutable contents, deep for independent nested state.",
+          "props": {
+            "title": "Copying, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "aliases",
+                "text": "Assignment aliases: same object.",
+                "code": "a is b"
+              },
+              {
+                "at": "outer",
+                "text": "Shallow: new outer container, shared insides.",
+                "code": "copy.copy"
+              },
+              {
+                "at": "recurses",
+                "text": "Deep: recursive, with a memo.",
+                "code": "copy.deepcopy"
+              },
+              {
+                "at": "Choose",
+                "text": "Shallow for immutable contents; deep otherwise.",
+                "code": "mutation decides"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
