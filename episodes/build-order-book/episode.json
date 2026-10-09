@@ -1,0 +1,690 @@
+{
+  "slug": "build-order-book",
+  "series": "build",
+  "title": "Order book matching",
+  "kicker": "Build it · Order book",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/interview/basic-order-book.md",
+  "summary": "Implement limit-order matching: the crossing rules, two heaps, price-time priority with a map of deques, and O(1) cancel with tombstones.",
+  "captionFixes": [
+    {
+      "match": [
+        "Cells",
+        "go",
+        "in"
+      ],
+      "display": "Sells go in"
+    },
+    {
+      "match": [
+        "Order",
+        "Book",
+        "Problem"
+      ],
+      "display": "Order book, problem"
+    },
+    {
+      "match": [
+        "cells"
+      ],
+      "display": "sells"
+    },
+    {
+      "match": [
+        "max",
+        "heap"
+      ],
+      "display": "max-heap"
+    },
+    {
+      "match": [
+        "min",
+        "heap"
+      ],
+      "display": "min-heap"
+    },
+    {
+      "match": [
+        "Problems",
+        "three"
+      ],
+      "display": "Problem three"
+    },
+    {
+      "match": [
+        "Pricetime",
+        "Priority"
+      ],
+      "display": "Price-time priority"
+    },
+    {
+      "match": [
+        "Price",
+        "time",
+        "priority"
+      ],
+      "display": "Price-time priority"
+    },
+    {
+      "match": [
+        "deck's"
+      ],
+      "display": "deque's"
+    },
+    {
+      "match": [
+        "decks"
+      ],
+      "display": "deques"
+    },
+    {
+      "match": [
+        "deck"
+      ],
+      "display": "deque"
+    },
+    {
+      "match": [
+        "maps",
+        "begin"
+      ],
+      "display": "map's begin"
+    },
+    {
+      "match": [
+        "right",
+        "match",
+        "buy"
+      ],
+      "display": "write matchBuy"
+    },
+    {
+      "match": [
+        "Match",
+        "buy"
+      ],
+      "display": "matchBuy"
+    },
+    {
+      "match": [
+        "buys",
+        "limit"
+      ],
+      "display": "buy's limit"
+    },
+    {
+      "match": [
+        "Bid",
+        "sought"
+      ],
+      "display": "Bids sort"
+    },
+    {
+      "match": [
+        "Ask",
+        "sought"
+      ],
+      "display": "Asks sort"
+    },
+    {
+      "match": [
+        "Ad",
+        "order"
+      ],
+      "display": "AddOrder"
+    },
+    {
+      "match": [
+        "ID",
+        "matches"
+      ],
+      "display": "IDs, matches"
+    },
+    {
+      "match": [
+        "the",
+        "code",
+        "is",
+        "tiny"
+      ],
+      "display": "The code is tiny"
+    },
+    {
+      "match": [
+        "cancel",
+        "just"
+      ],
+      "display": "Cancel just"
+    },
+    {
+      "match": [
+        "before",
+        "using"
+      ],
+      "display": "Before using"
+    },
+    {
+      "match": [
+        "skip",
+        "cancelled"
+      ],
+      "display": "skipCancelled"
+    },
+    {
+      "match": [
+        "each",
+        "order"
+      ],
+      "display": "Each order"
+    },
+    {
+      "match": [
+        "a",
+        "mortised"
+      ],
+      "display": "amortized"
+    },
+    {
+      "match": [
+        "id"
+      ],
+      "display": "ID"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "The matching rules",
+      "question": "An order arrives. Which resting orders does it trade with, and how much?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Order book, problem one. An order arrives at a limit order book. Which resting orders does it trade with, and how much does each one fill? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "An order arrives. Who does it <em>trade with</em>, and how much?"
+          }
+        },
+        {
+          "type": "book",
+          "say": "A buy trades with the cheapest resting sell, as long as that price is at or below the buy's limit. Here comes a buy for six at twelve. The best ask is eleven, where order two fills three, then order three fills two. Eleven is used up, so the buy moves up to twelve, and takes one from order one, which keeps its place with three left. Now a sell for four at eleven. The best bid is ten, below its limit, so nothing trades, and the whole order rests in the book.",
+          "props": {
+            "title": "Best price first, <em>while it crosses</em>",
+            "book": [
+              {
+                "id": 1,
+                "side": "sell",
+                "price": 12,
+                "qty": 4
+              },
+              {
+                "id": 2,
+                "side": "sell",
+                "price": 11,
+                "qty": 3
+              },
+              {
+                "id": 3,
+                "side": "sell",
+                "price": 11,
+                "qty": 2
+              },
+              {
+                "id": 4,
+                "side": "buy",
+                "price": 10,
+                "qty": 5
+              },
+              {
+                "id": 5,
+                "side": "buy",
+                "price": 9,
+                "qty": 3
+              }
+            ],
+            "steps": [
+              {
+                "at": "comes",
+                "order": {
+                  "id": 6,
+                  "side": "buy",
+                  "price": 12,
+                  "qty": 6
+                },
+                "fills": [
+                  "where",
+                  "then",
+                  "takes"
+                ],
+                "note": "BUY 6 @ 12 sweeps the asks from the lowest price up"
+              },
+              {
+                "at": "Now",
+                "order": {
+                  "id": 7,
+                  "side": "sell",
+                  "price": 11,
+                  "qty": 4
+                },
+                "pace": 0.8,
+                "note": "SELL 4 @ 11: best bid 10 < 11, so it rests"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "So, four rules. Price priority: the best opposite price trades first. A trade happens only while prices cross. Each fill is the smaller of the two quantities. And whatever is left of the incoming order rests in the book.",
+          "props": {
+            "title": "Four <em>rules</em>",
+            "items": [
+              {
+                "at": "Price",
+                "label": "Priority",
+                "title": "Best price first",
+                "body": "Lowest ask for a buy, highest bid for a sell.",
+                "code": "then oldest first"
+              },
+              {
+                "at": "cross",
+                "label": "Condition",
+                "title": "Only while crossing",
+                "body": "BUY: ask ≤ limit. SELL: bid ≥ limit.",
+                "code": "ask ≤ bid"
+              },
+              {
+                "at": "smaller",
+                "label": "Quantity",
+                "title": "min(a, b)",
+                "body": "A partly filled resting order keeps its place.",
+                "code": "partial fills"
+              },
+              {
+                "at": "rests",
+                "label": "Leftover",
+                "title": "Rests",
+                "body": "The remainder joins its own side of the book.",
+                "code": "becomes liquidity"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Two heaps",
+      "question": "Which data structure gives you the best bid and best ask fast?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Problem two. To return the total quantity filled, which data structure gives you the best bid and the best ask quickly? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Which structure gives the <em>best bid</em> and <em>best ask</em> fast?"
+          }
+        },
+        {
+          "type": "code",
+          "say": "Keep each side in a heap. Buys go in a max-heap, so its top is the best bid. Sells go in a min-heap, so its top is the best ask. For an incoming buy, loop while the best ask crosses its limit. Pop it, and fill the smaller of the two quantities. If the resting order was only partly filled, push its remainder back. Whatever is left of the buy rests on the buy side. Each fill costs log n, so an order with k fills is O of k log n.",
+          "props": {
+            "title": "A max-heap and a <em>min-heap</em>",
+            "file": "total_fills.cpp",
+            "tag": "O(k log n) per order",
+            "lang": "cpp",
+            "size": 21,
+            "width": 1120,
+            "code": "using Order = std::tuple<std::string, int, int>;  // (side, price, qty)\n\nint total_fills(const std::vector<Order>& orders) {\n    std::priority_queue<std::pair<int,int>> buys;          // max-heap\n    std::priority_queue<std::pair<int,int>,\n                        std::vector<std::pair<int,int>>,\n                        std::greater<>> sells;             // min-heap\n    int total = 0;\n\n    for (auto& [side, price, qty] : orders) {\n        int remaining = qty;\n        if (side == \"BUY\") {\n            while (remaining > 0 && !sells.empty() && sells.top().first <= price) {\n                auto [sell_price, sell_qty] = sells.top();\n                sells.pop();\n                int filled = std::min(remaining, sell_qty);\n                total += filled;\n                remaining -= filled;\n                if (sell_qty > filled)\n                    sells.push({sell_price, sell_qty - filled});\n            }\n            if (remaining > 0)\n                buys.push({price, remaining});\n        } else {\n            // SELL: the mirror image, against buys.top()\n        }\n    }\n    return total;\n}",
+            "highlights": [
+              {
+                "at": "Buys",
+                "lines": "4",
+                "note": "Best bid = top of a max-heap"
+              },
+              {
+                "at": "Sells",
+                "lines": "5-7",
+                "note": "Best ask = top of a min-heap (greater<>)"
+              },
+              {
+                "at": "loop",
+                "lines": "13",
+                "note": "Match while the best ask crosses"
+              },
+              {
+                "at": "Pop",
+                "lines": "14-18",
+                "note": "Fill min(remaining, resting)"
+              },
+              {
+                "at": "partly",
+                "lines": "19-20",
+                "note": "Partial fill: push the remainder back"
+              },
+              {
+                "at": "left",
+                "lines": "22-23",
+                "note": "Leftover rests as a bid"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "Four bugs to avoid. Forgetting to push back a partial fill silently loses quantity. Using the default priority queue for sells gives you a max-heap: the wrong order. Flipping the crossing comparison matches orders that should never trade. And modifying the structured binding, instead of a local remaining copy.",
+          "props": {
+            "title": "Four <em>pitfalls</em>",
+            "items": [
+              {
+                "at": "Forgetting",
+                "label": "Partial fills",
+                "title": "Push back",
+                "body": "The resting remainder must re-enter the heap.",
+                "code": "qty - filled"
+              },
+              {
+                "at": "default",
+                "label": "Heap order",
+                "title": "greater<> for sells",
+                "body": "The default priority_queue is a max-heap.",
+                "code": "min-heap"
+              },
+              {
+                "at": "Flipping",
+                "label": "Crossing",
+                "title": "≤ for buys",
+                "body": "BUY: ask ≤ limit; SELL: bid ≥ limit.",
+                "code": "direction"
+              },
+              {
+                "at": "modifying",
+                "label": "Mutation",
+                "title": "Copy qty",
+                "body": "Track a local remaining, not the binding.",
+                "code": "int remaining"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Price-time priority",
+      "question": "Two buys rest at the same price. Who fills first, and why can't a heap guarantee it?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Problem three. Two buy orders rest at the same price. Who should fill first, and why can't a heap guarantee it? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Two buys at the <em>same price</em>: who fills first?"
+          }
+        },
+        {
+          "type": "book",
+          "say": "Two buys rest at ten: order one arrived first, then order two. A sell for four at ten arrives. Price-time priority says the oldest order at the best price fills first: order one takes all three, and order two gets the last one, keeping one in the book.",
+          "props": {
+            "title": "Same price, <em>oldest first</em>",
+            "book": [
+              {
+                "id": 4,
+                "side": "sell",
+                "price": 11,
+                "qty": 5
+              },
+              {
+                "id": 1,
+                "side": "buy",
+                "price": 10,
+                "qty": 3
+              },
+              {
+                "id": 2,
+                "side": "buy",
+                "price": 10,
+                "qty": 2
+              },
+              {
+                "id": 3,
+                "side": "buy",
+                "price": 9,
+                "qty": 4
+              }
+            ],
+            "steps": [
+              {
+                "at": "arrives",
+                "order": {
+                  "id": 5,
+                  "side": "sell",
+                  "price": 10,
+                  "qty": 4
+                },
+                "fills": [
+                  "takes",
+                  "gets"
+                ],
+                "note": "SELL 4 @ 10: order 1 first (oldest), then order 2"
+              }
+            ]
+          }
+        },
+        {
+          "type": "compare",
+          "say": "A heap can't promise that. It pops by value, and two entries at the same price can come out in either order. So make each price level a FIFO queue, and keep the levels in a sorted map. The map's begin is the best level, and the deque's front is the oldest order there.",
+          "props": {
+            "title": "Heap vs <em>map of deques</em>",
+            "lang": "cpp",
+            "left": {
+              "at": "pops",
+              "label": "priority_queue",
+              "title": "Price only",
+              "tone": "bad",
+              "code": "buys.push({10, 3});   // order 1\nbuys.push({10, 2});   // order 2\nbuys.top();  // either one",
+              "body": "Equal prices come out in no guaranteed order."
+            },
+            "right": {
+              "at": "FIFO",
+              "label": "map<price, deque>",
+              "title": "Price, then time",
+              "tone": "good",
+              "code": "bids_[10].push_back({1, 3});\nbids_[10].push_back({2, 2});\nbids_.begin()->second.front();  // order 1",
+              "body": "begin() = best level; front() = oldest order."
+            },
+            "verdict": {
+              "at": "oldest",
+              "text": "Price-time priority: sorted map + FIFO per level.",
+              "code": "map<int, deque<Entry>>"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "04",
+      "title": "Your turn: matchBuy",
+      "question": "Write matchBuy for a map-of-deques order book.",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Your turn. With a map from price to a deque of orders, write match buy: sweep the asks while they cross the buy's limit, oldest order first, and record every trade. Pause and write it yourself.",
+          "pauseAfter": 10,
+          "props": {
+            "question": "Write <em>matchBuy</em>: sweep the asks while they cross, oldest first.",
+            "label": "Your turn",
+            "pauseLabel": "Pause · write it yourself"
+          }
+        },
+        {
+          "type": "code",
+          "say": "Here is one solution. Bids sort with greater, so begin is the highest bid; asks sort ascending, so begin is the lowest ask. Add order rejects duplicate IDs, matches, and rests any remainder at its price. Match buy loops over the best ask, and stops as soon as it no longer crosses. It fills the front of the deque, the oldest order, and records a trade. A fully filled order leaves the deque, and an empty level leaves the map, otherwise begin would point at a dead level forever.",
+          "props": {
+            "title": "<em>matchBuy</em>, one solution",
+            "file": "orderbook.cpp",
+            "tag": "price-time priority",
+            "lang": "cpp",
+            "size": 20,
+            "width": 1180,
+            "code": "struct Trade { int aggressorId, restingId, price, qty; };\n\nclass Orderbook {\npublic:\n    void AddOrder(int orderId, bool isBuy, int price, int qty) {\n        if (active_.count(orderId)) return;              // reject duplicate\n        active_.insert(orderId);\n        int remaining = qty;\n        if (isBuy) matchBuy(orderId, price, remaining);\n        else       matchSell(orderId, price, remaining);\n        if (remaining > 0) {\n            if (isBuy) bids_[price].push_back({orderId, remaining});\n            else       asks_[price].push_back({orderId, remaining});\n        } else {\n            active_.erase(orderId);                      // fully filled\n        }\n    }\n\nprivate:\n    struct Entry { int orderId, qty; };\n    std::map<int, std::deque<Entry>, std::greater<int>> bids_;  // begin() = best bid\n    std::map<int, std::deque<Entry>>                    asks_;  // begin() = best ask\n    std::unordered_set<int> active_, cancelled_;\n    std::vector<Trade> trades_;\n\n    void matchBuy(int aggressorId, int aggressorPrice, int& remaining) {\n        while (remaining > 0 && !asks_.empty()) {\n            auto it = asks_.begin();\n            if (it->first > aggressorPrice) break;      // best ask doesn't cross\n            skipCancelled(it->second);\n            if (it->second.empty()) { asks_.erase(it); continue; }\n\n            auto& resting = it->second.front();          // oldest at this price\n            int filled = std::min(remaining, resting.qty);\n            trades_.push_back({aggressorId, resting.orderId, it->first, filled});\n            remaining   -= filled;\n            resting.qty -= filled;\n            if (resting.qty == 0) {\n                active_.erase(resting.orderId);\n                it->second.pop_front();\n                if (it->second.empty()) asks_.erase(it);\n            }\n        }\n    }\n};",
+            "highlights": [
+              {
+                "at": "greater",
+                "lines": "21-22",
+                "note": "begin() is the best price on each side"
+              },
+              {
+                "at": "rejects",
+                "lines": "6-13",
+                "note": "Reject duplicates, match, rest the remainder"
+              },
+              {
+                "at": "stops",
+                "lines": "27-29",
+                "note": "Stop when the best ask stops crossing"
+              },
+              {
+                "at": "front",
+                "lines": "33-37",
+                "note": "Fill the oldest order; log the trade"
+              },
+              {
+                "at": "leaves",
+                "lines": "38-41",
+                "note": "Pop filled orders; erase empty levels"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "05",
+      "title": "Cancel with tombstones",
+      "question": "How do you cancel an order by ID without searching the book?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Problem five. How do you cancel an order by its ID, without searching through the book? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Cancel by ID <em>without searching</em> the book?"
+          }
+        },
+        {
+          "type": "book",
+          "say": "Cancel order two. Instead of digging it out of its queue, record the ID in a cancelled set: it stays in the book as a tombstone. Later, a buy for four at twenty arrives. Matching reaches order two first, sees the tombstone, and simply pops it. Then order three fills two. Twenty is now empty, and twenty-one is above the limit, so the last two rest as a bid at twenty.",
+          "props": {
+            "title": "Mark now, <em>pop later</em>",
+            "cancel": "lazy",
+            "book": [
+              {
+                "id": 1,
+                "side": "sell",
+                "price": 21,
+                "qty": 4
+              },
+              {
+                "id": 2,
+                "side": "sell",
+                "price": 20,
+                "qty": 3
+              },
+              {
+                "id": 3,
+                "side": "sell",
+                "price": 20,
+                "qty": 2
+              },
+              {
+                "id": 4,
+                "side": "buy",
+                "price": 19,
+                "qty": 5
+              }
+            ],
+            "steps": [
+              {
+                "at": "Cancel",
+                "cancel": 2,
+                "note": "Cancel #2: add to cancelled_, O(1)"
+              },
+              {
+                "at": "arrives",
+                "order": {
+                  "id": 5,
+                  "side": "buy",
+                  "price": 20,
+                  "qty": 4
+                },
+                "fills": [
+                  "sees",
+                  "Then"
+                ],
+                "note": "BUY 4 @ 20: pop the tombstone, fill #3, rest 2"
+              }
+            ]
+          }
+        },
+        {
+          "type": "code",
+          "say": "The code is tiny. Cancel just moves the ID from active to cancelled, in constant time. Before using the front of a level, skip cancelled drains any tombstones there. Each order is popped at most once, so the extra matching work is amortized constant.",
+          "props": {
+            "title": "Lazy deletion",
+            "file": "cancel.cpp",
+            "tag": "O(1) cancel",
+            "lang": "cpp",
+            "size": 23,
+            "width": 1100,
+            "code": "void CancelOrder(int orderId) {\n    if (!active_.count(orderId)) return;\n    active_.erase(orderId);\n    cancelled_.insert(orderId);       // O(1): leave the deque alone\n}\n\nvoid skipCancelled(std::deque<Entry>& dq) {\n    while (!dq.empty() && cancelled_.count(dq.front().orderId)) {\n        cancelled_.erase(dq.front().orderId);\n        dq.pop_front();               // tombstone popped on access\n    }\n}",
+            "highlights": [
+              {
+                "at": "moves",
+                "lines": "3-4",
+                "note": "O(1): the deque is untouched"
+              },
+              {
+                "at": "drains",
+                "lines": "8-10",
+                "note": "Pop tombstones when matching reaches them"
+              },
+              {
+                "at": "amortized",
+                "lines": "7",
+                "note": "Each entry popped once: amortized O(1)"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Trade at the best opposite price while prices cross, filling the smaller quantity. Two heaps give the best prices in log time. Price-time priority needs a sorted map of FIFO deques. And cancel lazily, with tombstones popped during matching.",
+          "props": {
+            "title": "Order book, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "cross",
+                "text": "Best opposite price first, while prices cross.",
+                "code": "min(qty, qty)"
+              },
+              {
+                "at": "heaps",
+                "text": "Two heaps: best bid and ask in O(log n).",
+                "code": "priority_queue"
+              },
+              {
+                "at": "deques",
+                "text": "Price-time priority: map of FIFO deques.",
+                "code": "map<int, deque>"
+              },
+              {
+                "at": "tombstones",
+                "text": "Cancel lazily; pop tombstones when matching.",
+                "code": "O(1) cancel"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

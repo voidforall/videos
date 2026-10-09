@@ -1,13 +1,15 @@
 // Active-recall opener: the question, then a draining "pause and answer" bar during the
 // silence that follows the narration (scene.pauseAfter seconds).
+// props: { question, label? = "Question", pauseLabel? = "Pause · answer out loud" }
+// e.g. a "Your turn" scene before an implementation: label "Your turn", pauseLabel "Pause · write it yourself".
 registerTemplate("question", {
   chrome: "minimal",
-  render(props) {
+  render(props, { esc }) {
     return `
-      <p class="q-label">Question</p>
+      <p class="q-label">${esc(props.label ?? "Question")}</p>
       <h1 class="q-text">${props.question}</h1>
       <div class="q-pause">
-        <p class="q-pause-label">Pause · answer out loud</p>
+        <p class="q-pause-label">${esc(props.pauseLabel ?? "Pause · answer out loud")}</p>
         <div class="q-track"><div class="q-bar"></div></div>
       </div>`;
   },

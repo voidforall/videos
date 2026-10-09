@@ -20,6 +20,11 @@
       "id": "system",
       "title": "System design",
       "blurb": "Interview designs drawn as live diagrams: request paths, hash rings, and the failure cases that decide each trade-off."
+    },
+    {
+      "id": "build",
+      "title": "Build it",
+      "blurb": "Concrete implementation problems, interview style: the spec, the data structure, the core operation animated, a pause to write it yourself, then the code."
     }
   ],
   "episodes": [
@@ -888,6 +893,124 @@
           "duration": 45,
           "video": "media/system-database-sharding-03.mp4",
           "poster": "media/system-database-sharding-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "build-order-book",
+      "series": "build",
+      "title": "Order book matching",
+      "kicker": "Build it · Order book",
+      "summary": "Implement limit-order matching: the crossing rules, two heaps, price-time priority with a map of deques, and O(1) cancel with tombstones.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/interview/basic-order-book.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "The matching rules",
+          "question": "An order arrives. Which resting orders does it trade with, and how much?",
+          "duration": 55,
+          "video": "media/build-order-book-01.mp4",
+          "poster": "media/build-order-book-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Two heaps",
+          "question": "Which data structure gives you the best bid and best ask fast?",
+          "duration": 58,
+          "video": "media/build-order-book-02.mp4",
+          "poster": "media/build-order-book-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Price-time priority",
+          "question": "Two buys rest at the same price. Who fills first, and why can't a heap guarantee it?",
+          "duration": 44,
+          "video": "media/build-order-book-03.mp4",
+          "poster": "media/build-order-book-03.jpg"
+        },
+        {
+          "id": "04",
+          "title": "Your turn: matchBuy",
+          "question": "Write matchBuy for a map-of-deques order book.",
+          "duration": 51,
+          "video": "media/build-order-book-04.mp4",
+          "poster": "media/build-order-book-04.jpg"
+        },
+        {
+          "id": "05",
+          "title": "Cancel with tombstones",
+          "question": "How do you cancel an order by ID without searching the book?",
+          "duration": 65,
+          "video": "media/build-order-book-05.mp4",
+          "poster": "media/build-order-book-05.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "build-low-latency-book",
+      "series": "build",
+      "title": "Low-latency order book",
+      "kicker": "Build it · Low-latency book",
+      "summary": "An order book on a nanosecond budget: contiguous levels with the best price at the back, O(1) cancel with stored list iterators, and what matters beyond big-O.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/interview/low-latency-order-book.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Where the levels live",
+          "question": "In a nanosecond-budget order book, which container holds the price levels?",
+          "duration": 63,
+          "video": "media/build-low-latency-book-01.mp4",
+          "poster": "media/build-low-latency-book-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "O(1) cancel",
+          "question": "How do you cancel any order in O(1) while keeping FIFO order?",
+          "duration": 60,
+          "video": "media/build-low-latency-book-02.mp4",
+          "poster": "media/build-low-latency-book-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Beyond big-O",
+          "question": "The algorithm is O(1). What else decides whether it runs in 50 nanoseconds?",
+          "duration": 58,
+          "video": "media/build-low-latency-book-03.mp4",
+          "poster": "media/build-low-latency-book-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "build-lru-cache",
+      "series": "build",
+      "title": "LRU cache",
+      "kicker": "Build it · LRU cache",
+      "summary": "O(1) get and put with a hash map into a doubly linked list: splice to promote, evict from the back, then the follow-ups interviewers ask.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/interview/lru-cache.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Hash map + linked list",
+          "question": "Design an LRU cache where get and put are both O(1).",
+          "duration": 43,
+          "video": "media/build-lru-cache-01.mp4",
+          "poster": "media/build-lru-cache-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Your turn: the code",
+          "question": "Write LRUCache with get and put.",
+          "duration": 61,
+          "video": "media/build-lru-cache-02.mp4",
+          "poster": "media/build-lru-cache-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Follow-ups",
+          "question": "Why a doubly linked list, can get take a shared lock, and how would you build LFU?",
+          "duration": 66,
+          "video": "media/build-lru-cache-03.mp4",
+          "poster": "media/build-lru-cache-03.jpg"
         }
       ]
     }

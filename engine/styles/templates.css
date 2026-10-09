@@ -134,3 +134,46 @@
 .tpl-ring .rg-note { position: relative; height: 164px; padding: 22px 28px; }
 .tpl-ring .rg-note .ar-slot { margin-top: 12px; height: 84px; }
 .tpl-ring .rg-note .ar-swap { font: 400 32px/1.3 var(--sans); }
+.tpl-code .cd-window { position: relative; overflow: hidden; -webkit-mask-image: linear-gradient(transparent 0, #000 22px, #000 calc(100% - 22px), transparent 100%); mask-image: linear-gradient(transparent 0, #000 22px, #000 calc(100% - 22px), transparent 100%); }
+.tpl-code .cd-track { position: absolute; right: 10px; top: 20px; bottom: 20px; width: 4px; border-radius: 2px; background: rgba(250, 249, 245, 0.08); }
+.tpl-code .cd-thumb { width: 100%; border-radius: 2px; background: rgba(250, 249, 245, 0.32); }
+
+/* — book — (ladder x 80–1180, y 232–740; incoming + trades panels x 1240–1840; note below) */
+.tpl-book .bk-row { left: 80px; width: 1100px; border-bottom: 1px solid var(--hair); }
+.tpl-book .bk-price { left: 236px; width: 110px; text-align: right; font: 400 40px/1 var(--serif); }
+.tpl-book .bk-limit { left: 226px; width: 132px; height: 56px; border: 2px dashed var(--coral); border-radius: 10px; }
+.tpl-book .bk-best { left: 80px; width: 130px; font: 500 18px/1 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: rgba(20, 20, 19, 0.56); }
+.tpl-book .bk-best::after { content: " ▸"; }
+.tpl-book .bk-best-ask { color: var(--coral); }
+.tpl-book .bk-best-bid { color: #3f9c89; }
+.tpl-book .bk-chip { width: 150px; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; border: 2px solid; border-radius: 10px; box-shadow: var(--shadow); font-family: var(--mono); }
+.tpl-book .bk-chip.bk-buy { border-color: #5db8a6; background: #eaf5f1; }
+.tpl-book .bk-chip.bk-sell { border-color: #cc785c; background: #f8ece6; }
+.tpl-book .bk-id { font: 500 18px/1 var(--mono); color: rgba(20, 20, 19, 0.55); }
+.tpl-book .bk-qty { position: relative; width: 54px; height: 28px; }
+.tpl-book .bk-num { position: relative; display: inline-block; width: 64px; height: 1em; vertical-align: baseline; }
+.tpl-book .bk-v { position: absolute; right: 0; top: 0; font-weight: 700; }
+.tpl-book .bk-qty .bk-v { font: 700 26px/28px var(--mono); }
+.tpl-book .bk-x { position: absolute; right: -10px; top: -12px; width: 26px; height: 26px; display: grid; place-items: center; border-radius: 50%; background: var(--ink); color: var(--cream); font: 700 14px/1 var(--sans); font-style: normal; }
+.tpl-book .bk-side-panels { left: 1240px; top: 222px; width: 600px; display: flex; flex-direction: column; gap: 18px; }
+.tpl-book .bk-in { position: relative; height: 170px; padding: 20px 24px; }
+.tpl-book .bk-in-slot { position: relative; margin-top: 16px; height: 96px; }
+.tpl-book .bk-in-card, .tpl-book .bk-in-idle { position: absolute; left: 0; right: 0; top: 0; }
+.tpl-book .bk-in-idle { font: 400 26px/1.3 var(--sans); color: rgba(20, 20, 19, 0.4); }
+.tpl-book .bk-in-head { display: flex; align-items: center; gap: 16px; font: 500 30px/1 var(--mono); }
+.tpl-book .bk-in-id { margin-left: auto; font-size: 22px; color: rgba(20, 20, 19, 0.55); }
+.tpl-book .bk-tag { padding: 7px 12px 6px; border-radius: 7px; font: 700 22px/1 var(--mono); letter-spacing: 0.06em; color: var(--cream); }
+.tpl-book .bk-tag.bk-buy { background: #3f9c89; }
+.tpl-book .bk-tag.bk-sell { background: var(--coral); }
+.tpl-book .bk-in-left { margin-top: 18px; font: 400 24px/1 var(--sans); color: rgba(20, 20, 19, 0.62); }
+.tpl-book .bk-in-left .bk-num { font: 700 26px/1 var(--mono); color: var(--ink); }
+.tpl-book .bk-trades { position: relative; height: 352px; padding: 20px 24px; }
+.tpl-book .bk-trades .label .bk-num { width: 52px; color: var(--ink); }
+.tpl-book .bk-trades .label .bk-v { left: 0; right: auto; }
+.tpl-book .bk-trade-list { position: relative; margin-top: 16px; height: 260px; overflow: hidden; }
+.tpl-book .bk-trade { position: absolute; left: 0; right: 0; top: 0; height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; border-radius: 8px; background: var(--tile); font: 500 23px/1 var(--mono); }
+.tpl-book .bk-trade span { color: rgba(20, 20, 19, 0.62); }
+.tpl-book .bk-note { left: 80px; right: 80px; top: 764px; height: 100px; padding: 16px 26px; }
+.tpl-book .bk-note .ar-slot { margin-top: 10px; height: 40px; }
+.tpl-book .bk-note .ar-swap { font: 400 30px/1.2 var(--sans); }
+.tpl-book .bk-in-left .bk-v { left: 8px; right: auto; }

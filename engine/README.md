@@ -49,15 +49,16 @@ Global fixes live in `engine/caption-fixes.json`.
 
 | type | props | use for |
 |:---|:---|:---|
-| `question` | `question` (HTML) · scene `pauseAfter` | Clip opener: ask, then a draining pause bar to answer out loud |
+| `question` | `question` (HTML), `label?`, `pauseLabel?` · scene `pauseAfter` | Clip opener: ask, then a draining pause bar to answer out loud. For a "Your turn" before code: `label: "Your turn"`, `pauseLabel: "Pause · write it yourself"`, `pauseAfter: 10` |
 | `statement` | `text`, `at?`, `sub?`, `subAt?` | One key fact or stance |
 | `points` | `title`, `items[{ at, label?, title, body?, code? }]` (1–4) | Definitions, steps, options |
 | `compare` | `title`, `lang?`, `left`/`right` `{ at, label, title, tone?, code?, body? }`, `verdict?{ at, text, code? }` | Before/after, A vs B |
-| `code` | `title`, `file`, `tag?`, `code`, `lang?` (cpp\|python), `size?`, `width?`, `highlights[{ at, lines: "2-3" \| "2,6", note }]` | Walking through an implementation |
+| `code` | `title`, `file`, `tag?`, `code`, `lang?` (cpp\|python), `size?`, `width?`, `highlights[{ at, lines: "2-3" \| "2,6", note }]` | Walking through an implementation. Code taller than the frame scrolls automatically, centring each highlight |
 | `array` | `title`, `problem?`, `values`, `stateLabel`, `resultLabel`, `pointers?{ l, r, m }` (labels), `steps[{ at, l?, r?, m?, mark?: ok\|bad, state?, note?, result? }]` | Sliding window, two pointers, binary search (`m` = mid; `l = r + 1` shows crossed pointers). Steps ≥ 0.5 s apart |
 | `stack` | `title`, `problem?`, `values`, `resultMode: value\|distance`, `resultDefault?`, `stackLabel?`, `steps[{ at, i?, ops?: [push\|pop…], note? }]` | Monotonic stack: the template simulates pushes/pops and fills results on each pop |
 | `graph` | `title`, `directed?`, `nodes[{ id, label?, x, y, w?, h?, hidden? }]` (w/h → box) (frame px; area x 80–1180, y 230–740), `edges[{ from, to, w? }]`, `panels[{ key, label, type: table\|list, initial }]`, `steps[{ at, note?, nodes?{ id: active\|done\|queued\|dim\|base }, edges?{ "u-v": relax\|tree\|dim\|base }, panels?{ key: {id: v} \| [..] }, show?[id], add?, remove?, move?{ id: [x, y] } }]` (list panels: `rows?`; table panels: `columns?`) | Dijkstra, BFS/DFS, topological sort, union-find forests, architecture diagrams (box nodes, empty `panels` for full width). Edges follow moved nodes; `u→v` + `v→u` draw side by side (request / response); steps ≥ 0.5 s apart |
 | `ring` | `title`, `servers[{ id, pos, group?, label?, hidden? }]`, `keys[{ id, pos, label?, hidden? }]` (pos 0–100 clockwise from the top), `load?{ label? }`, `steps[{ at, note?, show?[id], remove?[serverId \| group], lookup?[keyId] }]` | Consistent hashing: the template computes key ownership (next server clockwise), recolours moved keys, and counts keys per group; virtual nodes share a `group`. Steps ≥ 0.5 s apart |
+| `book` | `title`, `book[{ id, side: buy\|sell, price, qty }]` (resting, FIFO per price), `prices?`, `cancel?: eager\|lazy`, `steps[{ at, note?, order?{ id, side, price, qty }, fills?[cue…], pace?, cancel?: id }]` | Limit order books: the template runs price-time matching (fills, partial fills, remainder rests, tombstones) and drives the trades log, best bid/ask and incoming card. `fills` pins each fill to a narration cue |
 | `recap` | `title`, `items[{ at, text, code? }]` (≤ 5) | Clip or episode close |
 
 Titles accept inline `<em>` for the italic accent. Add a template by registering it in

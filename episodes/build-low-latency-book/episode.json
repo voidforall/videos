@@ -1,0 +1,523 @@
+{
+  "slug": "build-low-latency-book",
+  "series": "build",
+  "title": "Low-latency order book",
+  "kicker": "Build it · Low-latency book",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/interview/low-latency-order-book.md",
+  "summary": "An order book on a nanosecond budget: contiguous levels with the best price at the back, O(1) cancel with stored list iterators, and what matters beyond big-O.",
+  "captionFixes": [
+    {
+      "match": [
+        "Low",
+        "Latency",
+        "Order",
+        "Book",
+        "Problem"
+      ],
+      "display": "Low-latency order book, problem"
+    },
+    {
+      "match": [
+        "options",
+        "are",
+        "a",
+        "STD",
+        "map"
+      ],
+      "display": "options. A std::map"
+    },
+    {
+      "match": [
+        "log",
+        "and",
+        "lookup"
+      ],
+      "display": "log n lookup"
+    },
+    {
+      "match": [
+        "memoove"
+      ],
+      "display": "memmove"
+    },
+    {
+      "match": [
+        "Bid",
+        "sort"
+      ],
+      "display": "Bids sort"
+    },
+    {
+      "match": [
+        "Ask",
+        "sort"
+      ],
+      "display": "Asks sort"
+    },
+    {
+      "match": [
+        "pop",
+        "back"
+      ],
+      "display": "pop_back"
+    },
+    {
+      "match": [
+        "cash",
+        "lines"
+      ],
+      "display": "cache lines"
+    },
+    {
+      "match": [
+        "that",
+        "orders",
+        "list"
+      ],
+      "display": "that order's list"
+    },
+    {
+      "match": [
+        "levels",
+        "cached"
+      ],
+      "display": "level's cached"
+    },
+    {
+      "match": [
+        "std",
+        "list"
+      ],
+      "display": "std::list"
+    },
+    {
+      "match": [
+        "id"
+      ],
+      "display": "ID"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Where the levels live",
+      "question": "In a nanosecond-budget order book, which container holds the price levels?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Low-latency order book, problem one. On a budget of tens of nanoseconds, which container should hold the price levels? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Which container holds the <em>price levels</em>, on a nanosecond budget?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Three options. A std map is sorted, with log n lookup, but every level is a separate heap node: pointer chasing, cache misses and allocations, around sixty to eighty nanoseconds. A sorted vector keeps the levels contiguous. Search it with lower bound, and since real books are shallow, inserting with memmove is cheap: around thirty nanoseconds. And if prices live in a small fixed range, index an array directly by tick: constant time everywhere, but memory for every possible price.",
+          "props": {
+            "title": "Three <em>layouts</em>",
+            "items": [
+              {
+                "at": "sorted",
+                "label": "std::map",
+                "title": "Tree of nodes",
+                "body": "Sorted, O(log N), but pointer chasing and allocations.",
+                "code": "~60–80 ns"
+              },
+              {
+                "at": "contiguous",
+                "label": "std::vector",
+                "title": "Contiguous",
+                "body": "lower_bound + memmove; shallow books make it fast.",
+                "code": "~30 ns"
+              },
+              {
+                "at": "directly",
+                "label": "std::array",
+                "title": "Direct index",
+                "body": "(price − min) / tick: O(1), costly if sparse.",
+                "code": "O(1), big"
+              }
+            ]
+          }
+        },
+        {
+          "type": "code",
+          "say": "The vector trick is to reverse the sort. Bids sort ascending, so the best bid is at the back; asks sort descending, so the best ask is at the back too. Adding finds the level with lower bound, and usually it already exists, so we just add volume. And when the top level trades away, removing it is pop back: constant time, nothing shifts.",
+          "props": {
+            "title": "Best price at the <em>back</em>",
+            "file": "levels.cpp",
+            "tag": "std::vector",
+            "lang": "cpp",
+            "size": 22,
+            "width": 1120,
+            "code": "// Bids sorted ascending, so the best bid sits at back()\nvoid AddBid(std::vector<PriceLevel>& bids, Price price, Volume vol) {\n    auto it = std::lower_bound(bids.begin(), bids.end(), price,\n        [](const PriceLevel& lvl, Price p) { return lvl.price < p; });\n    if (it != bids.end() && it->price == price) {\n        it->total_volume += vol;          // hot: the level exists\n    } else {\n        bids.insert(it, {price, vol});    // cold: memmove the tail\n    }\n}\n\n// the top level traded away:\nbids.pop_back();                          // O(1): nothing shifts",
+            "highlights": [
+              {
+                "at": "reverse",
+                "lines": "1",
+                "note": "Bids ascending, asks descending: best at back()"
+              },
+              {
+                "at": "Adding",
+                "lines": "3-4",
+                "note": "Binary search for the level"
+              },
+              {
+                "at": "exists",
+                "lines": "5-6",
+                "note": "Common case: add to an existing level"
+              },
+              {
+                "at": "trades",
+                "lines": "13",
+                "note": "Consume the top level in O(1)"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "O(1) cancel",
+      "question": "How do you cancel any order in O(1) while keeping FIFO order?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Problem two. Most messages are cancels. How do you cancel any order in constant time, while keeping first-in, first-out order at each price? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Cancel <em>any</em> order in O(1), keeping FIFO per price?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Use three structures. A sorted map of price levels, each holding a linked list of orders in arrival order, and a hash map from order ID to that order's list iterator. To cancel order two, look up its iterator in the hash map: constant time. Erase it from the list: its neighbours just relink, also constant time, and iterators to every other order stay valid. Subtract its volume from the level's cached total. Only when a level becomes empty do we touch the tree, in log n.",
+          "props": {
+            "title": "Hash map → <em>list iterator</em>",
+            "nodes": [
+              {
+                "id": "L101",
+                "label": "101",
+                "x": 200,
+                "y": 330,
+                "w": 130,
+                "h": 64
+              },
+              {
+                "id": "L100",
+                "label": "100",
+                "x": 200,
+                "y": 560,
+                "w": 130,
+                "h": 64
+              },
+              {
+                "id": "o1",
+                "label": "#1 · 5",
+                "x": 470,
+                "y": 330,
+                "w": 170,
+                "h": 64
+              },
+              {
+                "id": "o2",
+                "label": "#2 · 3",
+                "x": 720,
+                "y": 330,
+                "w": 170,
+                "h": 64
+              },
+              {
+                "id": "o3",
+                "label": "#3 · 4",
+                "x": 970,
+                "y": 330,
+                "w": 170,
+                "h": 64
+              },
+              {
+                "id": "o4",
+                "label": "#4 · 2",
+                "x": 470,
+                "y": 560,
+                "w": 170,
+                "h": 64
+              },
+              {
+                "id": "o5",
+                "label": "#5 · 6",
+                "x": 720,
+                "y": 560,
+                "w": 170,
+                "h": 64
+              }
+            ],
+            "edges": [
+              {
+                "from": "L101",
+                "to": "o1"
+              },
+              {
+                "from": "o1",
+                "to": "o2"
+              },
+              {
+                "from": "o2",
+                "to": "o3"
+              },
+              {
+                "from": "L100",
+                "to": "o4"
+              },
+              {
+                "from": "o4",
+                "to": "o5"
+              }
+            ],
+            "panels": [
+              {
+                "key": "map",
+                "label": "order_map",
+                "type": "list",
+                "rows": 2,
+                "initial": [
+                  "#1→it",
+                  "#2→it",
+                  "#3→it",
+                  "#4→it",
+                  "#5→it"
+                ]
+              },
+              {
+                "key": "vol",
+                "label": "Level volume",
+                "type": "table",
+                "columns": [
+                  "L101",
+                  "L100"
+                ],
+                "initial": {
+                  "L101": "12",
+                  "L100": "8"
+                }
+              }
+            ],
+            "steps": [
+              {
+                "at": "structures",
+                "nodes": {
+                  "L101": "queued",
+                  "L100": "queued"
+                },
+                "note": "std::map<Price, Limit>: levels, sorted"
+              },
+              {
+                "at": "linked",
+                "nodes": {
+                  "L101": "base",
+                  "L100": "base"
+                },
+                "edges": {
+                  "o1-o2": "relax",
+                  "o2-o3": "relax",
+                  "o4-o5": "relax"
+                },
+                "note": "std::list<Order> per level: FIFO"
+              },
+              {
+                "at": "hash",
+                "edges": {
+                  "o1-o2": "base",
+                  "o2-o3": "base",
+                  "o4-o5": "base"
+                },
+                "note": "unordered_map<OrderId, list::iterator>"
+              },
+              {
+                "at": "look",
+                "nodes": {
+                  "o2": "active"
+                },
+                "panels": {
+                  "map": [
+                    "#1→it",
+                    "#2→it ◂",
+                    "#3→it",
+                    "#4→it",
+                    "#5→it"
+                  ]
+                },
+                "note": "cancel(#2): order_map.at(2), O(1)"
+              },
+              {
+                "at": "Erase",
+                "remove": [
+                  "o1-o2",
+                  "o2-o3"
+                ],
+                "add": [
+                  {
+                    "from": "o1",
+                    "to": "o3"
+                  }
+                ],
+                "nodes": {
+                  "o2": "dim"
+                },
+                "edges": {
+                  "o1-o3": "relax"
+                },
+                "panels": {
+                  "map": [
+                    "#1→it",
+                    "#3→it",
+                    "#4→it",
+                    "#5→it"
+                  ]
+                },
+                "note": "list.erase(it): neighbours relink, O(1)"
+              },
+              {
+                "at": "Subtract",
+                "edges": {
+                  "o1-o3": "base"
+                },
+                "panels": {
+                  "vol": {
+                    "L101": "9"
+                  }
+                },
+                "note": "Cached total_volume: 12 − 3 = 9"
+              },
+              {
+                "at": "empty",
+                "nodes": {
+                  "L100": "queued"
+                },
+                "note": "Level empties? side.erase(price): O(log N)"
+              }
+            ]
+          }
+        },
+        {
+          "type": "code",
+          "say": "In code: the limit caches its total volume, and keeps its orders in a std list. The book adds the hash map from ID to iterator. Cancel looks up the iterator, finds its level, subtracts the volume, and erases the node, removing the level only if it is now empty.",
+          "props": {
+            "title": "<em>cancel</em> in code",
+            "file": "book.cpp",
+            "tag": "howtohft layout",
+            "lang": "cpp",
+            "size": 21,
+            "width": 1180,
+            "code": "using OrderIter = std::list<Order>::iterator;\n\nstruct Limit {\n    Price            price;\n    Volume           total_volume = 0;   // cached per level\n    std::list<Order> orders;             // FIFO; front() = oldest\n};\n\nstruct Book {\n    std::map<Price, Limit>                 bids, asks;\n    std::unordered_map<OrderId, OrderIter> order_map;   // id → node\n};\n\nvoid cancel(Book& b, OrderId id) {\n    OrderIter oit = b.order_map.at(id);                 // O(1)\n    auto& side = (oit->side == Side::Bid) ? b.bids : b.asks;\n    Limit& lmt = side.at(oit->price);                   // O(log N)\n    lmt.total_volume -= oit->volume;\n    Price price = oit->price;\n    lmt.orders.erase(oit);                              // O(1) unlink\n    if (lmt.orders.empty()) side.erase(price);          // level gone\n    b.order_map.erase(id);\n}",
+            "highlights": [
+              {
+                "at": "caches",
+                "lines": "5-6",
+                "note": "Cached volume; stable list iterators"
+              },
+              {
+                "at": "adds",
+                "lines": "11",
+                "note": "id → iterator for O(1) cancel"
+              },
+              {
+                "at": "looks",
+                "lines": "15-17",
+                "note": "Find the node, then its level"
+              },
+              {
+                "at": "erases",
+                "lines": "20-22",
+                "note": "Unlink; drop the level only if empty"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Beyond big-O",
+      "question": "The algorithm is O(1). What else decides whether it runs in 50 nanoseconds?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Problem three. Your book is constant time on paper. What else decides whether it actually runs in fifty nanoseconds? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "It's O(1) on paper. What else decides <em>50 ns</em>?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Four things beyond big O. Never allocate on the hot path: preallocate orders and levels in an object pool. Search small books linearly, or with a branchless binary search, so the CPU never mispredicts. Keep rare paths, like a brand new price level, out of line and marked cold, so the hot loop stays in the instruction cache. And around the book, bypass the kernel for networking, and pass messages through lock-free shared memory ring buffers, with indices padded onto separate cache lines.",
+          "props": {
+            "title": "Where the <em>nanoseconds</em> go",
+            "items": [
+              {
+                "at": "allocate",
+                "label": "Memory",
+                "title": "Zero allocation",
+                "body": "Object pools for orders and levels.",
+                "code": "no new on hot path"
+              },
+              {
+                "at": "linearly",
+                "label": "Search",
+                "title": "No mispredicts",
+                "body": "Linear scan for small books, or branchless search.",
+                "code": "CMOV"
+              },
+              {
+                "at": "rare",
+                "label": "Code layout",
+                "title": "Cold paths out",
+                "body": "New levels and errors go out of line.",
+                "code": "[[likely]], cold"
+              },
+              {
+                "at": "kernel",
+                "label": "I/O",
+                "title": "Bypass + SPSC",
+                "body": "Kernel bypass; padded lock-free ring buffers.",
+                "code": "64-byte lines"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Keep levels contiguous, with the best price at the back. Store a list iterator per order ID, for constant-time cancel. Cache the volume per level. And on the hot path: no allocation, no avoidable branches, and no kernel.",
+          "props": {
+            "title": "Low-latency book, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "contiguous",
+                "text": "Contiguous levels; best price at back().",
+                "code": "pop_back()"
+              },
+              {
+                "at": "iterator",
+                "text": "id → list iterator: O(1) cancel.",
+                "code": "unordered_map"
+              },
+              {
+                "at": "Cache",
+                "text": "Cache total volume per level.",
+                "code": "O(1) depth"
+              },
+              {
+                "at": "allocation",
+                "text": "Hot path: no allocation, branches, or kernel.",
+                "code": "pools · bypass"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
