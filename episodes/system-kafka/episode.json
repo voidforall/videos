@@ -1,0 +1,606 @@
+{
+  "slug": "system-kafka",
+  "series": "system",
+  "title": "Kafka",
+  "kicker": "System design · Kafka",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/system/building-blocks/kafka.md",
+  "summary": "A partitioned, replicated log: keys pick partitions and give per-key order, consumer groups split partitions and resume from committed offsets, and delivery semantics depend on when you commit.",
+  "captionFixes": [
+    {
+      "match": [
+        "Kafka",
+        "Question"
+      ],
+      "display": "Kafka, question"
+    },
+    {
+      "match": [
+        "events",
+        "key"
+      ],
+      "display": "event's key"
+    },
+    {
+      "match": [
+        "user",
+        "a"
+      ],
+      "display": "user A"
+    },
+    {
+      "match": [
+        "hash",
+        "is"
+      ],
+      "display": "hashes"
+    },
+    {
+      "match": [
+        "only",
+        "partitions",
+        "there"
+      ],
+      "display": "only. Across partitions, there"
+    },
+    {
+      "match": [
+        "extra",
+        "sit"
+      ],
+      "display": "The extras sit"
+    },
+    {
+      "match": [
+        "axe"
+      ],
+      "display": "acks"
+    },
+    {
+      "match": [
+        "in",
+        "sync"
+      ],
+      "display": "in-sync"
+    },
+    {
+      "match": [
+        "to",
+        "recap"
+      ],
+      "display": "To recap"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Partitions and ordering",
+      "question": "How does Kafka scale a topic, and what order does it guarantee?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Kafka, question one. How does Kafka scale a single topic, and what ordering does it actually guarantee? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How does a topic <em>scale</em>, and what <em>order</em> is guaranteed?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "A topic is split into partitions, spread across brokers, and each partition is an append-only log. A producer picks the partition by hashing the event's key. User A's login lands in partition zero, at offset zero. Other users spread over the other partitions, so the topic scales out. Every event for user A hashes the same way, so all of A's events land in one partition, in order. That is the guarantee: order within a partition only. Across partitions, there is no global order.",
+          "props": {
+            "title": "Same key, <em>same partition</em>",
+            "nodes": [
+              {
+                "id": "prod",
+                "label": "Producer",
+                "x": 160,
+                "y": 460,
+                "w": 170,
+                "h": 64
+              },
+              {
+                "id": "P0",
+                "label": "P0",
+                "x": 580,
+                "y": 300,
+                "w": 90,
+                "h": 56
+              },
+              {
+                "id": "P1",
+                "label": "P1",
+                "x": 580,
+                "y": 460,
+                "w": 90,
+                "h": 56
+              },
+              {
+                "id": "P2",
+                "label": "P2",
+                "x": 580,
+                "y": 620,
+                "w": 90,
+                "h": 56
+              },
+              {
+                "id": "A1",
+                "label": "A1",
+                "x": 710,
+                "y": 300,
+                "w": 86,
+                "h": 50,
+                "hidden": true
+              },
+              {
+                "id": "A2",
+                "label": "A2",
+                "x": 810,
+                "y": 300,
+                "w": 86,
+                "h": 50,
+                "hidden": true
+              },
+              {
+                "id": "A3",
+                "label": "A3",
+                "x": 910,
+                "y": 300,
+                "w": 86,
+                "h": 50,
+                "hidden": true
+              },
+              {
+                "id": "B1",
+                "label": "B1",
+                "x": 710,
+                "y": 460,
+                "w": 86,
+                "h": 50,
+                "hidden": true
+              },
+              {
+                "id": "B2",
+                "label": "B2",
+                "x": 810,
+                "y": 460,
+                "w": 86,
+                "h": 50,
+                "hidden": true
+              },
+              {
+                "id": "C1",
+                "label": "C1",
+                "x": 710,
+                "y": 620,
+                "w": 86,
+                "h": 50,
+                "hidden": true
+              }
+            ],
+            "edges": [
+              {
+                "from": "prod",
+                "to": "P0"
+              },
+              {
+                "from": "prod",
+                "to": "P1",
+                "w": "hash(key) % 3"
+              },
+              {
+                "from": "prod",
+                "to": "P2"
+              }
+            ],
+            "panels": [
+              {
+                "key": "off",
+                "label": "Next offset",
+                "type": "table",
+                "columns": [
+                  "P0",
+                  "P1",
+                  "P2"
+                ],
+                "initial": {
+                  "P0": "0",
+                  "P1": "0",
+                  "P2": "0"
+                }
+              }
+            ],
+            "steps": [
+              {
+                "at": "login",
+                "show": [
+                  "A1"
+                ],
+                "nodes": {
+                  "A1": "active"
+                },
+                "edges": {
+                  "prod-P0": "relax"
+                },
+                "panels": {
+                  "off": {
+                    "P0": "1"
+                  }
+                },
+                "note": "key A → P0, offset 0"
+              },
+              {
+                "at": "spread#2",
+                "show": [
+                  "B1",
+                  "C1"
+                ],
+                "nodes": {
+                  "A1": "base"
+                },
+                "edges": {
+                  "prod-P0": "base",
+                  "prod-P1": "relax",
+                  "prod-P2": "relax"
+                },
+                "panels": {
+                  "off": {
+                    "P1": "1",
+                    "P2": "1"
+                  }
+                },
+                "note": "Keys B, C → other partitions: scale out"
+              },
+              {
+                "at": "hashes",
+                "show": [
+                  "A2",
+                  "B2",
+                  "A3"
+                ],
+                "edges": {
+                  "prod-P1": "base",
+                  "prod-P2": "base",
+                  "prod-P0": "relax"
+                },
+                "panels": {
+                  "off": {
+                    "P0": "3",
+                    "P1": "2"
+                  }
+                },
+                "note": "hash(A) never changes: A1, A2, A3 all in P0"
+              },
+              {
+                "at": "guarantee",
+                "nodes": {
+                  "A1": "done",
+                  "A2": "done",
+                  "A3": "done"
+                },
+                "edges": {
+                  "prod-P0": "base"
+                },
+                "note": "Ordered within a partition"
+              },
+              {
+                "at": "Across#2",
+                "nodes": {
+                  "B2": "queued",
+                  "A2": "queued"
+                },
+                "note": "B2 vs A2: no order across partitions"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Consumer groups and offsets",
+      "question": "How do consumers share a topic, and what happens when one crashes?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. How do several consumers share the work of one topic, and what happens when one of them crashes? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How do consumers <em>share</em> a topic, and what if one <em>crashes</em>?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "A consumer group divides a topic's partitions among its members: each partition goes to exactly one consumer. Adding a third consumer triggers a rebalance, and it takes over a partition. As they process, consumers commit their offsets: a bookmark per partition. If C2 crashes, the group rebalances again, and the survivors pick up its partitions, from the last committed offsets. Anything processed after that commit will be processed again. And a group can't use more consumers than partitions: the extras sit idle.",
+          "props": {
+            "title": "Partitions split across <em>a group</em>",
+            "nodes": [
+              {
+                "id": "P0",
+                "label": "P0",
+                "x": 260,
+                "y": 290,
+                "w": 120,
+                "h": 56
+              },
+              {
+                "id": "P1",
+                "label": "P1",
+                "x": 260,
+                "y": 420,
+                "w": 120,
+                "h": 56
+              },
+              {
+                "id": "P2",
+                "label": "P2",
+                "x": 260,
+                "y": 550,
+                "w": 120,
+                "h": 56
+              },
+              {
+                "id": "P3",
+                "label": "P3",
+                "x": 260,
+                "y": 680,
+                "w": 120,
+                "h": 56
+              },
+              {
+                "id": "C1",
+                "label": "C1",
+                "x": 800,
+                "y": 290,
+                "w": 150,
+                "h": 64
+              },
+              {
+                "id": "C3",
+                "label": "C3",
+                "x": 800,
+                "y": 485,
+                "w": 150,
+                "h": 64,
+                "hidden": true
+              },
+              {
+                "id": "C2",
+                "label": "C2",
+                "x": 800,
+                "y": 680,
+                "w": 150,
+                "h": 64
+              }
+            ],
+            "edges": [
+              {
+                "from": "P0",
+                "to": "C1"
+              },
+              {
+                "from": "P1",
+                "to": "C1"
+              },
+              {
+                "from": "P2",
+                "to": "C2"
+              },
+              {
+                "from": "P3",
+                "to": "C2"
+              }
+            ],
+            "panels": [
+              {
+                "key": "off",
+                "label": "Committed offset",
+                "type": "table",
+                "columns": [
+                  "P0",
+                  "P1",
+                  "P2",
+                  "P3"
+                ],
+                "initial": {
+                  "P0": "42",
+                  "P1": "17",
+                  "P2": "88",
+                  "P3": "5"
+                }
+              }
+            ],
+            "steps": [
+              {
+                "at": "divides",
+                "edges": {
+                  "P0-C1": "relax",
+                  "P1-C1": "relax",
+                  "P2-C2": "relax",
+                  "P3-C2": "relax"
+                },
+                "note": "Each partition → exactly one consumer"
+              },
+              {
+                "at": "Adding",
+                "show": [
+                  "C3"
+                ],
+                "remove": [
+                  "P1-C1"
+                ],
+                "add": [
+                  {
+                    "from": "P1",
+                    "to": "C3"
+                  }
+                ],
+                "nodes": {
+                  "C3": "active"
+                },
+                "edges": {
+                  "P0-C1": "base",
+                  "P2-C2": "base",
+                  "P3-C2": "base",
+                  "P1-C3": "relax"
+                },
+                "note": "Rebalance: C3 takes P1"
+              },
+              {
+                "at": "commit",
+                "nodes": {
+                  "C3": "base"
+                },
+                "edges": {
+                  "P1-C3": "base"
+                },
+                "panels": {
+                  "off": {
+                    "P0": "57",
+                    "P1": "21",
+                    "P2": "96",
+                    "P3": "9"
+                  }
+                },
+                "note": "Commit offsets as you go"
+              },
+              {
+                "at": "crashes",
+                "nodes": {
+                  "C2": "dim"
+                },
+                "edges": {
+                  "P2-C2": "dim",
+                  "P3-C2": "dim"
+                },
+                "note": "C2 crashes"
+              },
+              {
+                "at": "survivors",
+                "remove": [
+                  "P2-C2",
+                  "P3-C2"
+                ],
+                "add": [
+                  {
+                    "from": "P2",
+                    "to": "C1"
+                  },
+                  {
+                    "from": "P3",
+                    "to": "C3"
+                  }
+                ],
+                "edges": {
+                  "P2-C1": "relax",
+                  "P3-C3": "relax"
+                },
+                "note": "Survivors resume P2 at 96, P3 at 9"
+              },
+              {
+                "at": "again#2",
+                "nodes": {
+                  "P2": "queued",
+                  "P3": "queued"
+                },
+                "note": "Work after the last commit is replayed"
+              },
+              {
+                "at": "idle",
+                "nodes": {
+                  "P2": "base",
+                  "P3": "base"
+                },
+                "edges": {
+                  "P2-C1": "base",
+                  "P3-C3": "base"
+                },
+                "note": "Consumers > partitions → extras idle"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Delivery semantics and replication",
+      "question": "At-most-once, at-least-once, exactly-once: what decides which you get?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. At most once, at least once, or exactly once: what decides which delivery guarantee you get, and how does Kafka keep data safe? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "At-most, at-least, or <em>exactly</em> once: what decides it?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "It comes down to when you commit. Commit the offset before processing, and a crash loses the message: at most once. Process first, then commit, and a crash replays it: at least once, the default, so make processing idempotent. Exactly once needs an idempotent producer and transactions, that write results and offsets atomically. And for durability, each partition has a leader and followers; with acks set to all, a write is acknowledged only once every in-sync replica has it.",
+          "props": {
+            "title": "When you <em>commit</em> decides",
+            "items": [
+              {
+                "at": "before",
+                "label": "Commit, then process",
+                "title": "At most once",
+                "body": "A crash loses the message.",
+                "code": "may lose"
+              },
+              {
+                "at": "replays",
+                "label": "Process, then commit",
+                "title": "At least once",
+                "body": "A crash replays it: be idempotent.",
+                "code": "default"
+              },
+              {
+                "at": "transactions",
+                "label": "Transactions",
+                "title": "Exactly once",
+                "body": "Idempotent producer; outputs + offsets atomic.",
+                "code": "read-process-write"
+              },
+              {
+                "at": "durability",
+                "label": "Replication",
+                "title": "acks=all",
+                "body": "Leader + in-sync followers hold every write.",
+                "code": "ISR"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. A topic scales by partitions, and a key always maps to the same one. Order holds only within a partition. A consumer group splits partitions, and resumes from committed offsets. And commit after processing for at least once, with idempotent handlers.",
+          "props": {
+            "title": "Kafka, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "scales",
+                "text": "Topics scale by partitions; keys pick one.",
+                "code": "hash(key) % N"
+              },
+              {
+                "at": "Order",
+                "text": "Order only within a partition.",
+                "code": "per-key order"
+              },
+              {
+                "at": "splits",
+                "text": "Groups split partitions, resume from offsets.",
+                "code": "rebalance"
+              },
+              {
+                "at": "commit",
+                "text": "Process, then commit; handlers idempotent.",
+                "code": "at-least-once"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

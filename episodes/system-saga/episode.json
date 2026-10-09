@@ -1,0 +1,417 @@
+{
+  "slug": "system-saga",
+  "series": "system",
+  "title": "Saga pattern",
+  "kicker": "System design · Saga",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/system/building-blocks/saga.md",
+  "summary": "Transactions across microservices without two-phase commit: local commits, compensations in reverse, choreography vs orchestration, and the isolation a saga gives up.",
+  "captionFixes": [
+    {
+      "match": [
+        "SAGA",
+        "Question"
+      ],
+      "display": "Saga, question"
+    },
+    {
+      "match": [
+        "two",
+        "ways"
+      ],
+      "display": "Two ways"
+    },
+    {
+      "match": [
+        "a",
+        "saga",
+        "has",
+        "no"
+      ],
+      "display": "A saga has no"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Why not two-phase commit?",
+      "question": "An order spans payment, inventory and shipping services. Why not use two-phase commit?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Saga, question one. One order spans the payment, inventory and shipping services. Why not wrap it in a two-phase commit? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "One order, three services. Why not <em>two-phase commit</em>?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Two-phase commit makes every service prepare, and hold its locks, until a coordinator says commit. It is strongly consistent, but one slow or failed participant blocks everyone, and the coordinator becomes a single point of failure. A saga commits each step locally, right away. If a later step fails, it undoes the completed steps with compensating transactions. Higher availability and no long-held locks, in exchange for only eventual consistency.",
+          "props": {
+            "title": "Lock and wait, or <em>commit and compensate</em>",
+            "left": {
+              "at": "prepare",
+              "label": "Two-phase commit",
+              "title": "Lock, then commit",
+              "tone": "bad",
+              "body": "Strongly consistent, but participants hold locks until the coordinator decides. One slow service blocks all."
+            },
+            "right": {
+              "at": "locally",
+              "label": "Saga",
+              "title": "Commit, then compensate",
+              "tone": "good",
+              "body": "Each step commits locally at once; failures trigger compensating transactions, in reverse."
+            },
+            "verdict": {
+              "at": "exchange",
+              "text": "Sagas trade isolation and instant consistency for availability.",
+              "code": "eventual consistency"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Compensating in reverse",
+      "question": "Payment and inventory succeeded, then shipping fails. What does the saga do?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. In an order saga, payment and inventory have already committed, and then shipping fails. What happens next? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Shipping fails <em>after</em> payment and inventory committed. Now what?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "An orchestrator runs the order saga as a sequence of local transactions. First it creates the order, in a pending state. Payment charges the card, and commits locally. Inventory reserves the stock. Then shipping fails: no courier is available. There is no global rollback, so the orchestrator runs compensating transactions, in reverse order. Inventory releases the stock. Payment refunds the card. And the order is marked cancelled. Every compensation must be idempotent, because it may be retried.",
+          "props": {
+            "title": "Forward steps, <em>reverse</em> compensations",
+            "nodes": [
+              {
+                "id": "orch",
+                "label": "Saga orchestrator",
+                "x": 640,
+                "y": 270,
+                "w": 320,
+                "h": 70
+              },
+              {
+                "id": "order",
+                "label": "Order",
+                "x": 190,
+                "y": 560,
+                "w": 190,
+                "h": 70
+              },
+              {
+                "id": "pay",
+                "label": "Payment",
+                "x": 450,
+                "y": 560,
+                "w": 190,
+                "h": 70
+              },
+              {
+                "id": "inv",
+                "label": "Inventory",
+                "x": 710,
+                "y": 560,
+                "w": 190,
+                "h": 70
+              },
+              {
+                "id": "ship",
+                "label": "Shipping",
+                "x": 970,
+                "y": 560,
+                "w": 190,
+                "h": 70
+              }
+            ],
+            "edges": [
+              {
+                "from": "orch",
+                "to": "order"
+              },
+              {
+                "from": "orch",
+                "to": "pay"
+              },
+              {
+                "from": "orch",
+                "to": "inv"
+              },
+              {
+                "from": "orch",
+                "to": "ship"
+              }
+            ],
+            "panels": [
+              {
+                "key": "log",
+                "label": "Saga log",
+                "type": "list",
+                "rows": 2,
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "creates",
+                "nodes": {
+                  "order": "active"
+                },
+                "edges": {
+                  "orch-order": "relax"
+                },
+                "panels": {
+                  "log": [
+                    "create ✓"
+                  ]
+                },
+                "note": "1. Create the order: status PENDING"
+              },
+              {
+                "at": "charges",
+                "nodes": {
+                  "order": "done",
+                  "pay": "active"
+                },
+                "edges": {
+                  "orch-order": "base",
+                  "orch-pay": "relax"
+                },
+                "panels": {
+                  "log": [
+                    "create ✓",
+                    "charge ✓"
+                  ]
+                },
+                "note": "2. Charge the card: local commit"
+              },
+              {
+                "at": "reserves",
+                "nodes": {
+                  "pay": "done",
+                  "inv": "active"
+                },
+                "edges": {
+                  "orch-pay": "base",
+                  "orch-inv": "relax"
+                },
+                "panels": {
+                  "log": [
+                    "create ✓",
+                    "charge ✓",
+                    "reserve ✓"
+                  ]
+                },
+                "note": "3. Reserve stock: local commit"
+              },
+              {
+                "at": "fails",
+                "nodes": {
+                  "inv": "done",
+                  "ship": "dim"
+                },
+                "edges": {
+                  "orch-inv": "base",
+                  "orch-ship": "dim"
+                },
+                "panels": {
+                  "log": [
+                    "create ✓",
+                    "charge ✓",
+                    "reserve ✓",
+                    "ship ✗"
+                  ]
+                },
+                "note": "4. Shipping fails: no courier"
+              },
+              {
+                "at": "reverse",
+                "nodes": {
+                  "orch": "active"
+                },
+                "note": "No global rollback: compensate in reverse"
+              },
+              {
+                "at": "releases",
+                "nodes": {
+                  "orch": "base",
+                  "inv": "queued"
+                },
+                "edges": {
+                  "orch-inv": "relax"
+                },
+                "panels": {
+                  "log": [
+                    "create ✓",
+                    "charge ✓",
+                    "reserve ✓",
+                    "ship ✗",
+                    "release ↺"
+                  ]
+                },
+                "note": "Undo 3: release the stock"
+              },
+              {
+                "at": "refunds",
+                "nodes": {
+                  "pay": "queued"
+                },
+                "edges": {
+                  "orch-inv": "base",
+                  "orch-pay": "relax"
+                },
+                "panels": {
+                  "log": [
+                    "create ✓",
+                    "charge ✓",
+                    "reserve ✓",
+                    "ship ✗",
+                    "release ↺",
+                    "refund ↺"
+                  ]
+                },
+                "note": "Undo 2: refund the card"
+              },
+              {
+                "at": "cancelled",
+                "nodes": {
+                  "order": "queued"
+                },
+                "edges": {
+                  "orch-pay": "base",
+                  "orch-order": "relax"
+                },
+                "panels": {
+                  "log": [
+                    "create ✓",
+                    "charge ✓",
+                    "reserve ✓",
+                    "ship ✗",
+                    "release ↺",
+                    "refund ↺",
+                    "cancel ↺"
+                  ]
+                },
+                "note": "Undo 1: order CANCELLED · compensations are idempotent"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Choreography, orchestration, isolation",
+      "question": "Choreography or orchestration, and what does a saga give up?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. Should services choreograph the saga with events, or should an orchestrator drive it? And what does a saga give up compared with a database transaction? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "<em>Choreography</em> or <em>orchestration</em>, and what does a saga give up?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Two ways to run it. In choreography, each service listens for the previous service's event, and emits its own. There is no central piece, but the flow is spread across every service, and hard to follow. In orchestration, a central state machine sends commands, and records progress. It is easier to reason about and debug, at the cost of one more service to run.",
+          "props": {
+            "title": "Events, or a <em>conductor</em>",
+            "left": {
+              "at": "choreography",
+              "label": "Choreography",
+              "title": "React to events",
+              "body": "Loosely coupled, no central piece, but the flow is implicit and cycles creep in."
+            },
+            "right": {
+              "at": "orchestration",
+              "label": "Orchestration",
+              "title": "Central state machine",
+              "tone": "good",
+              "body": "Explicit flow, easy to trace and debug; one more service to operate."
+            },
+            "verdict": {
+              "at": "debug",
+              "text": "More than two or three steps: orchestrate.",
+              "code": "state machine"
+            }
+          }
+        },
+        {
+          "type": "points",
+          "say": "A saga has no isolation: another request can see the half-finished order. Countermeasures: a semantic lock, like a pending status that other flows respect. Commutative updates, which can apply in any order. And step ordering: put the risky steps before the pivot, the point after which the saga always runs to completion. Finally, make every compensation idempotent.",
+          "props": {
+            "title": "Living without <em>isolation</em>",
+            "items": [
+              {
+                "at": "semantic",
+                "label": "Semantic lock",
+                "title": "PENDING status",
+                "body": "Other flows see and respect in-progress work.",
+                "code": "status = PENDING"
+              },
+              {
+                "at": "Commutative",
+                "label": "Updates",
+                "title": "Commutative",
+                "body": "Increments and decrements apply in any order.",
+                "code": "stock -= n"
+              },
+              {
+                "at": "pivot",
+                "label": "Ordering",
+                "title": "Risky first",
+                "body": "After the pivot step, only retryable steps remain.",
+                "code": "pivot transaction"
+              },
+              {
+                "at": "idempotent",
+                "label": "Compensations",
+                "title": "Idempotent",
+                "body": "Retries must not refund twice.",
+                "code": "dedupe by saga ID"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. A saga replaces one distributed transaction with local commits. A failure triggers compensating transactions, in reverse order. Orchestration keeps the flow explicit. And without isolation, use semantic locks, careful ordering, and idempotent compensations.",
+          "props": {
+            "title": "Sagas, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "replaces",
+                "text": "Local commits instead of one distributed transaction.",
+                "code": "no 2PC locks"
+              },
+              {
+                "at": "reverse",
+                "text": "Failure → compensations in reverse order.",
+                "code": "release · refund · cancel"
+              },
+              {
+                "at": "explicit",
+                "text": "Orchestration keeps the flow explicit.",
+                "code": "state machine"
+              },
+              {
+                "at": "isolation",
+                "text": "No isolation: semantic locks, idempotent undo.",
+                "code": "PENDING"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

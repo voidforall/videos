@@ -1,0 +1,681 @@
+{
+  "slug": "system-youtube",
+  "series": "system",
+  "title": "YouTube",
+  "kicker": "System design · YouTube",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/system/design-interview/youtube.md",
+  "summary": "A video platform end to end: chunked uploads straight to storage via presigned URLs, a transcoding DAG, and CDN delivery with adaptive bitrate streaming.",
+  "captionFixes": [
+    {
+      "match": [
+        "YouTube",
+        "Question"
+      ],
+      "display": "YouTube, question"
+    },
+    {
+      "match": [
+        "retrays"
+      ],
+      "display": "retries"
+    },
+    {
+      "match": [
+        "process",
+        "storage",
+        "when"
+      ],
+      "display": "processed storage. Only when"
+    },
+    {
+      "match": [
+        "process",
+        "storage"
+      ],
+      "display": "processed storage"
+    },
+    {
+      "match": [
+        "10",
+        "ATP"
+      ],
+      "display": "1080p"
+    },
+    {
+      "match": [
+        "CPU",
+        "heavy"
+      ],
+      "display": "CPU-heavy"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Uploading huge files",
+      "question": "How do users upload multi-gigabyte videos reliably?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "YouTube, question one. Users upload videos that are several gigabytes. How do you make uploads fast, and resilient to flaky networks? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Multi-gigabyte uploads: <em>fast</em> and <em>resilient</em>?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "First the client asks the upload service for permission. It authenticates the user, and returns a presigned URL: temporary, write-only access to one object in storage. The client splits the video into chunks of five to ten megabytes, and uploads them straight to object storage, so the bulk traffic bypasses the application servers. If a chunk fails, the client retries just that chunk, not the whole file. When every chunk has landed, storage fires an event onto the transcoding queue.",
+          "props": {
+            "title": "Straight to storage, <em>chunk by chunk</em>",
+            "nodes": [
+              {
+                "id": "client",
+                "label": "Client",
+                "x": 170,
+                "y": 520,
+                "w": 180,
+                "h": 70
+              },
+              {
+                "id": "up",
+                "label": "Upload service",
+                "x": 660,
+                "y": 270,
+                "w": 260,
+                "h": 70
+              },
+              {
+                "id": "store",
+                "label": "Object storage\n(raw)",
+                "x": 980,
+                "y": 480,
+                "w": 260,
+                "h": 90
+              },
+              {
+                "id": "queue",
+                "label": "Transcode queue",
+                "x": 980,
+                "y": 680,
+                "w": 260,
+                "h": 60,
+                "hidden": true
+              }
+            ],
+            "edges": [
+              {
+                "from": "client",
+                "to": "up",
+                "w": "POST /uploads"
+              },
+              {
+                "from": "client",
+                "to": "store",
+                "w": "PUT chunk k"
+              }
+            ],
+            "panels": [
+              {
+                "key": "chunks",
+                "label": "Chunks",
+                "type": "list",
+                "rows": 1,
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "asks",
+                "nodes": {
+                  "client": "active"
+                },
+                "edges": {
+                  "client-up": "relax"
+                },
+                "note": "Ask to upload"
+              },
+              {
+                "at": "temporary",
+                "add": [
+                  {
+                    "from": "up",
+                    "to": "client",
+                    "w": "presigned URL"
+                  }
+                ],
+                "nodes": {
+                  "client": "base",
+                  "up": "active"
+                },
+                "edges": {
+                  "client-up": "base",
+                  "up-client": "relax"
+                },
+                "note": "Auth, then a presigned URL: temporary, write-only"
+              },
+              {
+                "at": "splits",
+                "nodes": {
+                  "up": "base",
+                  "client": "active"
+                },
+                "edges": {
+                  "up-client": "base",
+                  "client-store": "relax"
+                },
+                "panels": {
+                  "chunks": [
+                    "1 ✓",
+                    "2 ✓"
+                  ]
+                },
+                "note": "5–10 MB chunks, straight to storage"
+              },
+              {
+                "at": "bypasses",
+                "nodes": {
+                  "up": "dim"
+                },
+                "note": "Bulk traffic bypasses the app servers"
+              },
+              {
+                "at": "fails",
+                "edges": {
+                  "client-store": "dim"
+                },
+                "panels": {
+                  "chunks": [
+                    "1 ✓",
+                    "2 ✓",
+                    "3 ✗"
+                  ]
+                },
+                "note": "Chunk 3 fails…"
+              },
+              {
+                "at": "retries",
+                "edges": {
+                  "client-store": "relax"
+                },
+                "panels": {
+                  "chunks": [
+                    "1 ✓",
+                    "2 ✓",
+                    "3 ✓",
+                    "4 ✓"
+                  ]
+                },
+                "note": "…retry only chunk 3"
+              },
+              {
+                "at": "landed",
+                "show": [
+                  "queue"
+                ],
+                "add": [
+                  {
+                    "from": "store",
+                    "to": "queue",
+                    "w": "all chunks in"
+                  }
+                ],
+                "nodes": {
+                  "client": "base",
+                  "up": "base",
+                  "store": "done"
+                },
+                "edges": {
+                  "client-store": "base",
+                  "store-queue": "relax"
+                },
+                "note": "Complete → event to the transcode queue"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "The transcoding DAG",
+      "question": "What happens between upload and ready to play?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. A raw video has landed in storage. What has to happen before anyone can play it? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Between <em>uploaded</em> and <em>ready to play</em>?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "The upload event lands on a queue, and a workflow orchestrator picks it up, and runs the processing as a DAG. First it inspects the raw file: codec, resolution and frame rate decide the outputs. Then transcoding jobs run in parallel, one per resolution and format, on a CPU-heavy worker fleet, with thumbnails extracted alongside. Each output is cut into segments a few seconds long, plus a manifest that lists every quality. Segments and manifests go to processed storage. Only when the whole DAG finishes is the video marked ready, in the metadata database.",
+          "props": {
+            "title": "Processing as a <em>DAG</em>",
+            "nodes": [
+              {
+                "id": "queue",
+                "label": "Queue",
+                "x": 170,
+                "y": 470,
+                "w": 150,
+                "h": 60
+              },
+              {
+                "id": "orch",
+                "label": "Orchestrator",
+                "x": 430,
+                "y": 470,
+                "w": 220,
+                "h": 64
+              },
+              {
+                "id": "insp",
+                "label": "Inspect",
+                "x": 700,
+                "y": 470,
+                "w": 170,
+                "h": 64
+              },
+              {
+                "id": "t1",
+                "label": "1080p",
+                "x": 960,
+                "y": 310,
+                "w": 150,
+                "h": 56
+              },
+              {
+                "id": "t2",
+                "label": "720p",
+                "x": 960,
+                "y": 470,
+                "w": 150,
+                "h": 56
+              },
+              {
+                "id": "t3",
+                "label": "480p",
+                "x": 960,
+                "y": 630,
+                "w": 150,
+                "h": 56
+              },
+              {
+                "id": "pkg",
+                "label": "Segments\n+ manifest",
+                "x": 1250,
+                "y": 470,
+                "w": 220,
+                "h": 90
+              },
+              {
+                "id": "store",
+                "label": "Processed storage",
+                "x": 1620,
+                "y": 330,
+                "w": 290,
+                "h": 64
+              },
+              {
+                "id": "meta",
+                "label": "Metadata: READY",
+                "x": 1620,
+                "y": 610,
+                "w": 290,
+                "h": 64
+              }
+            ],
+            "edges": [
+              {
+                "from": "queue",
+                "to": "orch"
+              },
+              {
+                "from": "orch",
+                "to": "insp"
+              },
+              {
+                "from": "insp",
+                "to": "t1"
+              },
+              {
+                "from": "insp",
+                "to": "t2"
+              },
+              {
+                "from": "insp",
+                "to": "t3"
+              },
+              {
+                "from": "t1",
+                "to": "pkg"
+              },
+              {
+                "from": "t2",
+                "to": "pkg"
+              },
+              {
+                "from": "t3",
+                "to": "pkg"
+              },
+              {
+                "from": "pkg",
+                "to": "store"
+              },
+              {
+                "from": "pkg",
+                "to": "meta"
+              }
+            ],
+            "panels": [],
+            "steps": [
+              {
+                "at": "orchestrator",
+                "nodes": {
+                  "orch": "active"
+                },
+                "edges": {
+                  "queue-orch": "relax"
+                },
+                "note": "Orchestrator (e.g. Step Functions, Airflow) runs a DAG"
+              },
+              {
+                "at": "inspects",
+                "nodes": {
+                  "orch": "base",
+                  "insp": "active"
+                },
+                "edges": {
+                  "queue-orch": "base",
+                  "orch-insp": "relax"
+                },
+                "note": "Inspect codec, resolution, fps → choose outputs"
+              },
+              {
+                "at": "parallel",
+                "nodes": {
+                  "insp": "base",
+                  "t1": "active",
+                  "t2": "active",
+                  "t3": "active"
+                },
+                "edges": {
+                  "orch-insp": "base",
+                  "insp-t1": "relax",
+                  "insp-t2": "relax",
+                  "insp-t3": "relax"
+                },
+                "note": "Transcode in parallel, + thumbnails"
+              },
+              {
+                "at": "segments",
+                "nodes": {
+                  "t1": "done",
+                  "t2": "done",
+                  "t3": "done",
+                  "pkg": "active"
+                },
+                "edges": {
+                  "insp-t1": "base",
+                  "insp-t2": "base",
+                  "insp-t3": "base",
+                  "t1-pkg": "relax",
+                  "t2-pkg": "relax",
+                  "t3-pkg": "relax"
+                },
+                "note": "2–10 s segments (HLS / DASH)"
+              },
+              {
+                "at": "manifest",
+                "edges": {
+                  "t1-pkg": "base",
+                  "t2-pkg": "base",
+                  "t3-pkg": "base"
+                },
+                "note": "Manifest: a playlist of every quality"
+              },
+              {
+                "at": "processed",
+                "nodes": {
+                  "pkg": "base",
+                  "store": "done"
+                },
+                "edges": {
+                  "pkg-store": "relax"
+                },
+                "note": "Write segments + manifests to processed storage"
+              },
+              {
+                "at": "ready",
+                "nodes": {
+                  "meta": "done"
+                },
+                "edges": {
+                  "pkg-store": "base",
+                  "pkg-meta": "relax"
+                },
+                "note": "Whole DAG done → status READY"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Adaptive streaming",
+      "question": "How does playback start fast and survive a bad network?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. How does playback start quickly anywhere in the world, and keep going when the network gets worse? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Start fast, and <em>survive</em> a bad network?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "When you press play, the player asks the video API for metadata, including the manifest's URL on a CDN. It downloads the manifest from the nearest edge, and the manifest lists every quality level. Popular segments are already cached at the edge; a miss is fetched from processed storage once, and then cached. The player measures its bandwidth and picks a quality: on a fast connection, ten eighty p segments. Enter a tunnel, bandwidth drops, and the next segment comes from the four eighty p stream instead, without stopping playback. When the network recovers, it steps back up.",
+          "props": {
+            "title": "Edge-cached, <em>adaptive</em>",
+            "nodes": [
+              {
+                "id": "player",
+                "label": "Player",
+                "x": 180,
+                "y": 470,
+                "w": 180,
+                "h": 70
+              },
+              {
+                "id": "api",
+                "label": "Video API",
+                "x": 560,
+                "y": 290,
+                "w": 220,
+                "h": 64
+              },
+              {
+                "id": "cdn",
+                "label": "CDN edge",
+                "x": 560,
+                "y": 620,
+                "w": 220,
+                "h": 70
+              },
+              {
+                "id": "origin",
+                "label": "Processed\nstorage",
+                "x": 990,
+                "y": 620,
+                "w": 220,
+                "h": 90
+              }
+            ],
+            "edges": [
+              {
+                "from": "player",
+                "to": "api",
+                "w": "metadata"
+              },
+              {
+                "from": "player",
+                "to": "cdn"
+              },
+              {
+                "from": "cdn",
+                "to": "origin",
+                "w": "miss"
+              }
+            ],
+            "panels": [
+              {
+                "key": "bw",
+                "label": "Bandwidth",
+                "type": "list",
+                "rows": 1,
+                "initial": []
+              },
+              {
+                "key": "seg",
+                "label": "Segments fetched",
+                "type": "list",
+                "rows": 3,
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "press",
+                "nodes": {
+                  "player": "active"
+                },
+                "edges": {
+                  "player-api": "relax"
+                },
+                "note": "Metadata, including the manifest URL"
+              },
+              {
+                "at": "nearest",
+                "nodes": {
+                  "player": "base",
+                  "cdn": "active"
+                },
+                "edges": {
+                  "player-api": "base",
+                  "player-cdn": "relax"
+                },
+                "panels": {
+                  "seg": [
+                    "manifest"
+                  ]
+                },
+                "note": "Manifest from the nearest edge"
+              },
+              {
+                "at": "miss",
+                "nodes": {
+                  "origin": "active"
+                },
+                "edges": {
+                  "cdn-origin": "relax"
+                },
+                "note": "Edge miss → origin once, then cached"
+              },
+              {
+                "at": "measures",
+                "nodes": {
+                  "origin": "base"
+                },
+                "edges": {
+                  "cdn-origin": "base"
+                },
+                "panels": {
+                  "bw": [
+                    "8 Mbps"
+                  ],
+                  "seg": [
+                    "manifest",
+                    "seg 1 · 1080p",
+                    "seg 2 · 1080p"
+                  ]
+                },
+                "note": "Fast link → 1080p segments"
+              },
+              {
+                "at": "tunnel",
+                "nodes": {
+                  "cdn": "queued"
+                },
+                "panels": {
+                  "bw": [
+                    "0.9 Mbps"
+                  ],
+                  "seg": [
+                    "manifest",
+                    "seg 1 · 1080p",
+                    "seg 2 · 1080p",
+                    "seg 3 · 480p"
+                  ]
+                },
+                "note": "Bandwidth drops → next segment at 480p"
+              },
+              {
+                "at": "recovers",
+                "nodes": {
+                  "cdn": "active"
+                },
+                "panels": {
+                  "bw": [
+                    "5 Mbps"
+                  ],
+                  "seg": [
+                    "manifest",
+                    "seg 1 · 1080p",
+                    "seg 2 · 1080p",
+                    "seg 3 · 480p",
+                    "seg 4 · 720p"
+                  ]
+                },
+                "note": "Network recovers → step back up"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Upload in chunks, straight to storage, with presigned URLs. Transcode as a DAG, with outputs in parallel. Cut segments and a manifest per quality. And serve from CDN edges, with the player adapting the bitrate segment by segment.",
+          "props": {
+            "title": "YouTube, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "chunks",
+                "text": "Chunked uploads straight to storage.",
+                "code": "presigned URL"
+              },
+              {
+                "at": "DAG",
+                "text": "Transcode as a DAG, outputs in parallel.",
+                "code": "inspect → transcode"
+              },
+              {
+                "at": "manifest",
+                "text": "Segments + a manifest per quality.",
+                "code": "HLS / DASH"
+              },
+              {
+                "at": "edges",
+                "text": "CDN edges; the player adapts the bitrate.",
+                "code": "ABR"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

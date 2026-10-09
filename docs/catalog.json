@@ -1123,6 +1123,108 @@
           "poster": "media/build-spsc-ring-buffer-03.jpg"
         }
       ]
+    },
+    {
+      "slug": "system-saga",
+      "series": "system",
+      "title": "Saga pattern",
+      "kicker": "System design · Saga",
+      "summary": "Transactions across microservices without two-phase commit: local commits, compensations in reverse, choreography vs orchestration, and the isolation a saga gives up.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/system/building-blocks/saga.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Why not two-phase commit?",
+          "question": "An order spans payment, inventory and shipping services. Why not use two-phase commit?",
+          "duration": 41,
+          "video": "media/system-saga-01.mp4",
+          "poster": "media/system-saga-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Compensating in reverse",
+          "question": "Payment and inventory succeeded, then shipping fails. What does the saga do?",
+          "duration": 45,
+          "video": "media/system-saga-02.mp4",
+          "poster": "media/system-saga-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Choreography, orchestration, isolation",
+          "question": "Choreography or orchestration, and what does a saga give up?",
+          "duration": 78,
+          "video": "media/system-saga-03.mp4",
+          "poster": "media/system-saga-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "system-kafka",
+      "series": "system",
+      "title": "Kafka",
+      "kicker": "System design · Kafka",
+      "summary": "A partitioned, replicated log: keys pick partitions and give per-key order, consumer groups split partitions and resume from committed offsets, and delivery semantics depend on when you commit.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/system/building-blocks/kafka.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Partitions and ordering",
+          "question": "How does Kafka scale a topic, and what order does it guarantee?",
+          "duration": 42,
+          "video": "media/system-kafka-01.mp4",
+          "poster": "media/system-kafka-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Consumer groups and offsets",
+          "question": "How do consumers share a topic, and what happens when one crashes?",
+          "duration": 43,
+          "video": "media/system-kafka-02.mp4",
+          "poster": "media/system-kafka-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Delivery semantics and replication",
+          "question": "At-most-once, at-least-once, exactly-once: what decides which you get?",
+          "duration": 60,
+          "video": "media/system-kafka-03.mp4",
+          "poster": "media/system-kafka-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "system-youtube",
+      "series": "system",
+      "title": "YouTube",
+      "kicker": "System design · YouTube",
+      "summary": "A video platform end to end: chunked uploads straight to storage via presigned URLs, a transcoding DAG, and CDN delivery with adaptive bitrate streaming.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/system/design-interview/youtube.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Uploading huge files",
+          "question": "How do users upload multi-gigabyte videos reliably?",
+          "duration": 43,
+          "video": "media/system-youtube-01.mp4",
+          "poster": "media/system-youtube-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "The transcoding DAG",
+          "question": "What happens between upload and ready to play?",
+          "duration": 46,
+          "video": "media/system-youtube-02.mp4",
+          "poster": "media/system-youtube-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Adaptive streaming",
+          "question": "How does playback start fast and survive a bad network?",
+          "duration": 62,
+          "video": "media/system-youtube-03.mp4",
+          "poster": "media/system-youtube-03.jpg"
+        }
+      ]
     }
   ]
 }
