@@ -1,0 +1,633 @@
+{
+  "slug": "build-spsc-ring-buffer",
+  "series": "build",
+  "title": "SPSC ring buffer",
+  "kicker": "Build it · Ring buffer",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/interview/ring-buffer.md",
+  "summary": "A fixed array with chasing head and tail: wrap-around, the sacrificed slot that tells full from empty, the lock-free acquire/release version, and the follow-ups.",
+  "captionFixes": [
+    {
+      "match": [
+        "writes",
+        "a",
+        "tail"
+      ],
+      "display": "writes at tail"
+    },
+    {
+      "match": [
+        "Pop",
+        "a",
+        "leaves"
+      ],
+      "display": "Pop: A leaves"
+    },
+    {
+      "match": [
+        "sacrifice",
+        "slot"
+      ],
+      "display": "sacrificed slot"
+    },
+    {
+      "match": [
+        "Always"
+      ],
+      "display": "always"
+    },
+    {
+      "match": [
+        "lock",
+        "free"
+      ],
+      "display": "lock-free"
+    },
+    {
+      "match": [
+        "bit",
+        "wise"
+      ],
+      "display": "bitwise"
+    },
+    {
+      "match": [
+        "cash",
+        "lines"
+      ],
+      "display": "cache lines"
+    },
+    {
+      "match": [
+        "Problem",
+        "3",
+        "the"
+      ],
+      "display": "Problem 3, the"
+    },
+    {
+      "match": [
+        "compare",
+        "and",
+        "swap"
+      ],
+      "display": "compare-and-swap"
+    },
+    {
+      "match": [
+        "disruptor"
+      ],
+      "display": "Disruptor"
+    },
+    {
+      "match": [
+        "thread",
+        "sanitizer"
+      ],
+      "display": "ThreadSanitizer"
+    },
+    {
+      "match": [
+        "SBSC"
+      ],
+      "display": "SPSC"
+    },
+    {
+      "match": [
+        "fixed",
+        "size"
+      ],
+      "display": "fixed-size"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Head, tail, and wrap",
+      "question": "In a fixed-size ring buffer, how do head and tail move, and how do you tell full from empty?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Ring buffer, problem one. In a fixed-size ring buffer, how do head and tail move, and how do you tell a full buffer from an empty one? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How do <em>head</em> and <em>tail</em> move, and how is full told from empty?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "A ring buffer is a fixed array with two indices. The producer writes at tail and advances it; the consumer reads at head and advances it. Push A, B and C: tail moves to three. Pop: A leaves from head, and head moves to one. Push five more. Tail runs off the end, and wraps back to slot zero. Now try to push I. Advancing tail would land on head, so the buffer counts as full, even though slot zero is still empty. That sacrificed slot is how head equal to tail always means empty, never full.",
+          "props": {
+            "title": "Head chases <em>tail</em>",
+            "nodes": [
+              {
+                "id": "i0",
+                "label": "0",
+                "x": 250,
+                "y": 398,
+                "w": 44,
+                "h": 32
+              },
+              {
+                "id": "i1",
+                "label": "1",
+                "x": 362,
+                "y": 398,
+                "w": 44,
+                "h": 32
+              },
+              {
+                "id": "i2",
+                "label": "2",
+                "x": 474,
+                "y": 398,
+                "w": 44,
+                "h": 32
+              },
+              {
+                "id": "i3",
+                "label": "3",
+                "x": 586,
+                "y": 398,
+                "w": 44,
+                "h": 32
+              },
+              {
+                "id": "i4",
+                "label": "4",
+                "x": 698,
+                "y": 398,
+                "w": 44,
+                "h": 32
+              },
+              {
+                "id": "i5",
+                "label": "5",
+                "x": 810,
+                "y": 398,
+                "w": 44,
+                "h": 32
+              },
+              {
+                "id": "i6",
+                "label": "6",
+                "x": 922,
+                "y": 398,
+                "w": 44,
+                "h": 32
+              },
+              {
+                "id": "i7",
+                "label": "7",
+                "x": 1034,
+                "y": 398,
+                "w": 44,
+                "h": 32
+              },
+              {
+                "id": "s0",
+                "label": "",
+                "x": 250,
+                "y": 470,
+                "w": 100,
+                "h": 76
+              },
+              {
+                "id": "s1",
+                "label": "",
+                "x": 362,
+                "y": 470,
+                "w": 100,
+                "h": 76
+              },
+              {
+                "id": "s2",
+                "label": "",
+                "x": 474,
+                "y": 470,
+                "w": 100,
+                "h": 76
+              },
+              {
+                "id": "s3",
+                "label": "",
+                "x": 586,
+                "y": 470,
+                "w": 100,
+                "h": 76
+              },
+              {
+                "id": "s4",
+                "label": "",
+                "x": 698,
+                "y": 470,
+                "w": 100,
+                "h": 76
+              },
+              {
+                "id": "s5",
+                "label": "",
+                "x": 810,
+                "y": 470,
+                "w": 100,
+                "h": 76
+              },
+              {
+                "id": "s6",
+                "label": "",
+                "x": 922,
+                "y": 470,
+                "w": 100,
+                "h": 76
+              },
+              {
+                "id": "s7",
+                "label": "",
+                "x": 1034,
+                "y": 470,
+                "w": 100,
+                "h": 76
+              },
+              {
+                "id": "A",
+                "label": "A",
+                "x": 250,
+                "y": 470,
+                "w": 70,
+                "h": 52,
+                "hidden": true
+              },
+              {
+                "id": "B",
+                "label": "B",
+                "x": 362,
+                "y": 470,
+                "w": 70,
+                "h": 52,
+                "hidden": true
+              },
+              {
+                "id": "C",
+                "label": "C",
+                "x": 474,
+                "y": 470,
+                "w": 70,
+                "h": 52,
+                "hidden": true
+              },
+              {
+                "id": "D",
+                "label": "D",
+                "x": 586,
+                "y": 470,
+                "w": 70,
+                "h": 52,
+                "hidden": true
+              },
+              {
+                "id": "E",
+                "label": "E",
+                "x": 698,
+                "y": 470,
+                "w": 70,
+                "h": 52,
+                "hidden": true
+              },
+              {
+                "id": "F",
+                "label": "F",
+                "x": 810,
+                "y": 470,
+                "w": 70,
+                "h": 52,
+                "hidden": true
+              },
+              {
+                "id": "G",
+                "label": "G",
+                "x": 922,
+                "y": 470,
+                "w": 70,
+                "h": 52,
+                "hidden": true
+              },
+              {
+                "id": "H",
+                "label": "H",
+                "x": 1034,
+                "y": 470,
+                "w": 70,
+                "h": 52,
+                "hidden": true
+              },
+              {
+                "id": "I",
+                "label": "I",
+                "x": 250,
+                "y": 300,
+                "w": 70,
+                "h": 52,
+                "hidden": true
+              },
+              {
+                "id": "head",
+                "label": "▲ head",
+                "x": 250,
+                "y": 568,
+                "w": 140,
+                "h": 40
+              },
+              {
+                "id": "tail",
+                "label": "▲ tail",
+                "x": 250,
+                "y": 622,
+                "w": 140,
+                "h": 40
+              }
+            ],
+            "edges": [],
+            "panels": [
+              {
+                "key": "call",
+                "label": "Call",
+                "type": "list",
+                "initial": []
+              },
+              {
+                "key": "ret",
+                "label": "Returns",
+                "type": "list",
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "Push",
+                "show": [
+                  "A",
+                  "B",
+                  "C"
+                ],
+                "move": {
+                  "tail": [
+                    586,
+                    622
+                  ]
+                },
+                "nodes": {
+                  "tail": "active"
+                },
+                "panels": {
+                  "call": [
+                    "push A, B, C"
+                  ]
+                },
+                "note": "Write at tail, advance: tail = 3"
+              },
+              {
+                "at": "Pop",
+                "move": {
+                  "head": [
+                    362,
+                    568
+                  ],
+                  "A": [
+                    250,
+                    300
+                  ]
+                },
+                "nodes": {
+                  "tail": "base",
+                  "A": "dim",
+                  "head": "active"
+                },
+                "panels": {
+                  "call": [
+                    "pop()"
+                  ],
+                  "ret": [
+                    "A"
+                  ]
+                },
+                "note": "Read at head, advance: head = 1"
+              },
+              {
+                "at": "more",
+                "show": [
+                  "D",
+                  "E",
+                  "F",
+                  "G",
+                  "H"
+                ],
+                "move": {
+                  "tail": [
+                    250,
+                    622
+                  ]
+                },
+                "nodes": {
+                  "head": "base",
+                  "tail": "active"
+                },
+                "panels": {
+                  "call": [
+                    "push D … H"
+                  ],
+                  "ret": [
+                    "—"
+                  ]
+                },
+                "note": "Five more pushes fill slots 3–7"
+              },
+              {
+                "at": "wraps",
+                "nodes": {
+                  "tail": "queued"
+                },
+                "note": "tail = (7 + 1) & 7 = 0: wrap around"
+              },
+              {
+                "at": "try",
+                "show": [
+                  "I"
+                ],
+                "move": {
+                  "A": [
+                    250,
+                    -120
+                  ]
+                },
+                "nodes": {
+                  "I": "queued",
+                  "tail": "base",
+                  "head": "active"
+                },
+                "panels": {
+                  "call": [
+                    "push I"
+                  ],
+                  "ret": [
+                    "false (full)"
+                  ]
+                },
+                "note": "next(tail) = 1 == head → full: reject I"
+              },
+              {
+                "at": "sacrificed",
+                "nodes": {
+                  "s0": "queued",
+                  "head": "base"
+                },
+                "note": "Slot 0 stays empty: head == tail means only empty"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Lock-free SPSC",
+      "question": "Make it lock-free for one producer and one consumer.",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Your turn. Make the ring buffer lock-free, for exactly one producer thread and one consumer thread. Which memory orders do you need? Pause and write it yourself.",
+          "pauseAfter": 10,
+          "props": {
+            "question": "Make it <em>lock-free</em> for one producer and one consumer.",
+            "label": "Your turn",
+            "pauseLabel": "Pause · write it yourself"
+          }
+        },
+        {
+          "type": "code",
+          "say": "Here is one solution. Only the producer writes tail, and only the consumer writes head, so each side loads its own index relaxed. The producer loads head with acquire, to see the slots the consumer has freed. It writes the slot, then publishes tail with release, so the data is visible before the new tail is. Pop mirrors it: acquire on tail, release on head. Capacity is a power of two, so wrapping is a bitwise and, not a division. And head and tail sit on separate cache lines, so the two cores never fight over one line.",
+          "props": {
+            "title": "Acquire / <em>release</em>, nothing more",
+            "file": "spsc.cpp",
+            "tag": "lock-free",
+            "lang": "cpp",
+            "size": 19,
+            "width": 1190,
+            "code": "template <typename T, std::size_t N>\nclass SPSCRingBuffer {\n    static_assert(N >= 2 && (N & (N - 1)) == 0, \"N must be a power of 2\");\npublic:\n    bool push(T value) {                                     // producer only\n        const auto tail = tail_.load(std::memory_order_relaxed);\n        const auto next = (tail + 1) & (N - 1);\n        if (next == head_.load(std::memory_order_acquire)) return false;  // full\n        buf_[tail] = std::move(value);\n        tail_.store(next, std::memory_order_release);        // publish the slot\n        return true;\n    }\n\n    std::optional<T> pop() {                                 // consumer only\n        const auto head = head_.load(std::memory_order_relaxed);\n        if (head == tail_.load(std::memory_order_acquire)) return std::nullopt;\n        T value = std::move(buf_[head]);\n        head_.store((head + 1) & (N - 1), std::memory_order_release);  // free it\n        return value;\n    }\n\nprivate:\n    std::array<T, N> buf_{};\n    alignas(std::hardware_destructive_interference_size) std::atomic<std::size_t> head_{0};\n    alignas(std::hardware_destructive_interference_size) std::atomic<std::size_t> tail_{0};\n};",
+            "highlights": [
+              {
+                "at": "relaxed",
+                "lines": "6,15",
+                "note": "Own index: relaxed (only I write it)"
+              },
+              {
+                "at": "acquire",
+                "lines": "8",
+                "note": "Acquire head: see freed slots"
+              },
+              {
+                "at": "publishes",
+                "lines": "9-10",
+                "note": "Write the slot, then release tail"
+              },
+              {
+                "at": "mirrors",
+                "lines": "16-18",
+                "note": "Pop: acquire tail, release head"
+              },
+              {
+                "at": "power",
+                "lines": "3,7",
+                "note": "Power of 2: wrap with & (N − 1)"
+              },
+              {
+                "at": "separate",
+                "lines": "24-25",
+                "note": "One cache line each: no false sharing"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Follow-ups",
+      "question": "Why not seq_cst, why not a size counter, and what changes with many producers?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Problem three, the follow-ups. Why acquire and release rather than sequential consistency? Why not track a size counter? And what changes with many producers? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Why not <em>seq_cst</em>, why no size counter, and what about <em>many producers</em>?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Common follow-ups. Sequential consistency adds a global order nobody needs: each index has a single writer, so acquire and release are enough. A shared size counter would be written by both threads, putting a contended atomic back on every operation; the sacrificed slot avoids it. With several producers, two of them could claim the same slot, so producers claim tail with compare-and-swap, and each slot carries a sequence number saying when it's ready, as in the Disruptor. And test it: push a million items, check order and a checksum, and run under ThreadSanitizer.",
+          "props": {
+            "title": "Interviewer <em>follow-ups</em>",
+            "items": [
+              {
+                "at": "nobody",
+                "label": "Ordering",
+                "title": "No seq_cst",
+                "body": "Each index has one writer: acquire/release suffice.",
+                "code": "release → acquire"
+              },
+              {
+                "at": "counter",
+                "label": "Full vs empty",
+                "title": "No shared size",
+                "body": "Both threads would write it; waste a slot instead.",
+                "code": "sentinel slot"
+              },
+              {
+                "at": "several",
+                "label": "MPMC",
+                "title": "CAS + sequences",
+                "body": "CAS to claim tail; per-slot sequence numbers.",
+                "code": "Disruptor"
+              },
+              {
+                "at": "test",
+                "label": "Testing",
+                "title": "Order + TSan",
+                "body": "1M items, FIFO check, checksum, TSan.",
+                "code": "-fsanitize=thread"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Head chases tail around a fixed array, and both wrap. One empty slot tells full from empty. Lock-free SPSC needs only acquire and release, because each index has one writer. And keep the two indices on separate cache lines.",
+          "props": {
+            "title": "Ring buffer, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "chases",
+                "text": "Head chases tail; both wrap with & (N − 1).",
+                "code": "power of 2"
+              },
+              {
+                "at": "empty",
+                "text": "One empty slot tells full from empty.",
+                "code": "next(tail) == head"
+              },
+              {
+                "at": "release",
+                "text": "SPSC: acquire/release; one writer per index.",
+                "code": "lock-free"
+              },
+              {
+                "at": "lines",
+                "text": "Head and tail on separate cache lines.",
+                "code": "alignas(64)"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

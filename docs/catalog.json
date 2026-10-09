@@ -1013,6 +1013,116 @@
           "poster": "media/build-lru-cache-03.jpg"
         }
       ]
+    },
+    {
+      "slug": "build-bbo-nbbo",
+      "series": "build",
+      "title": "BBO and NBBO",
+      "kicker": "Build it · BBO / NBBO",
+      "summary": "Best bid and offer per exchange and nationally: sorted maps per side, quantity summed only at the winning price, a one-pass NBBO, and keeping it fresh under updates.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/interview/bbo-nbbo.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Per exchange, then national",
+          "question": "Given orders on several exchanges, what is each exchange's BBO, and what is the NBBO?",
+          "duration": 52,
+          "video": "media/build-bbo-nbbo-01.mp4",
+          "poster": "media/build-bbo-nbbo-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Sorted sides, one-pass NBBO",
+          "question": "Which structures make BBO queries O(1), and how do you compute the NBBO quantity?",
+          "duration": 64,
+          "video": "media/build-bbo-nbbo-02.mp4",
+          "poster": "media/build-bbo-nbbo-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Keeping NBBO fresh",
+          "question": "Orders now arrive and cancel continuously. How do you keep the NBBO fresh?",
+          "duration": 53,
+          "video": "media/build-bbo-nbbo-03.mp4",
+          "poster": "media/build-bbo-nbbo-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "build-max-drawdown",
+      "series": "build",
+      "title": "Max drawdown tracker",
+      "kicker": "Build it · Max drawdown",
+      "summary": "Per-ticker max drawdown over a streaming feed: the one-pass update, why it's path-dependent so a CAS max is wrong, and a single writer per ticker.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/interview/max-drawdown-tracker.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "The one-pass update",
+          "question": "Track a ticker's max drawdown over a stream of prices.",
+          "duration": 50,
+          "video": "media/build-max-drawdown-01.mp4",
+          "poster": "media/build-max-drawdown-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Why CAS is wrong",
+          "question": "Many threads feed updates. Why doesn't a CAS max, like for max price, work for drawdown?",
+          "duration": 40,
+          "video": "media/build-max-drawdown-02.mp4",
+          "poster": "media/build-max-drawdown-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "One writer per ticker",
+          "question": "How do you make it concurrent and still correct?",
+          "duration": 53,
+          "video": "media/build-max-drawdown-03.mp4",
+          "poster": "media/build-max-drawdown-03.jpg"
+        },
+        {
+          "id": "04",
+          "title": "Pitfalls and follow-ups",
+          "question": "What breaks this design, and how would you extend it?",
+          "duration": 52,
+          "video": "media/build-max-drawdown-04.mp4",
+          "poster": "media/build-max-drawdown-04.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "build-spsc-ring-buffer",
+      "series": "build",
+      "title": "SPSC ring buffer",
+      "kicker": "Build it · Ring buffer",
+      "summary": "A fixed array with chasing head and tail: wrap-around, the sacrificed slot that tells full from empty, the lock-free acquire/release version, and the follow-ups.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/interview/ring-buffer.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Head, tail, and wrap",
+          "question": "In a fixed-size ring buffer, how do head and tail move, and how do you tell full from empty?",
+          "duration": 44,
+          "video": "media/build-spsc-ring-buffer-01.mp4",
+          "poster": "media/build-spsc-ring-buffer-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Lock-free SPSC",
+          "question": "Make it lock-free for one producer and one consumer.",
+          "duration": 53,
+          "video": "media/build-spsc-ring-buffer-02.mp4",
+          "poster": "media/build-spsc-ring-buffer-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Follow-ups",
+          "question": "Why not seq_cst, why not a size counter, and what changes with many producers?",
+          "duration": 65,
+          "video": "media/build-spsc-ring-buffer-03.mp4",
+          "poster": "media/build-spsc-ring-buffer-03.jpg"
+        }
+      ]
     }
   ]
 }

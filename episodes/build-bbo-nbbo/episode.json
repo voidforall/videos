@@ -1,0 +1,545 @@
+{
+  "slug": "build-bbo-nbbo",
+  "series": "build",
+  "title": "BBO and NBBO",
+  "kicker": "Build it · BBO / NBBO",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/interview/bbo-nbbo.md",
+  "summary": "Best bid and offer per exchange and nationally: sorted maps per side, quantity summed only at the winning price, a one-pass NBBO, and keeping it fresh under updates.",
+  "captionFixes": [
+    {
+      "match": [
+        "BBO",
+        "and",
+        "NBBO",
+        "problem"
+      ],
+      "display": "BBO and NBBO, problem"
+    },
+    {
+      "match": [
+        "each",
+        "exchange",
+        "has"
+      ],
+      "display": "Each exchange has"
+    },
+    {
+      "match": [
+        "nBBO"
+      ],
+      "display": "NBBO"
+    },
+    {
+      "match": [
+        "Pitfulser"
+      ],
+      "display": "Pitfalls."
+    },
+    {
+      "match": [
+        "exchanges",
+        "best"
+      ],
+      "display": "exchange's best"
+    },
+    {
+      "match": [
+        "e"
+      ],
+      "display": "E"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Per exchange, then national",
+      "question": "Given orders on several exchanges, what is each exchange's BBO, and what is the NBBO?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "BBO and NBBO, problem one. Orders rest on several exchanges. What is each exchange's best bid and offer, and what is the national best bid and offer? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Each exchange's <em>BBO</em>, and the national <em>NBBO</em>?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Each exchange has its own book. A's best bid is its highest bid, one oh one for five, and its best ask is its lowest ask, one oh three for nine. B's best bid is also one oh one, for six, and its best ask is one oh two, for four. C bids one oh one for three, and offers at one oh six. For the national best bid, take the highest price across all exchanges, one oh one. Then add up the quantity at exactly that price everywhere: five, plus six, plus three, is fourteen. The national best ask is one oh two, and only B is there: four. A's bid at one hundred is a worse price, so it contributes nothing.",
+          "props": {
+            "title": "Best per exchange, <em>then</em> nationally",
+            "nodes": [
+              {
+                "id": "A",
+                "label": "exch A",
+                "x": 440,
+                "y": 238,
+                "w": 150,
+                "h": 44
+              },
+              {
+                "id": "B",
+                "label": "exch B",
+                "x": 640,
+                "y": 238,
+                "w": 150,
+                "h": 44
+              },
+              {
+                "id": "C",
+                "label": "exch C",
+                "x": 840,
+                "y": 238,
+                "w": 150,
+                "h": 44
+              },
+              {
+                "id": "p106",
+                "label": "106",
+                "x": 220,
+                "y": 300,
+                "w": 100,
+                "h": 44
+              },
+              {
+                "id": "p105",
+                "label": "105",
+                "x": 220,
+                "y": 356,
+                "w": 100,
+                "h": 44
+              },
+              {
+                "id": "p104",
+                "label": "104",
+                "x": 220,
+                "y": 412,
+                "w": 100,
+                "h": 44
+              },
+              {
+                "id": "p103",
+                "label": "103",
+                "x": 220,
+                "y": 468,
+                "w": 100,
+                "h": 44
+              },
+              {
+                "id": "p102",
+                "label": "102",
+                "x": 220,
+                "y": 524,
+                "w": 100,
+                "h": 44
+              },
+              {
+                "id": "p101",
+                "label": "101",
+                "x": 220,
+                "y": 580,
+                "w": 100,
+                "h": 44
+              },
+              {
+                "id": "p100",
+                "label": "100",
+                "x": 220,
+                "y": 636,
+                "w": 100,
+                "h": 44
+              },
+              {
+                "id": "p99",
+                "label": "99",
+                "x": 220,
+                "y": 692,
+                "w": 100,
+                "h": 44
+              },
+              {
+                "id": "bA100",
+                "label": "bid 2",
+                "x": 440,
+                "y": 636,
+                "w": 150,
+                "h": 44
+              },
+              {
+                "id": "bA101",
+                "label": "bid 5",
+                "x": 440,
+                "y": 580,
+                "w": 150,
+                "h": 44
+              },
+              {
+                "id": "aA103",
+                "label": "ask 9",
+                "x": 440,
+                "y": 468,
+                "w": 150,
+                "h": 44
+              },
+              {
+                "id": "aA104",
+                "label": "ask 1",
+                "x": 440,
+                "y": 412,
+                "w": 150,
+                "h": 44
+              },
+              {
+                "id": "bB99",
+                "label": "bid 1",
+                "x": 640,
+                "y": 692,
+                "w": 150,
+                "h": 44
+              },
+              {
+                "id": "bB101",
+                "label": "bid 6",
+                "x": 640,
+                "y": 580,
+                "w": 150,
+                "h": 44
+              },
+              {
+                "id": "aB102",
+                "label": "ask 4",
+                "x": 640,
+                "y": 524,
+                "w": 150,
+                "h": 44
+              },
+              {
+                "id": "aB105",
+                "label": "ask 2",
+                "x": 640,
+                "y": 356,
+                "w": 150,
+                "h": 44
+              },
+              {
+                "id": "bC101",
+                "label": "bid 3",
+                "x": 840,
+                "y": 580,
+                "w": 150,
+                "h": 44
+              },
+              {
+                "id": "aC106",
+                "label": "ask 1",
+                "x": 840,
+                "y": 300,
+                "w": 150,
+                "h": 44
+              }
+            ],
+            "edges": [],
+            "panels": [
+              {
+                "key": "bid",
+                "label": "Best bid (price × qty)",
+                "type": "table",
+                "columns": [
+                  "A",
+                  "B",
+                  "C"
+                ],
+                "initial": {
+                  "A": "—",
+                  "B": "—",
+                  "C": "—"
+                }
+              },
+              {
+                "key": "ask",
+                "label": "Best ask (price × qty)",
+                "type": "table",
+                "columns": [
+                  "A",
+                  "B",
+                  "C"
+                ],
+                "initial": {
+                  "A": "—",
+                  "B": "—",
+                  "C": "—"
+                }
+              },
+              {
+                "key": "nbbo",
+                "label": "NBBO",
+                "type": "list",
+                "rows": 1,
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "highest",
+                "nodes": {
+                  "bA101": "active",
+                  "aA103": "active"
+                },
+                "panels": {
+                  "bid": {
+                    "A": "101×5"
+                  },
+                  "ask": {
+                    "A": "103×9"
+                  }
+                },
+                "note": "A: highest bid 101, lowest ask 103"
+              },
+              {
+                "at": "also",
+                "nodes": {
+                  "bA101": "base",
+                  "aA103": "base",
+                  "bB101": "active",
+                  "aB102": "active"
+                },
+                "panels": {
+                  "bid": {
+                    "B": "101×6"
+                  },
+                  "ask": {
+                    "B": "102×4"
+                  }
+                },
+                "note": "B: bid 101, ask 102"
+              },
+              {
+                "at": "offers",
+                "nodes": {
+                  "bB101": "base",
+                  "aB102": "base",
+                  "bC101": "active",
+                  "aC106": "active"
+                },
+                "panels": {
+                  "bid": {
+                    "C": "101×3"
+                  },
+                  "ask": {
+                    "C": "106×1"
+                  }
+                },
+                "note": "C: bid 101, ask 106"
+              },
+              {
+                "at": "national",
+                "nodes": {
+                  "bC101": "base",
+                  "aC106": "base",
+                  "p101": "active"
+                },
+                "note": "National best bid price: max(101, 101, 101) = 101"
+              },
+              {
+                "at": "add",
+                "nodes": {
+                  "bA101": "done",
+                  "bB101": "done",
+                  "bC101": "done"
+                },
+                "panels": {
+                  "nbbo": [
+                    "bid 101 × 14"
+                  ]
+                },
+                "note": "Sum qty at exactly 101: 5 + 6 + 3 = 14"
+              },
+              {
+                "at": "only",
+                "nodes": {
+                  "p101": "base",
+                  "p102": "active",
+                  "aB102": "done"
+                },
+                "panels": {
+                  "nbbo": [
+                    "bid 101 × 14",
+                    "ask 102 × 4"
+                  ]
+                },
+                "note": "National best ask 102: only B, qty 4"
+              },
+              {
+                "at": "worse",
+                "nodes": {
+                  "p102": "base",
+                  "bA100": "dim"
+                },
+                "note": "A's bid at 100: worse price, contributes 0"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Sorted sides, one-pass NBBO",
+      "question": "Which structures make BBO queries O(1), and how do you compute the NBBO quantity?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Problem two. Which data structures make every BBO query constant time, and how do you compute the NBBO quantity correctly? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Which structures make queries <em>O(1)</em>, and how do you sum NBBO qty?"
+          }
+        },
+        {
+          "type": "code",
+          "say": "Keep a hash map from exchange to its book, and each side as an ordered map from price to total quantity, so orders at the same price simply add up. The best bid is the map's last entry, and the best ask its first. Build the NBBO once, so every query is constant time. And it needs only one pass: an exchange can only hold quantity at the national best price if that price is its own best. So compare each exchange's best level: a better price resets the quantity, and a tie adds to it.",
+          "props": {
+            "title": "Ordered sides, <em>one-pass</em> NBBO",
+            "file": "bbo.cpp",
+            "tag": "O(N log N) build · O(1) query",
+            "lang": "cpp",
+            "size": 20,
+            "width": 1180,
+            "code": "using Side = std::map<Price, Qty>;                  // price → total qty\nstruct OrderBook { Side bids, asks; };              // best bid = rbegin, best ask = begin\nstruct Level { Price price; Qty qty; };\nstd::unordered_map<std::string, OrderBook> books_;  // exchange → book\n\nvoid build(const std::vector<Order>& orders) {\n    for (const auto& [exch, price, qty, side] : orders) {\n        OrderBook& book = books_[exch];\n        (side == \"bid\" ? book.bids : book.asks)[price] += qty;   // same price: sum\n    }\n    nbbo_ = {national(true), national(false)};      // precompute → O(1) queries\n}\n\n// One pass: a better price resets the qty, a tie adds to it.\nstd::optional<Level> national(bool bid) const {\n    std::optional<Level> best;\n    for (const auto& [exch, book] : books_) {\n        const Side& s = bid ? book.bids : book.asks;\n        if (s.empty()) continue;\n        auto [px, qty] = bid ? *s.rbegin() : *s.begin();     // this exchange's best\n        if (!best || (bid ? px > best->price : px < best->price))\n            best = Level{px, qty};                           // better: reset\n        else if (px == best->price)\n            best->qty += qty;                                // tie: add\n    }\n    return best;\n}",
+            "highlights": [
+              {
+                "at": "hash",
+                "lines": "4",
+                "note": "exchange → book: O(1) lookup"
+              },
+              {
+                "at": "ordered",
+                "lines": "1,9",
+                "note": "price → qty, sorted; same price sums"
+              },
+              {
+                "at": "last",
+                "lines": "2",
+                "note": "Best bid = rbegin(), best ask = begin()"
+              },
+              {
+                "at": "once",
+                "lines": "11",
+                "note": "Precompute the NBBO at build time"
+              },
+              {
+                "at": "compare",
+                "lines": "20-24",
+                "note": "Better price: reset · tie: add"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "Pitfalls. NBBO quantity is only the quantity at the exact winning price, never everything at or near it. An unknown exchange must return no bid and no ask, not an empty default book. And keep each side in an ordered map: a hash map would need a separate best-price tracker that breaks when that level empties.",
+          "props": {
+            "title": "Three <em>pitfalls</em>",
+            "items": [
+              {
+                "at": "exact",
+                "label": "NBBO qty",
+                "title": "Exact price only",
+                "body": "Worse-priced exchanges contribute zero.",
+                "code": "== best price"
+              },
+              {
+                "at": "unknown",
+                "label": "Queries",
+                "title": "Unknown exchange",
+                "body": "Return (none, none); don't create a book.",
+                "code": "find, not []"
+              },
+              {
+                "at": "ordered",
+                "label": "Sides",
+                "title": "Ordered map",
+                "body": "Best price is always an end iterator.",
+                "code": "std::map"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Keeping NBBO fresh",
+      "question": "Orders now arrive and cancel continuously. How do you keep the NBBO fresh?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Problem three. Orders now arrive and cancel continuously. How do you keep the national best bid and offer fresh? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Orders stream in and cancel. How do you keep the <em>NBBO</em> fresh?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Three options, by the number of exchanges, E. Recompute the NBBO from every exchange's best on each update: order E, and fine when there are only a dozen venues. Keep a heap of each exchange's best price, and skip stale entries lazily, the same tombstone trick as in an order book. Or keep exchange bests in a sorted set, or a segment tree, for log E updates and queries.",
+          "props": {
+            "title": "Three ways to stay <em>fresh</em>",
+            "items": [
+              {
+                "at": "Recompute",
+                "label": "Simple",
+                "title": "Recompute",
+                "body": "Rescan every exchange's best per update.",
+                "code": "O(E)"
+              },
+              {
+                "at": "heap",
+                "label": "Lazy",
+                "title": "Heap + tombstones",
+                "body": "Push new bests; skip stale ones on read.",
+                "code": "amortized O(log E)"
+              },
+              {
+                "at": "sorted",
+                "label": "Indexed",
+                "title": "Sorted set",
+                "body": "Exchange bests in a set or segment tree.",
+                "code": "O(log E)"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Each exchange keeps ordered sides of price to total quantity. Its BBO is the two inner ends. The national price is the best of the exchange bests, and its quantity sums only that exact price. And under live updates, rescan, or index the exchange bests.",
+          "props": {
+            "title": "BBO and NBBO, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "ordered",
+                "text": "Per exchange: ordered map price → total qty.",
+                "code": "std::map"
+              },
+              {
+                "at": "inner",
+                "text": "BBO = the two inner ends.",
+                "code": "rbegin · begin"
+              },
+              {
+                "at": "national",
+                "text": "NBBO qty: only the exact winning price.",
+                "code": "one pass"
+              },
+              {
+                "at": "rescan",
+                "text": "Live updates: rescan, or index the bests.",
+                "code": "O(E) or O(log E)"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,578 @@
+{
+  "slug": "build-max-drawdown",
+  "series": "build",
+  "title": "Max drawdown tracker",
+  "kicker": "Build it · Max drawdown",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/interview/max-drawdown-tracker.md",
+  "summary": "Per-ticker max drawdown over a streaming feed: the one-pass update, why it's path-dependent so a CAS max is wrong, and a single writer per ticker.",
+  "captionFixes": [
+    {
+      "match": [
+        "Max",
+        "Drawdown",
+        "Problem"
+      ],
+      "display": "Max drawdown, problem"
+    },
+    {
+      "match": [
+        "give",
+        "every"
+      ],
+      "display": "Give every"
+    },
+    {
+      "match": [
+        "a",
+        "choir"
+      ],
+      "display": "acquire"
+    },
+    {
+      "match": [
+        "writers",
+        "high",
+        "and",
+        "draw",
+        "down"
+      ],
+      "display": "writer's high and drawdown"
+    },
+    {
+      "match": [
+        "seclock"
+      ],
+      "display": "seqlock"
+    },
+    {
+      "match": [
+        "deck"
+      ],
+      "display": "deque"
+    },
+    {
+      "match": [
+        "Concurrent,",
+        "compare",
+        "and",
+        "swap"
+      ],
+      "display": "Concurrent compare-and-swap"
+    },
+    {
+      "match": [
+        "compare",
+        "and",
+        "swap"
+      ],
+      "display": "compare-and-swap"
+    },
+    {
+      "match": [
+        "path",
+        "dependent"
+      ],
+      "display": "path-dependent"
+    },
+    {
+      "match": [
+        "Root"
+      ],
+      "display": "Route"
+    },
+    {
+      "match": [
+        "SBS",
+        "CQs"
+      ],
+      "display": "SPSC queues"
+    },
+    {
+      "match": [
+        "single",
+        "threaded"
+      ],
+      "display": "single-threaded"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "The one-pass update",
+      "question": "Track a ticker's max drawdown over a stream of prices.",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Max drawdown, problem one. Prices stream in for a ticker. Track its maximum drawdown: the largest drop from a peak to a later trough. Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Track a ticker's <em>max drawdown</em> over a price stream."
+          }
+        },
+        {
+          "type": "array",
+          "say": "Walk the prices once, keeping two numbers: the running high, and the largest drop from it. One hundred starts as the high. Then ninety: ten below the high, so the max drawdown is ten. One ten sets a new high, and the current drop resets to zero. Ninety-five drops fifteen from it, so the max becomes fifteen. One twenty is another new high. And one hundred falls twenty from it: the max drawdown is twenty, from one twenty down to one hundred.",
+          "props": {
+            "title": "Running high, <em>largest drop</em>",
+            "values": [
+              100,
+              90,
+              110,
+              95,
+              120,
+              100
+            ],
+            "stateLabel": "high · current drop",
+            "resultLabel": "Max drawdown",
+            "pointers": {
+              "l": "peak",
+              "r": "price"
+            },
+            "steps": [
+              {
+                "at": "starts",
+                "l": 0,
+                "r": 0,
+                "state": "100 · 0",
+                "note": "First price: the high",
+                "result": "0"
+              },
+              {
+                "at": "Then",
+                "l": 0,
+                "r": 1,
+                "state": "100 · 10",
+                "note": "90 is 10 below the high",
+                "result": "10"
+              },
+              {
+                "at": "sets",
+                "l": 2,
+                "r": 2,
+                "state": "110 · 0",
+                "note": "New high: the drop resets"
+              },
+              {
+                "at": "drops",
+                "l": 2,
+                "r": 3,
+                "state": "110 · 15",
+                "note": "95 is 15 below 110",
+                "result": "15"
+              },
+              {
+                "at": "another",
+                "l": 4,
+                "r": 4,
+                "state": "120 · 0",
+                "note": "Another new high"
+              },
+              {
+                "at": "falls",
+                "l": 4,
+                "r": 5,
+                "mark": "ok",
+                "state": "120 · 20",
+                "note": "Peak 120 → trough 100",
+                "result": "20"
+              }
+            ]
+          }
+        },
+        {
+          "type": "code",
+          "say": "So the whole update is two lines: raise the high, then compare the drop from it with the best so far. Constant time and constant space per ticker.",
+          "props": {
+            "title": "Two lines, <em>O(1)</em>",
+            "file": "drawdown.cpp",
+            "tag": "per ticker",
+            "lang": "cpp",
+            "size": 26,
+            "width": 1180,
+            "code": "void Update(double price) {\n    high_   = std::max(high_, price);            // running peak\n    max_dd_ = std::max(max_dd_, high_ - price);  // largest drop\n}",
+            "highlights": [
+              {
+                "at": "raise",
+                "lines": "2",
+                "note": "Running peak"
+              },
+              {
+                "at": "compare",
+                "lines": "3",
+                "note": "Largest drop from a peak"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Why CAS is wrong",
+      "question": "Many threads feed updates. Why doesn't a CAS max, like for max price, work for drawdown?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Problem two. Many threads feed updates. For a running max price, a compare-and-swap loop works. Why doesn't the same trick work for max drawdown? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "A CAS max works for <em>max price</em>. Why not for drawdown?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Max price is commutative: apply the updates in any order, and you get the same answer. Drawdown isn't. Start with a high of one hundred. If ninety arrives before one ten, the drawdown is ten. If one ten arrives first, the high becomes one ten, and ninety is now twenty below it. Same events, different answer. Concurrent compare-and-swap reorders events, so it silently computes the wrong number.",
+          "props": {
+            "title": "Same events, <em>different answer</em>",
+            "lang": "cpp",
+            "left": {
+              "at": "before",
+              "label": "90, then 110",
+              "title": "max dd = 10",
+              "tone": "good",
+              "code": "high 100: 90  → dd 10\nhigh 110: 110 → dd 0\nmax_dd = 10"
+            },
+            "right": {
+              "at": "first",
+              "label": "110, then 90",
+              "title": "max dd = 20",
+              "tone": "bad",
+              "code": "high 110: 110 → dd 0\nhigh 110: 90  → dd 20\nmax_dd = 20"
+            },
+            "verdict": {
+              "at": "silently",
+              "text": "Path-dependent: each ticker needs one total order.",
+              "code": "order matters"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "One writer per ticker",
+      "question": "How do you make it concurrent and still correct?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Problem three. So how do you make the tracker concurrent, and still match the single-threaded answer? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Concurrent, <em>and</em> still correct?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Give every ticker exactly one writer thread. A feed hashes the ticker to pick its writer, and sends the event over a single-producer, single-consumer queue, one per feed and writer pair. A ticker always arrives on the same feed, so its events stay in wire order. The writer updates the high and drawdown in plain memory, with no atomics on the math, then publishes the pair with a release store. Readers load it with acquire, and always see a consistent pair.",
+          "props": {
+            "title": "Hash to <em>one writer</em>",
+            "nodes": [
+              {
+                "id": "F0",
+                "label": "Feed 0",
+                "x": 180,
+                "y": 330,
+                "w": 170,
+                "h": 64
+              },
+              {
+                "id": "F1",
+                "label": "Feed 1",
+                "x": 180,
+                "y": 610,
+                "w": 170,
+                "h": 64
+              },
+              {
+                "id": "W0",
+                "label": "Writer 0",
+                "x": 600,
+                "y": 330,
+                "w": 190,
+                "h": 64
+              },
+              {
+                "id": "W1",
+                "label": "Writer 1",
+                "x": 600,
+                "y": 610,
+                "w": 190,
+                "h": 64
+              },
+              {
+                "id": "AAPL",
+                "label": "AAPL slot",
+                "x": 1010,
+                "y": 270,
+                "w": 200,
+                "h": 60
+              },
+              {
+                "id": "MSFT",
+                "label": "MSFT slot",
+                "x": 1010,
+                "y": 400,
+                "w": 200,
+                "h": 60
+              },
+              {
+                "id": "TSLA",
+                "label": "TSLA slot",
+                "x": 1010,
+                "y": 610,
+                "w": 200,
+                "h": 60
+              }
+            ],
+            "edges": [
+              {
+                "from": "F0",
+                "to": "W0",
+                "w": "SPSC"
+              },
+              {
+                "from": "F0",
+                "to": "W1"
+              },
+              {
+                "from": "F1",
+                "to": "W0"
+              },
+              {
+                "from": "F1",
+                "to": "W1",
+                "w": "SPSC"
+              },
+              {
+                "from": "W0",
+                "to": "AAPL"
+              },
+              {
+                "from": "W0",
+                "to": "MSFT"
+              },
+              {
+                "from": "W1",
+                "to": "TSLA"
+              }
+            ],
+            "panels": [
+              {
+                "key": "route",
+                "label": "hash(ticker) % 2",
+                "type": "table",
+                "columns": [
+                  "AAPL",
+                  "MSFT",
+                  "TSLA"
+                ],
+                "initial": {
+                  "AAPL": "W0",
+                  "MSFT": "W0",
+                  "TSLA": "W1"
+                }
+              },
+              {
+                "key": "pub",
+                "label": "Published (high, max dd)",
+                "type": "list",
+                "rows": 1,
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "exactly",
+                "nodes": {
+                  "W0": "active",
+                  "W1": "active"
+                },
+                "note": "Each ticker has exactly one writer"
+              },
+              {
+                "at": "hashes",
+                "nodes": {
+                  "W1": "base",
+                  "F0": "active"
+                },
+                "edges": {
+                  "F0-W0": "relax"
+                },
+                "note": "AAPL 118 → hash → writer 0"
+              },
+              {
+                "at": "pair",
+                "nodes": {
+                  "F0": "base"
+                },
+                "edges": {
+                  "F0-W0": "base",
+                  "F0-W1": "relax",
+                  "F1-W0": "relax",
+                  "F1-W1": "relax"
+                },
+                "note": "One SPSC queue per (feed, writer) pair"
+              },
+              {
+                "at": "wire",
+                "edges": {
+                  "F0-W1": "base",
+                  "F1-W0": "base",
+                  "F1-W1": "base",
+                  "F0-W0": "tree"
+                },
+                "note": "A ticker's events keep their wire order"
+              },
+              {
+                "at": "plain",
+                "nodes": {
+                  "AAPL": "active"
+                },
+                "edges": {
+                  "W0-AAPL": "relax"
+                },
+                "note": "Writer updates (high, dd): plain memory"
+              },
+              {
+                "at": "publishes",
+                "nodes": {
+                  "AAPL": "done",
+                  "W0": "base"
+                },
+                "edges": {
+                  "W0-AAPL": "tree"
+                },
+                "panels": {
+                  "pub": [
+                    "AAPL (120, 20)"
+                  ]
+                },
+                "note": "Publish the pair with a release store"
+              },
+              {
+                "at": "acquire",
+                "note": "Readers: acquire load → a consistent pair"
+              }
+            ]
+          }
+        },
+        {
+          "type": "code",
+          "say": "In code, the slot keeps the writer's high and drawdown as plain doubles, and a sixteen-byte atomic pair for readers. The writer loop pops events in order, updates the two numbers, and publishes with release. A reader finds the slot, and loads the pair with acquire.",
+          "props": {
+            "title": "The writer and the reader",
+            "file": "tracker.cpp",
+            "tag": "single writer",
+            "lang": "cpp",
+            "size": 21,
+            "width": 1180,
+            "code": "struct alignas(64) TickerSlot {\n    double w_high = -INFINITY, w_max_dd = 0;     // writer-only: plain memory\n    std::atomic<PairView> published;            // (high, max_dd) for readers\n};\n\n// One writer thread owns this queue, and every ticker hashed to it.\nvoid WriterLoop(SPSCQueue<Event>& q) {\n    Event e;\n    while (q.WaitAndPop(e)) {\n        auto* s = e.slot;\n        if (e.price > s->w_high) s->w_high = e.price;\n        double dd = s->w_high - e.price;\n        if (dd > s->w_max_dd) s->w_max_dd = dd;\n        s->published.store({s->w_high, s->w_max_dd},\n                           std::memory_order_release);\n    }\n}\n\nstd::optional<double> GetMaxDrawdown(const std::string& ticker) const {\n    auto* s = registry_.Find(ticker);\n    if (!s) return std::nullopt;\n    return s->published.load(std::memory_order_acquire).max_dd;\n}",
+            "highlights": [
+              {
+                "at": "plain",
+                "lines": "2-3",
+                "note": "Writer-only doubles + an atomic pair"
+              },
+              {
+                "at": "pops",
+                "lines": "9-13",
+                "note": "In-order events, plain math"
+              },
+              {
+                "at": "release",
+                "lines": "14-15",
+                "note": "Publish both numbers at once"
+              },
+              {
+                "at": "reader",
+                "lines": "20-22",
+                "note": "Readers: acquire load"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "04",
+      "title": "Pitfalls and follow-ups",
+      "question": "What breaks this design, and how would you extend it?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Problem four. What can still break this design, and how would you extend it? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What breaks it, and how would you <em>extend</em> it?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Four things to mention. Reject NaN at the boundary: a NaN price never raises the high, but poisons the drawdown. The design only matches the reference if each ticker's feed is in order on the wire, so say that assumption out loud. A sixteen-byte atomic is lock-free only with a double-width compare-and-swap; otherwise publish through a seqlock. And for a trailing window, the writer keeps a monotonic deque of prices, at no extra concurrency cost.",
+          "props": {
+            "title": "Pitfalls and <em>follow-ups</em>",
+            "items": [
+              {
+                "at": "NaN",
+                "label": "Input",
+                "title": "Reject NaN",
+                "body": "NaN never raises the high, but poisons dd.",
+                "code": "isnan → drop"
+              },
+              {
+                "at": "assumption",
+                "label": "Ordering",
+                "title": "In-order feed",
+                "body": "Per-ticker wire order is assumed.",
+                "code": "else: reorder buffer"
+              },
+              {
+                "at": "atomic",
+                "label": "Publish",
+                "title": "16-byte atomic",
+                "body": "Needs CMPXCHG16B; else a seqlock.",
+                "code": "-mcx16"
+              },
+              {
+                "at": "window",
+                "label": "Windowed",
+                "title": "Trailing W",
+                "body": "Monotonic deque in the writer.",
+                "code": "deque<(t, p)>"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Keep the running high and the largest drop from it. Drawdown is path-dependent, so a compare-and-swap max is wrong. Route each ticker to one writer over SPSC queues. And publish the pair with release, read it with acquire.",
+          "props": {
+            "title": "Max drawdown, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "running",
+                "text": "Track the running high and the largest drop.",
+                "code": "O(1) update"
+              },
+              {
+                "at": "wrong",
+                "text": "Path-dependent: CAS max reorders → wrong.",
+                "code": "10 vs 20"
+              },
+              {
+                "at": "Route",
+                "text": "One writer per ticker over SPSC queues.",
+                "code": "hash % N"
+              },
+              {
+                "at": "publish",
+                "text": "Publish with release, read with acquire.",
+                "code": "atomic pair"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
