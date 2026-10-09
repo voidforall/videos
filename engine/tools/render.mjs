@@ -50,7 +50,7 @@ async function renderSegment(url, path, from, to, fps, onFrame) {
 
 // poster: the end of the second scene (first explanation fully on screen), without captions
 async function renderPoster(url, dir, timing) {
-  const at = timing.lines.length > 2 ? timing.lines[2].start - 0.8 : timing.duration / 2;
+  const at = (timing.lines.length > 2 ? timing.lines[2].start : timing.duration) - 0.8;
   const browser = await launch();
   try {
     const page = await openClip(browser, url);
