@@ -14,7 +14,7 @@
     {
       "id": "python",
       "title": "Python",
-      "blurb": "How the language really works: decorators and closures, generators and laziness, and the GIL behind every concurrency choice."
+      "blurb": "How the language really works: decorators and generators, references and copying, the import system, and concurrency from the GIL to asyncio."
     },
     {
       "id": "system",
