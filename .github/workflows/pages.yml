@@ -25,6 +25,20 @@ jobs:
       - uses: actions/configure-pages@v5
         with:
           enablement: true
+      # Media is never committed: copy each catalogued release's clips and posters into the site, so
+      # they are served same-origin as video/mp4 with range requests (iOS WebKit needs this).
+      - name: Fetch clip media from releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p docs/media
+          for slug in $(jq -r '.episodes[].slug' docs/catalog.json); do
+            gh release download "ep-$slug" --dir docs/media --pattern '*.mp4' --pattern '*.jpg' --clobber
+          done
+          jq -r '.episodes[].clips[] | .video, .poster' docs/catalog.json | while read -r asset; do
+            test -f "docs/$asset" || { echo "::error::catalog references missing $asset"; exit 1; }
+          done
+          du -sh docs/media
       - uses: actions/upload-pages-artifact@v3
         with:
           path: docs

@@ -36,32 +36,32 @@
           "title": "Why a window?",
           "question": "Why does a sliding window beat nested loops?",
           "duration": 55,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-sliding-window/algorithm-sliding-window-01.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-sliding-window/algorithm-sliding-window-01.jpg"
+          "video": "media/algorithm-sliding-window-01.mp4",
+          "poster": "media/algorithm-sliding-window-01.jpg"
         },
         {
           "id": "02",
           "title": "Expand, shrink, update",
           "question": "What are the four moves of a variable-size sliding window?",
           "duration": 51,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-sliding-window/algorithm-sliding-window-02.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-sliding-window/algorithm-sliding-window-02.jpg"
+          "video": "media/algorithm-sliding-window-02.mp4",
+          "poster": "media/algorithm-sliding-window-02.jpg"
         },
         {
           "id": "03",
           "title": "The C++ template",
           "question": "Write the general variable-size sliding window template from memory.",
           "duration": 49,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-sliding-window/algorithm-sliding-window-03.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-sliding-window/algorithm-sliding-window-03.jpg"
+          "video": "media/algorithm-sliding-window-03.mp4",
+          "poster": "media/algorithm-sliding-window-03.jpg"
         },
         {
           "id": "04",
           "title": "Max vs min: where to update",
           "question": "For a maximum window and a minimum window, where does the update go?",
           "duration": 61,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-sliding-window/algorithm-sliding-window-04.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-sliding-window/algorithm-sliding-window-04.jpg"
+          "video": "media/algorithm-sliding-window-04.mp4",
+          "poster": "media/algorithm-sliding-window-04.jpg"
         }
       ]
     },
@@ -78,24 +78,24 @@
           "title": "The search interval",
           "question": "In closed-interval binary search, what do left and right mean, and when does the loop stop?",
           "duration": 57,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-binary-search/algorithm-binary-search-01.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-binary-search/algorithm-binary-search-01.jpg"
+          "video": "media/algorithm-binary-search-01.mp4",
+          "poster": "media/algorithm-binary-search-01.jpg"
         },
         {
           "id": "02",
           "title": "First and last occurrence",
           "question": "With duplicates, how do you find the first and the last occurrence of a target?",
           "duration": 58,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-binary-search/algorithm-binary-search-02.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-binary-search/algorithm-binary-search-02.jpg"
+          "video": "media/algorithm-binary-search-02.mp4",
+          "poster": "media/algorithm-binary-search-02.jpg"
         },
         {
           "id": "03",
           "title": "Search on the answer",
           "question": "When can you binary search something that is not a sorted array?",
           "duration": 62,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-binary-search/algorithm-binary-search-03.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-binary-search/algorithm-binary-search-03.jpg"
+          "video": "media/algorithm-binary-search-03.mp4",
+          "poster": "media/algorithm-binary-search-03.jpg"
         }
       ]
     },
@@ -112,24 +112,24 @@
           "title": "When to reach for it",
           "question": "What problem shape tells you to use a monotonic stack?",
           "duration": 36,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-monotonic-stack/algorithm-monotonic-stack-01.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-monotonic-stack/algorithm-monotonic-stack-01.jpg"
+          "video": "media/algorithm-monotonic-stack-01.mp4",
+          "poster": "media/algorithm-monotonic-stack-01.jpg"
         },
         {
           "id": "02",
           "title": "Next greater element",
           "question": "Find the next greater element for every value in a single pass.",
           "duration": 58,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-monotonic-stack/algorithm-monotonic-stack-02.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-monotonic-stack/algorithm-monotonic-stack-02.jpg"
+          "video": "media/algorithm-monotonic-stack-02.mp4",
+          "poster": "media/algorithm-monotonic-stack-02.jpg"
         },
         {
           "id": "03",
           "title": "Pick the order",
           "question": "Next smaller, largest rectangle, trapping rain water: increasing or decreasing stack?",
           "duration": 62,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-monotonic-stack/algorithm-monotonic-stack-03.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-monotonic-stack/algorithm-monotonic-stack-03.jpg"
+          "video": "media/algorithm-monotonic-stack-03.mp4",
+          "poster": "media/algorithm-monotonic-stack-03.jpg"
         }
       ]
     },
@@ -146,24 +146,24 @@
           "title": "Relax and commit",
           "question": "What does Dijkstra commit to at each step, and why is that safe?",
           "duration": 56,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-dijkstra/algorithm-dijkstra-01.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-dijkstra/algorithm-dijkstra-01.jpg"
+          "video": "media/algorithm-dijkstra-01.mp4",
+          "poster": "media/algorithm-dijkstra-01.jpg"
         },
         {
           "id": "02",
           "title": "The heap and stale entries",
           "question": "In the heap version, why check whether the popped distance is larger than dist[u]?",
           "duration": 42,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-dijkstra/algorithm-dijkstra-02.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-dijkstra/algorithm-dijkstra-02.jpg"
+          "video": "media/algorithm-dijkstra-02.mp4",
+          "poster": "media/algorithm-dijkstra-02.jpg"
         },
         {
           "id": "03",
           "title": "When it breaks",
           "question": "Why does Dijkstra fail with negative edges, and what do you use instead?",
           "duration": 44,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-dijkstra/algorithm-dijkstra-03.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-dijkstra/algorithm-dijkstra-03.jpg"
+          "video": "media/algorithm-dijkstra-03.mp4",
+          "poster": "media/algorithm-dijkstra-03.jpg"
         }
       ]
     },
@@ -180,24 +180,24 @@
           "title": "Kahn's algorithm",
           "question": "How does Kahn's algorithm produce a topological order?",
           "duration": 42,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-topological-sort/algorithm-topological-sort-01.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-topological-sort/algorithm-topological-sort-01.jpg"
+          "video": "media/algorithm-topological-sort-01.mp4",
+          "poster": "media/algorithm-topological-sort-01.jpg"
         },
         {
           "id": "02",
           "title": "Detecting a cycle",
           "question": "How does topological sort tell you the graph has a cycle?",
           "duration": 42,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-topological-sort/algorithm-topological-sort-02.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-topological-sort/algorithm-topological-sort-02.jpg"
+          "video": "media/algorithm-topological-sort-02.mp4",
+          "poster": "media/algorithm-topological-sort-02.jpg"
         },
         {
           "id": "03",
           "title": "Code and patterns",
           "question": "Write Kahn's algorithm, and name problems it solves.",
           "duration": 49,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-topological-sort/algorithm-topological-sort-03.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-topological-sort/algorithm-topological-sort-03.jpg"
+          "video": "media/algorithm-topological-sort-03.mp4",
+          "poster": "media/algorithm-topological-sort-03.jpg"
         }
       ]
     },
@@ -214,24 +214,24 @@
           "title": "Find and union",
           "question": "How does union-find represent sets, and what do find and union do?",
           "duration": 45,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-union-find/algorithm-union-find-01.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-union-find/algorithm-union-find-01.jpg"
+          "video": "media/algorithm-union-find-01.mp4",
+          "poster": "media/algorithm-union-find-01.jpg"
         },
         {
           "id": "02",
           "title": "The two optimizations",
           "question": "Which two optimizations make union-find effectively constant time?",
           "duration": 38,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-union-find/algorithm-union-find-02.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-union-find/algorithm-union-find-02.jpg"
+          "video": "media/algorithm-union-find-02.mp4",
+          "poster": "media/algorithm-union-find-02.jpg"
         },
         {
           "id": "03",
           "title": "Code and patterns",
           "question": "Write union-find with both optimizations, and name problems it solves.",
           "duration": 50,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-union-find/algorithm-union-find-03.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-union-find/algorithm-union-find-03.jpg"
+          "video": "media/algorithm-union-find-03.mp4",
+          "poster": "media/algorithm-union-find-03.jpg"
         }
       ]
     },
@@ -248,24 +248,24 @@
           "title": "Level by level",
           "question": "Why does BFS find the shortest path in an unweighted graph?",
           "duration": 38,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-bfs/algorithm-bfs-01.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-bfs/algorithm-bfs-01.jpg"
+          "video": "media/algorithm-bfs-01.mp4",
+          "poster": "media/algorithm-bfs-01.jpg"
         },
         {
           "id": "02",
           "title": "The framework",
           "question": "Write BFS that returns the minimum number of steps to a target.",
           "duration": 48,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-bfs/algorithm-bfs-02.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-bfs/algorithm-bfs-02.jpg"
+          "video": "media/algorithm-bfs-02.mp4",
+          "poster": "media/algorithm-bfs-02.jpg"
         },
         {
           "id": "03",
           "title": "Bidirectional BFS",
           "question": "When the target is known, how can you make BFS dramatically faster?",
           "duration": 45,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-bfs/algorithm-bfs-03.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-bfs/algorithm-bfs-03.jpg"
+          "video": "media/algorithm-bfs-03.mp4",
+          "poster": "media/algorithm-bfs-03.jpg"
         }
       ]
     },
@@ -282,24 +282,24 @@
           "title": "Kruskal's algorithm",
           "question": "How does Kruskal's algorithm build a minimum spanning tree?",
           "duration": 36,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-minimum-spanning-tree/algorithm-minimum-spanning-tree-01.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-minimum-spanning-tree/algorithm-minimum-spanning-tree-01.jpg"
+          "video": "media/algorithm-minimum-spanning-tree-01.mp4",
+          "poster": "media/algorithm-minimum-spanning-tree-01.jpg"
         },
         {
           "id": "02",
           "title": "Prim's algorithm",
           "question": "How does Prim's algorithm grow the tree, and how is it like Dijkstra?",
           "duration": 41,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-minimum-spanning-tree/algorithm-minimum-spanning-tree-02.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-minimum-spanning-tree/algorithm-minimum-spanning-tree-02.jpg"
+          "video": "media/algorithm-minimum-spanning-tree-02.mp4",
+          "poster": "media/algorithm-minimum-spanning-tree-02.jpg"
         },
         {
           "id": "03",
           "title": "Kruskal's or Prim's?",
           "question": "When do you pick Kruskal's over Prim's, and which properties make greedy MSTs correct?",
           "duration": 48,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-minimum-spanning-tree/algorithm-minimum-spanning-tree-03.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-minimum-spanning-tree/algorithm-minimum-spanning-tree-03.jpg"
+          "video": "media/algorithm-minimum-spanning-tree-03.mp4",
+          "poster": "media/algorithm-minimum-spanning-tree-03.jpg"
         }
       ]
     },
@@ -316,24 +316,24 @@
           "title": "Prefixes share paths",
           "question": "How does a trie store words, and how do search and startsWith differ?",
           "duration": 38,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-trie/algorithm-trie-01.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-trie/algorithm-trie-01.jpg"
+          "video": "media/algorithm-trie-01.mp4",
+          "poster": "media/algorithm-trie-01.jpg"
         },
         {
           "id": "02",
           "title": "The code",
           "question": "Implement insert, search, and startsWith.",
           "duration": 31,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-trie/algorithm-trie-02.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-trie/algorithm-trie-02.jpg"
+          "video": "media/algorithm-trie-02.mp4",
+          "poster": "media/algorithm-trie-02.jpg"
         },
         {
           "id": "03",
           "title": "When a trie wins",
           "question": "When would you choose a trie over a hash set of strings?",
           "duration": 38,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-algorithm-trie/algorithm-trie-03.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-algorithm-trie/algorithm-trie-03.jpg"
+          "video": "media/algorithm-trie-03.mp4",
+          "poster": "media/algorithm-trie-03.jpg"
         }
       ]
     },
@@ -350,24 +350,24 @@
           "title": "std::move is a cast",
           "question": "What does std::move actually do at runtime?",
           "duration": 53,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-move-semantics/cpp-move-semantics-01.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-move-semantics/cpp-move-semantics-01.jpg"
+          "video": "media/cpp-move-semantics-01.mp4",
+          "poster": "media/cpp-move-semantics-01.jpg"
         },
         {
           "id": "02",
           "title": "Three silent mistakes",
           "question": "Name three ways std::move quietly goes wrong.",
           "duration": 57,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-move-semantics/cpp-move-semantics-02.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-move-semantics/cpp-move-semantics-02.jpg"
+          "video": "media/cpp-move-semantics-02.mp4",
+          "poster": "media/cpp-move-semantics-02.jpg"
         },
         {
           "id": "03",
           "title": "std::move vs std::forward",
           "question": "When do you use std::forward instead of std::move?",
           "duration": 59,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-move-semantics/cpp-move-semantics-03.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-move-semantics/cpp-move-semantics-03.jpg"
+          "video": "media/cpp-move-semantics-03.mp4",
+          "poster": "media/cpp-move-semantics-03.jpg"
         }
       ]
     },
@@ -384,24 +384,24 @@
           "title": "Three kinds of ownership",
           "question": "unique_ptr, shared_ptr, weak_ptr: what ownership does each express?",
           "duration": 48,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-smart-pointers/cpp-smart-pointers-01.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-smart-pointers/cpp-smart-pointers-01.jpg"
+          "video": "media/cpp-smart-pointers-01.mp4",
+          "poster": "media/cpp-smart-pointers-01.jpg"
         },
         {
           "id": "02",
           "title": "Inside shared_ptr",
           "question": "What does a shared_ptr hold, and when are the object and its control block freed?",
           "duration": 54,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-smart-pointers/cpp-smart-pointers-02.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-smart-pointers/cpp-smart-pointers-02.jpg"
+          "video": "media/cpp-smart-pointers-02.mp4",
+          "poster": "media/cpp-smart-pointers-02.jpg"
         },
         {
           "id": "03",
           "title": "Passing smart pointers",
           "question": "How should a function take a smart pointer parameter?",
           "duration": 44,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-smart-pointers/cpp-smart-pointers-03.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-smart-pointers/cpp-smart-pointers-03.jpg"
+          "video": "media/cpp-smart-pointers-03.mp4",
+          "poster": "media/cpp-smart-pointers-03.jpg"
         }
       ]
     },
@@ -418,24 +418,24 @@
           "title": "vptr and vtable",
           "question": "How does a virtual call find the right function at runtime?",
           "duration": 38,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-virtual-functions/cpp-virtual-functions-01.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-virtual-functions/cpp-virtual-functions-01.jpg"
+          "video": "media/cpp-virtual-functions-01.mp4",
+          "poster": "media/cpp-virtual-functions-01.jpg"
         },
         {
           "id": "02",
           "title": "Destructors and constructors",
           "question": "Why must a polymorphic base have a virtual destructor, and what happens when a constructor calls a virtual function?",
           "duration": 48,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-virtual-functions/cpp-virtual-functions-02.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-virtual-functions/cpp-virtual-functions-02.jpg"
+          "video": "media/cpp-virtual-functions-02.mp4",
+          "poster": "media/cpp-virtual-functions-02.jpg"
         },
         {
           "id": "03",
           "title": "The cost of dispatch",
           "question": "What does dynamic dispatch cost, and how can you avoid it?",
           "duration": 56,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-virtual-functions/cpp-virtual-functions-03.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-virtual-functions/cpp-virtual-functions-03.jpg"
+          "video": "media/cpp-virtual-functions-03.mp4",
+          "poster": "media/cpp-virtual-functions-03.jpg"
         }
       ]
     },
@@ -452,24 +452,24 @@
           "title": "RAII and stack unwinding",
           "question": "What is RAII, and why does it make code exception safe?",
           "duration": 50,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-raii-rule-of-zero/cpp-raii-rule-of-zero-01.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-raii-rule-of-zero/cpp-raii-rule-of-zero-01.jpg"
+          "video": "media/cpp-raii-rule-of-zero-01.mp4",
+          "poster": "media/cpp-raii-rule-of-zero-01.jpg"
         },
         {
           "id": "02",
           "title": "The rule of three and five",
           "question": "Your class deletes a raw pointer in its destructor. What else must you write, and why?",
           "duration": 48,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-raii-rule-of-zero/cpp-raii-rule-of-zero-02.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-raii-rule-of-zero/cpp-raii-rule-of-zero-02.jpg"
+          "video": "media/cpp-raii-rule-of-zero-02.mp4",
+          "poster": "media/cpp-raii-rule-of-zero-02.jpg"
         },
         {
           "id": "03",
           "title": "The rule of zero",
           "question": "How do you avoid writing any of the five special members?",
           "duration": 46,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-raii-rule-of-zero/cpp-raii-rule-of-zero-03.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-raii-rule-of-zero/cpp-raii-rule-of-zero-03.jpg"
+          "video": "media/cpp-raii-rule-of-zero-03.mp4",
+          "poster": "media/cpp-raii-rule-of-zero-03.jpg"
         }
       ]
     },
@@ -486,24 +486,24 @@
           "title": "Construct in place",
           "question": "What does return value optimization actually do?",
           "duration": 40,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-copy-elision/cpp-copy-elision-01.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-copy-elision/cpp-copy-elision-01.jpg"
+          "video": "media/cpp-copy-elision-01.mp4",
+          "poster": "media/cpp-copy-elision-01.jpg"
         },
         {
           "id": "02",
           "title": "Guaranteed vs optional",
           "question": "Which copy elisions does C++17 guarantee, and what blocks NRVO?",
           "duration": 43,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-copy-elision/cpp-copy-elision-02.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-copy-elision/cpp-copy-elision-02.jpg"
+          "video": "media/cpp-copy-elision-02.mp4",
+          "poster": "media/cpp-copy-elision-02.jpg"
         },
         {
           "id": "03",
           "title": "Elide, move, or copy",
           "question": "If the compiler cannot elide a return, what happens instead?",
           "duration": 46,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-copy-elision/cpp-copy-elision-03.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-copy-elision/cpp-copy-elision-03.jpg"
+          "video": "media/cpp-copy-elision-03.mp4",
+          "poster": "media/cpp-copy-elision-03.jpg"
         }
       ]
     },
@@ -520,24 +520,24 @@
           "title": "Why reordering breaks threads",
           "question": "How can another thread see a flag set before the data it guards?",
           "duration": 36,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-memory-ordering/cpp-memory-ordering-01.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-memory-ordering/cpp-memory-ordering-01.jpg"
+          "video": "media/cpp-memory-ordering-01.mp4",
+          "poster": "media/cpp-memory-ordering-01.jpg"
         },
         {
           "id": "02",
           "title": "The memory orders",
           "question": "relaxed, acquire, release, seq_cst: what does each guarantee?",
           "duration": 45,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-memory-ordering/cpp-memory-ordering-02.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-memory-ordering/cpp-memory-ordering-02.jpg"
+          "video": "media/cpp-memory-ordering-02.mp4",
+          "poster": "media/cpp-memory-ordering-02.jpg"
         },
         {
           "id": "03",
           "title": "What std::atomic can hold",
           "question": "Which types can std::atomic hold lock-free, and why?",
           "duration": 57,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-memory-ordering/cpp-memory-ordering-03.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-memory-ordering/cpp-memory-ordering-03.jpg"
+          "video": "media/cpp-memory-ordering-03.mp4",
+          "poster": "media/cpp-memory-ordering-03.jpg"
         }
       ]
     },
@@ -554,8 +554,8 @@
           "title": "Full walkthrough",
           "question": "Seven C++ functional programming interview questions in one review.",
           "duration": 252,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-functional-walkthrough/cpp-functional-walkthrough-01.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-functional-walkthrough/cpp-functional-walkthrough-01.jpg"
+          "video": "media/cpp-functional-walkthrough-01.mp4",
+          "poster": "media/cpp-functional-walkthrough-01.jpg"
         }
       ]
     },
@@ -572,8 +572,8 @@
           "title": "Full walkthrough",
           "question": "Eight C++ OOP interview topics in one review.",
           "duration": 207,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-cpp-oop-walkthrough/cpp-oop-walkthrough-01.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-cpp-oop-walkthrough/cpp-oop-walkthrough-01.jpg"
+          "video": "media/cpp-oop-walkthrough-01.mp4",
+          "poster": "media/cpp-oop-walkthrough-01.jpg"
         }
       ]
     },
@@ -590,24 +590,24 @@
           "title": "A callable that returns a callable",
           "question": "What does the @decorator line actually do, and when does it run?",
           "duration": 44,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-python-decorators/python-decorators-01.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-python-decorators/python-decorators-01.jpg"
+          "video": "media/python-decorators-01.mp4",
+          "poster": "media/python-decorators-01.jpg"
         },
         {
           "id": "02",
           "title": "functools essentials",
           "question": "Why should a decorator use functools.wraps, and which functools decorators should you know?",
           "duration": 46,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-python-decorators/python-decorators-02.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-python-decorators/python-decorators-02.jpg"
+          "video": "media/python-decorators-02.mp4",
+          "poster": "media/python-decorators-02.jpg"
         },
         {
           "id": "03",
           "title": "Decorators with arguments",
           "question": "How do you write a decorator that takes arguments, like @repeat(3)?",
           "duration": 41,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-python-decorators/python-decorators-03.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-python-decorators/python-decorators-03.jpg"
+          "video": "media/python-decorators-03.mp4",
+          "poster": "media/python-decorators-03.jpg"
         }
       ]
     },
@@ -624,24 +624,24 @@
           "title": "Iterable vs iterator",
           "question": "What is the difference between an iterable and an iterator?",
           "duration": 42,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-python-generators/python-generators-01.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-python-generators/python-generators-01.jpg"
+          "video": "media/python-generators-01.mp4",
+          "poster": "media/python-generators-01.jpg"
         },
         {
           "id": "02",
           "title": "What yield does",
           "question": "What happens, step by step, when you call a generator function?",
           "duration": 33,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-python-generators/python-generators-02.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-python-generators/python-generators-02.jpg"
+          "video": "media/python-generators-02.mp4",
+          "poster": "media/python-generators-02.jpg"
         },
         {
           "id": "03",
           "title": "Laziness and yield from",
           "question": "Why are generators memory-cheap, and what does yield from do?",
           "duration": 58,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-python-generators/python-generators-03.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-python-generators/python-generators-03.jpg"
+          "video": "media/python-generators-03.mp4",
+          "poster": "media/python-generators-03.jpg"
         }
       ]
     },
@@ -658,24 +658,24 @@
           "title": "The GIL",
           "question": "Why don't threads speed up CPU-bound Python code?",
           "duration": 38,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-python-concurrency/python-concurrency-01.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-python-concurrency/python-concurrency-01.jpg"
+          "video": "media/python-concurrency-01.mp4",
+          "poster": "media/python-concurrency-01.jpg"
         },
         {
           "id": "02",
           "title": "Threads, processes, or asyncio",
           "question": "When do you choose threads, processes, or asyncio?",
           "duration": 50,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-python-concurrency/python-concurrency-02.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-python-concurrency/python-concurrency-02.jpg"
+          "video": "media/python-concurrency-02.mp4",
+          "poster": "media/python-concurrency-02.jpg"
         },
         {
           "id": "03",
           "title": "The rule of asyncio",
           "question": "What does await do, and what is the cardinal rule of asyncio?",
           "duration": 55,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-python-concurrency/python-concurrency-03.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-python-concurrency/python-concurrency-03.jpg"
+          "video": "media/python-concurrency-03.mp4",
+          "poster": "media/python-concurrency-03.jpg"
         }
       ]
     },
@@ -692,24 +692,24 @@
           "title": "The redirect path",
           "question": "Walk through what happens when someone clicks a short link.",
           "duration": 50,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-system-url-shortener/system-url-shortener-01.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-url-shortener/system-url-shortener-01.jpg"
+          "video": "media/system-url-shortener-01.mp4",
+          "poster": "media/system-url-shortener-01.jpg"
         },
         {
           "id": "02",
           "title": "Generating short codes",
           "question": "How do you generate a short code that never collides?",
           "duration": 54,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-system-url-shortener/system-url-shortener-02.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-url-shortener/system-url-shortener-02.jpg"
+          "video": "media/system-url-shortener-02.mp4",
+          "poster": "media/system-url-shortener-02.jpg"
         },
         {
           "id": "03",
           "title": "Scaling the read path",
           "question": "Reads outnumber writes 100 to 1. How do you scale the service?",
           "duration": 54,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-system-url-shortener/system-url-shortener-03.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-url-shortener/system-url-shortener-03.jpg"
+          "video": "media/system-url-shortener-03.mp4",
+          "poster": "media/system-url-shortener-03.jpg"
         }
       ]
     },
@@ -726,24 +726,24 @@
           "title": "Why not hash mod N?",
           "question": "Why does hash(key) mod N break down when you add a server?",
           "duration": 40,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-system-consistent-hashing/system-consistent-hashing-01.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-consistent-hashing/system-consistent-hashing-01.jpg"
+          "video": "media/system-consistent-hashing-01.mp4",
+          "poster": "media/system-consistent-hashing-01.jpg"
         },
         {
           "id": "02",
           "title": "The hash ring",
           "question": "How does consistent hashing decide which server owns a key?",
           "duration": 40,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-system-consistent-hashing/system-consistent-hashing-02.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-consistent-hashing/system-consistent-hashing-02.jpg"
+          "video": "media/system-consistent-hashing-02.mp4",
+          "poster": "media/system-consistent-hashing-02.jpg"
         },
         {
           "id": "03",
           "title": "Virtual nodes",
           "question": "Why is a ring with few servers unbalanced, and how do virtual nodes fix it?",
           "duration": 63,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-system-consistent-hashing/system-consistent-hashing-03.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-consistent-hashing/system-consistent-hashing-03.jpg"
+          "video": "media/system-consistent-hashing-03.mp4",
+          "poster": "media/system-consistent-hashing-03.jpg"
         }
       ]
     },
@@ -760,32 +760,32 @@
           "title": "Idempotency keys",
           "question": "A charge request times out and the client retries. How do you avoid charging twice?",
           "duration": 61,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-system-payment-gateway/system-payment-gateway-01.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-payment-gateway/system-payment-gateway-01.jpg"
+          "video": "media/system-payment-gateway-01.mp4",
+          "poster": "media/system-payment-gateway-01.jpg"
         },
         {
           "id": "02",
           "title": "Tokenization and PCI scope",
           "question": "How do you keep raw card numbers out of most of your system?",
           "duration": 39,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-system-payment-gateway/system-payment-gateway-02.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-payment-gateway/system-payment-gateway-02.jpg"
+          "video": "media/system-payment-gateway-02.mp4",
+          "poster": "media/system-payment-gateway-02.jpg"
         },
         {
           "id": "03",
           "title": "Reliable webhooks",
           "question": "How do you reliably notify a merchant that a payment succeeded?",
           "duration": 59,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-system-payment-gateway/system-payment-gateway-03.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-payment-gateway/system-payment-gateway-03.jpg"
+          "video": "media/system-payment-gateway-03.mp4",
+          "poster": "media/system-payment-gateway-03.jpg"
         },
         {
           "id": "04",
           "title": "REST or GraphQL",
           "question": "Would you expose the payment API as REST or GraphQL?",
           "duration": 58,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-system-payment-gateway/system-payment-gateway-04.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-payment-gateway/system-payment-gateway-04.jpg"
+          "video": "media/system-payment-gateway-04.mp4",
+          "poster": "media/system-payment-gateway-04.jpg"
         }
       ]
     },
@@ -802,24 +802,24 @@
           "title": "Leader election",
           "question": "How does Raft elect a leader, and why are election timeouts randomized?",
           "duration": 48,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-system-raft/system-raft-01.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-raft/system-raft-01.jpg"
+          "video": "media/system-raft-01.mp4",
+          "poster": "media/system-raft-01.jpg"
         },
         {
           "id": "02",
           "title": "Log replication",
           "question": "When is a Raft log entry committed, and what keeps committed entries safe?",
           "duration": 64,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-system-raft/system-raft-02.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-raft/system-raft-02.jpg"
+          "video": "media/system-raft-02.mp4",
+          "poster": "media/system-raft-02.jpg"
         },
         {
           "id": "03",
           "title": "Network partitions",
           "question": "A five-node cluster splits two and three. What happens to writes on each side?",
           "duration": 62,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-system-raft/system-raft-03.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-raft/system-raft-03.jpg"
+          "video": "media/system-raft-03.mp4",
+          "poster": "media/system-raft-03.jpg"
         }
       ]
     },
@@ -836,24 +836,24 @@
           "title": "From submit to done",
           "question": "Sketch a distributed task scheduler. What happens from submit to done?",
           "duration": 59,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-system-task-scheduler/system-task-scheduler-01.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-task-scheduler/system-task-scheduler-01.jpg"
+          "video": "media/system-task-scheduler-01.mp4",
+          "poster": "media/system-task-scheduler-01.jpg"
         },
         {
           "id": "02",
           "title": "When a worker dies",
           "question": "A worker dies mid-task. How do you notice, and what happens to the task?",
           "duration": 45,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-system-task-scheduler/system-task-scheduler-02.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-task-scheduler/system-task-scheduler-02.jpg"
+          "video": "media/system-task-scheduler-02.mp4",
+          "poster": "media/system-task-scheduler-02.jpg"
         },
         {
           "id": "03",
           "title": "A highly available scheduler",
           "question": "The scheduler is a single point of failure. How do you make it highly available?",
           "duration": 65,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-system-task-scheduler/system-task-scheduler-03.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-task-scheduler/system-task-scheduler-03.jpg"
+          "video": "media/system-task-scheduler-03.mp4",
+          "poster": "media/system-task-scheduler-03.jpg"
         }
       ]
     },
@@ -870,24 +870,24 @@
           "title": "Hash, range, or directory",
           "question": "Hash, range, or directory sharding: what does each one trade off?",
           "duration": 45,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-system-database-sharding/system-database-sharding-01.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-database-sharding/system-database-sharding-01.jpg"
+          "video": "media/system-database-sharding-01.mp4",
+          "poster": "media/system-database-sharding-01.jpg"
         },
         {
           "id": "02",
           "title": "What sharding costs you",
           "question": "What gets harder once your data is sharded?",
           "duration": 55,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-system-database-sharding/system-database-sharding-02.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-database-sharding/system-database-sharding-02.jpg"
+          "video": "media/system-database-sharding-02.mp4",
+          "poster": "media/system-database-sharding-02.jpg"
         },
         {
           "id": "03",
           "title": "When to shard",
           "question": "Your database is struggling. When is sharding actually the right move?",
           "duration": 45,
-          "video": "https://github.com/voidforall/videos/releases/download/ep-system-database-sharding/system-database-sharding-03.mp4",
-          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-database-sharding/system-database-sharding-03.jpg"
+          "video": "media/system-database-sharding-03.mp4",
+          "poster": "media/system-database-sharding-03.jpg"
         }
       ]
     }

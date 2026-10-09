@@ -1,5 +1,6 @@
 // Publish an episode's rendered clips to a GitHub Release and record them in docs/catalog.json.
-// MP4s and posters live only on the release (tag ep-<slug>); git keeps the source and the catalog.
+// MP4s and posters live only on the release (tag ep-<slug>); git keeps the source and the catalog,
+// and the Pages deploy serves the media same-origin under media/.
 // Usage: node engine/tools/publish.mjs <episode>
 import { execFile } from "node:child_process";
 import { copyFile, mkdir, readFile, rm, writeFile, access } from "node:fs/promises";
@@ -23,8 +24,10 @@ if (!catalog.series.some((s) => s.id === episode.series)) {
   throw new Error(`episode.series "${episode.series}" is not in docs/catalog.json series: ${catalog.series.map((s) => s.id).join(", ")}`);
 }
 const tag = `ep-${slug}`;
-const repo = await gh("repo", "view", "--json", "nameWithOwner", "-q", ".nameWithOwner");
-const assetUrl = (name) => `https://github.com/${repo}/releases/download/${tag}/${name}`;
+// The release is the store of record, but the site serves media from its own origin: the Pages
+// workflow copies every catalogued release asset into docs/media/. Release download URLs redirect to
+// short-lived signed URLs served as attachments, which iOS WebKit (Safari, and Chrome on iPhone) won't play.
+const assetUrl = (name) => `media/${name}`;
 
 // stage uniquely named copies (release assets are flat, named by file basename)
 const stage = `${epDir}/build/publish`;
@@ -62,3 +65,6 @@ const episodes = index >= 0 ? catalog.episodes.map((e, i) => (i === index ? entr
 await writeFile(catalogPath, `${JSON.stringify({ ...catalog, episodes }, null, 2)}\n`);
 await rm(stage, { recursive: true, force: true });
 console.log(`updated docs/catalog.json (${clips.length} clips)`);
+// re-uploaded assets don't change git, so redeploy Pages explicitly (a catalog push also triggers it)
+await gh("workflow", "run", "pages.yml", "--ref", "main");
+console.log("triggered the Pages deploy (copies release media into the site)");
