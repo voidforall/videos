@@ -788,6 +788,108 @@
           "poster": "https://github.com/voidforall/videos/releases/download/ep-system-payment-gateway/system-payment-gateway-04.jpg"
         }
       ]
+    },
+    {
+      "slug": "system-raft",
+      "series": "system",
+      "title": "Raft consensus",
+      "kicker": "System design · Raft",
+      "summary": "How a cluster agrees on one log: randomized leader election, majority commits, the safety rules, and what a network partition does to writes.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/system/building-blocks/raft.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Leader election",
+          "question": "How does Raft elect a leader, and why are election timeouts randomized?",
+          "duration": 48,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-system-raft/system-raft-01.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-raft/system-raft-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Log replication",
+          "question": "When is a Raft log entry committed, and what keeps committed entries safe?",
+          "duration": 64,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-system-raft/system-raft-02.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-raft/system-raft-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Network partitions",
+          "question": "A five-node cluster splits two and three. What happens to writes on each side?",
+          "duration": 62,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-system-raft/system-raft-03.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-raft/system-raft-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "system-task-scheduler",
+      "series": "system",
+      "title": "Distributed task scheduler",
+      "kicker": "System design · Task scheduler",
+      "summary": "From submit to done: queue, leader scheduler, and workers; push vs pull; heartbeats and rescheduling dead workers; and keeping exactly one scheduler in charge.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/system/design-interview/distributed-task-scheduler.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "From submit to done",
+          "question": "Sketch a distributed task scheduler. What happens from submit to done?",
+          "duration": 59,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-system-task-scheduler/system-task-scheduler-01.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-task-scheduler/system-task-scheduler-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "When a worker dies",
+          "question": "A worker dies mid-task. How do you notice, and what happens to the task?",
+          "duration": 45,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-system-task-scheduler/system-task-scheduler-02.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-task-scheduler/system-task-scheduler-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "A highly available scheduler",
+          "question": "The scheduler is a single point of failure. How do you make it highly available?",
+          "duration": 65,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-system-task-scheduler/system-task-scheduler-03.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-task-scheduler/system-task-scheduler-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "system-database-sharding",
+      "series": "system",
+      "title": "Database sharding",
+      "kicker": "System design · Sharding",
+      "summary": "Hash, range and directory sharding through one query router; what sharding makes harder; logical shards for rebalancing; and when to shard at all.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/system/building-blocks/database-sharding.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Hash, range, or directory",
+          "question": "Hash, range, or directory sharding: what does each one trade off?",
+          "duration": 45,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-system-database-sharding/system-database-sharding-01.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-database-sharding/system-database-sharding-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "What sharding costs you",
+          "question": "What gets harder once your data is sharded?",
+          "duration": 55,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-system-database-sharding/system-database-sharding-02.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-database-sharding/system-database-sharding-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "When to shard",
+          "question": "Your database is struggling. When is sharding actually the right move?",
+          "duration": 45,
+          "video": "https://github.com/voidforall/videos/releases/download/ep-system-database-sharding/system-database-sharding-03.mp4",
+          "poster": "https://github.com/voidforall/videos/releases/download/ep-system-database-sharding/system-database-sharding-03.jpg"
+        }
+      ]
     }
   ]
 }

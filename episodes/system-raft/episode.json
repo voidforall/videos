@@ -1,0 +1,793 @@
+{
+  "slug": "system-raft",
+  "series": "system",
+  "title": "Raft consensus",
+  "kicker": "System design · Raft",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/system/building-blocks/raft.md",
+  "summary": "How a cluster agrees on one log: randomized leader election, majority commits, the safety rules, and what a network partition does to writes.",
+  "captionFixes": [
+    {
+      "match": [
+        "is",
+        "the",
+        "leader",
+        "when"
+      ],
+      "display": "A is the leader when"
+    },
+    {
+      "match": [
+        "R"
+      ],
+      "display": "A"
+    },
+    {
+      "match": [
+        "two",
+        "or",
+        "five"
+      ],
+      "display": "two of five"
+    },
+    {
+      "match": [
+        "three",
+        "or",
+        "five"
+      ],
+      "display": "three of five"
+    },
+    {
+      "match": [
+        "the",
+        "the"
+      ],
+      "display": "the"
+    },
+    {
+      "match": [
+        "append",
+        "entries"
+      ],
+      "display": "AppendEntries"
+    },
+    {
+      "match": [
+        "Apply"
+      ],
+      "display": "apply"
+    },
+    {
+      "match": [
+        "who's"
+      ],
+      "display": "whose"
+    },
+    {
+      "match": [
+        "two",
+        "votes"
+      ],
+      "display": "two, votes"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Leader election",
+      "question": "How does Raft elect a leader, and why are election timeouts randomized?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Raft, question one. How does Raft elect a new leader, and why are the election timeouts randomized? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How does Raft elect a leader, and why <em>randomized</em> timeouts?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "The leader, A, crashes, and its heartbeats stop. Each follower waits a randomized election timeout, somewhere between one fifty and three hundred milliseconds. C's timer fires first. It becomes a candidate: it bumps the term to two, votes for itself, and asks every other server for its vote. B and D grant theirs, which makes three votes out of five: a majority. C becomes leader, and its heartbeats reset everyone else's timers, so nobody else starts an election. If two candidates ever split the vote, both wait another random time and retry, and the randomness makes a second tie unlikely.",
+          "props": {
+            "title": "First timer wins, <em>majority</em> decides",
+            "nodes": [
+              {
+                "id": "A",
+                "x": 680,
+                "y": 280
+              },
+              {
+                "id": "B",
+                "x": 861,
+                "y": 411
+              },
+              {
+                "id": "C",
+                "x": 792,
+                "y": 624
+              },
+              {
+                "id": "D",
+                "x": 568,
+                "y": 624
+              },
+              {
+                "id": "E",
+                "x": 499,
+                "y": 411
+              }
+            ],
+            "edges": [
+              {
+                "from": "A",
+                "to": "B"
+              },
+              {
+                "from": "A",
+                "to": "C"
+              },
+              {
+                "from": "A",
+                "to": "D"
+              },
+              {
+                "from": "A",
+                "to": "E"
+              }
+            ],
+            "panels": [
+              {
+                "key": "term",
+                "label": "Current term",
+                "type": "table",
+                "initial": {
+                  "A": "1",
+                  "B": "1",
+                  "C": "1",
+                  "D": "1",
+                  "E": "1"
+                }
+              },
+              {
+                "key": "votes",
+                "label": "Votes for C",
+                "type": "list",
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "crashes",
+                "nodes": {
+                  "A": "dim"
+                },
+                "edges": {
+                  "A-B": "dim",
+                  "A-C": "dim",
+                  "A-D": "dim",
+                  "A-E": "dim"
+                },
+                "note": "Leader A crashes: heartbeats stop"
+              },
+              {
+                "at": "first",
+                "nodes": {
+                  "C": "queued"
+                },
+                "note": "C's random timeout fires first"
+              },
+              {
+                "at": "candidate",
+                "panels": {
+                  "term": {
+                    "C": "2"
+                  },
+                  "votes": [
+                    "C"
+                  ]
+                },
+                "note": "Candidate: term 2, votes for itself"
+              },
+              {
+                "at": "asks",
+                "add": [
+                  {
+                    "from": "C",
+                    "to": "B"
+                  },
+                  {
+                    "from": "C",
+                    "to": "D"
+                  },
+                  {
+                    "from": "C",
+                    "to": "E"
+                  },
+                  {
+                    "from": "C",
+                    "to": "A"
+                  }
+                ],
+                "edges": {
+                  "C-B": "relax",
+                  "C-D": "relax",
+                  "C-E": "relax",
+                  "C-A": "relax"
+                },
+                "note": "RequestVote(term 2) to every server"
+              },
+              {
+                "at": "grant",
+                "nodes": {
+                  "B": "done",
+                  "D": "done"
+                },
+                "panels": {
+                  "term": {
+                    "B": "2",
+                    "D": "2"
+                  },
+                  "votes": [
+                    "C",
+                    "B",
+                    "D"
+                  ]
+                },
+                "note": "B and D grant: 3 of 5 is a majority"
+              },
+              {
+                "at": "reset",
+                "nodes": {
+                  "C": "active",
+                  "B": "base",
+                  "D": "base"
+                },
+                "edges": {
+                  "C-B": "tree",
+                  "C-D": "tree",
+                  "C-E": "tree",
+                  "C-A": "dim"
+                },
+                "panels": {
+                  "term": {
+                    "E": "2"
+                  }
+                },
+                "note": "Leader C: heartbeats reset every timer"
+              },
+              {
+                "at": "split",
+                "note": "Split vote? Wait a new random timeout, retry"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Log replication",
+      "question": "When is a Raft log entry committed, and what keeps committed entries safe?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. When is a log entry committed in Raft, and what keeps committed entries safe across leader changes? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "When is an entry <em>committed</em>, and what keeps it safe?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "A client sends set x to five to the leader, C. The leader appends it to its own log at index four, but it is not committed yet. It replicates the entry to the followers with AppendEntries. B and D store it and acknowledge. Counting itself, three of five servers now hold the entry: a majority, so it is committed. The leader applies it to its state machine, and replies to the client. The next heartbeat carries the new commit index, so the followers apply it too, and slow E catches up.",
+          "props": {
+            "title": "Committed = on a <em>majority</em>",
+            "nodes": [
+              {
+                "id": "A",
+                "x": 680,
+                "y": 280
+              },
+              {
+                "id": "B",
+                "x": 861,
+                "y": 411
+              },
+              {
+                "id": "C",
+                "x": 792,
+                "y": 624
+              },
+              {
+                "id": "D",
+                "x": 568,
+                "y": 624
+              },
+              {
+                "id": "E",
+                "x": 499,
+                "y": 411
+              },
+              {
+                "id": "client",
+                "label": "Client",
+                "x": 1060,
+                "y": 624,
+                "w": 180,
+                "h": 64
+              }
+            ],
+            "edges": [],
+            "panels": [
+              {
+                "key": "log",
+                "label": "Last log index",
+                "type": "table",
+                "columns": [
+                  "A",
+                  "B",
+                  "C",
+                  "D",
+                  "E"
+                ],
+                "initial": {
+                  "A": "3",
+                  "B": "3",
+                  "C": "3",
+                  "D": "3",
+                  "E": "3"
+                }
+              },
+              {
+                "key": "commit",
+                "label": "Committed",
+                "type": "list",
+                "initial": [
+                  "1–3"
+                ]
+              }
+            ],
+            "steps": [
+              {
+                "at": "sends",
+                "add": [
+                  {
+                    "from": "client",
+                    "to": "C",
+                    "w": "x = 5"
+                  }
+                ],
+                "nodes": {
+                  "A": "dim",
+                  "C": "active"
+                },
+                "edges": {
+                  "client-C": "relax"
+                },
+                "note": "Client → leader C: set x = 5"
+              },
+              {
+                "at": "appends",
+                "edges": {
+                  "client-C": "base"
+                },
+                "panels": {
+                  "log": {
+                    "C": "4"
+                  }
+                },
+                "note": "Leader appends at index 4: not committed yet"
+              },
+              {
+                "at": "replicates",
+                "add": [
+                  {
+                    "from": "C",
+                    "to": "B"
+                  },
+                  {
+                    "from": "C",
+                    "to": "D"
+                  },
+                  {
+                    "from": "C",
+                    "to": "E"
+                  }
+                ],
+                "edges": {
+                  "C-B": "relax",
+                  "C-D": "relax",
+                  "C-E": "relax"
+                },
+                "note": "AppendEntries(index 4) to the followers"
+              },
+              {
+                "at": "acknowledge",
+                "nodes": {
+                  "B": "done",
+                  "D": "done"
+                },
+                "panels": {
+                  "log": {
+                    "B": "4",
+                    "D": "4"
+                  }
+                },
+                "note": "B and D store it and ack; E is slow"
+              },
+              {
+                "at": "majority",
+                "edges": {
+                  "C-B": "tree",
+                  "C-D": "tree"
+                },
+                "panels": {
+                  "commit": [
+                    "1–3",
+                    "4: x = 5"
+                  ]
+                },
+                "note": "3 of 5 hold index 4 → committed"
+              },
+              {
+                "at": "replies",
+                "add": [
+                  {
+                    "from": "C",
+                    "to": "client",
+                    "w": "ok"
+                  }
+                ],
+                "edges": {
+                  "C-client": "relax"
+                },
+                "note": "Apply to the state machine, reply ok"
+              },
+              {
+                "at": "heartbeat",
+                "nodes": {
+                  "B": "base",
+                  "D": "base"
+                },
+                "edges": {
+                  "C-client": "base",
+                  "C-B": "base",
+                  "C-D": "base",
+                  "C-E": "tree"
+                },
+                "panels": {
+                  "log": {
+                    "E": "4"
+                  }
+                },
+                "note": "Heartbeat carries commitIndex 4: all apply"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "Three rules keep committed entries safe. Voters reject a candidate whose log is behind their own, so any new leader already holds every committed entry. If two logs share an entry with the same index and term, they are identical up to that point. And data only flows from leader to follower: the leader overwrites a follower's conflicting entries, never the other way round.",
+          "props": {
+            "title": "Three <em>safety</em> rules",
+            "items": [
+              {
+                "at": "reject",
+                "label": "Election restriction",
+                "title": "Stale logs lose",
+                "body": "Voters refuse a candidate whose log is behind theirs.",
+                "code": "new leader has all commits"
+              },
+              {
+                "at": "identical",
+                "label": "Log matching",
+                "title": "Same index + term",
+                "body": "…means identical logs up to that entry.",
+                "code": "(index, term)"
+              },
+              {
+                "at": "flows",
+                "label": "Leader only",
+                "title": "One direction",
+                "body": "The leader overwrites conflicting follower entries.",
+                "code": "leader → follower"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Network partitions",
+      "question": "A five-node cluster splits two and three. What happens to writes on each side?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. A five-node cluster is split by the network into two servers and three servers. What happens to writes on each side, and when it heals? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "The cluster splits <em>2 | 3</em>. What happens to writes on each side?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "A is the leader when the network splits the cluster: A and B on one side, C, D and E on the other. A still believes it leads, but it can reach only two of five servers, so a write it receives stalls: it can never commit. On the other side, C times out, wins votes from D and E in term three, and becomes leader. With three of five, that side keeps committing writes. When the partition heals, A sees the higher term and steps down. A and B roll back their uncommitted entry, and copy the new leader's log.",
+          "props": {
+            "title": "Only the <em>majority</em> side moves",
+            "nodes": [
+              {
+                "id": "A",
+                "x": 680,
+                "y": 280
+              },
+              {
+                "id": "B",
+                "x": 861,
+                "y": 411
+              },
+              {
+                "id": "C",
+                "x": 792,
+                "y": 624
+              },
+              {
+                "id": "D",
+                "x": 568,
+                "y": 624
+              },
+              {
+                "id": "E",
+                "x": 499,
+                "y": 411
+              },
+              {
+                "id": "wall",
+                "label": "",
+                "x": 560,
+                "y": 460,
+                "w": 10,
+                "h": 440,
+                "hidden": true
+              }
+            ],
+            "edges": [
+              {
+                "from": "A",
+                "to": "B"
+              },
+              {
+                "from": "A",
+                "to": "C"
+              },
+              {
+                "from": "A",
+                "to": "D"
+              },
+              {
+                "from": "A",
+                "to": "E"
+              }
+            ],
+            "panels": [
+              {
+                "key": "term",
+                "label": "Current term",
+                "type": "table",
+                "columns": [
+                  "A",
+                  "B",
+                  "C",
+                  "D",
+                  "E"
+                ],
+                "initial": {
+                  "A": "2",
+                  "B": "2",
+                  "C": "2",
+                  "D": "2",
+                  "E": "2"
+                }
+              },
+              {
+                "key": "writes",
+                "label": "Writes",
+                "type": "list",
+                "rows": 2,
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "splits",
+                "show": [
+                  "wall"
+                ],
+                "move": {
+                  "A": [
+                    300,
+                    340
+                  ],
+                  "B": [
+                    300,
+                    580
+                  ],
+                  "C": [
+                    840,
+                    290
+                  ],
+                  "D": [
+                    1020,
+                    460
+                  ],
+                  "E": [
+                    840,
+                    630
+                  ]
+                },
+                "remove": [
+                  "A-C",
+                  "A-D",
+                  "A-E"
+                ],
+                "nodes": {
+                  "A": "active"
+                },
+                "note": "Partition: {A, B} | {C, D, E}"
+              },
+              {
+                "at": "stalls",
+                "nodes": {
+                  "A": "queued"
+                },
+                "panels": {
+                  "writes": [
+                    "A: x = 7 (stuck)"
+                  ]
+                },
+                "note": "A reaches only 2 of 5: x = 7 can't commit"
+              },
+              {
+                "at": "wins",
+                "add": [
+                  {
+                    "from": "C",
+                    "to": "D"
+                  },
+                  {
+                    "from": "C",
+                    "to": "E"
+                  }
+                ],
+                "nodes": {
+                  "C": "active"
+                },
+                "edges": {
+                  "C-D": "tree",
+                  "C-E": "tree"
+                },
+                "panels": {
+                  "term": {
+                    "C": "3",
+                    "D": "3",
+                    "E": "3"
+                  }
+                },
+                "note": "C wins D and E in term 3"
+              },
+              {
+                "at": "committing",
+                "panels": {
+                  "writes": [
+                    "A: x = 7 (stuck)",
+                    "C: y = 1 ✓"
+                  ]
+                },
+                "note": "3 of 5: C's side commits y = 1"
+              },
+              {
+                "at": "heals",
+                "move": {
+                  "wall": [
+                    560,
+                    -400
+                  ],
+                  "A": [
+                    680,
+                    280
+                  ],
+                  "B": [
+                    861,
+                    411
+                  ],
+                  "C": [
+                    792,
+                    624
+                  ],
+                  "D": [
+                    568,
+                    624
+                  ],
+                  "E": [
+                    499,
+                    411
+                  ]
+                },
+                "remove": [
+                  "A-B"
+                ],
+                "add": [
+                  {
+                    "from": "C",
+                    "to": "A"
+                  },
+                  {
+                    "from": "C",
+                    "to": "B"
+                  }
+                ],
+                "nodes": {
+                  "A": "base"
+                },
+                "edges": {
+                  "C-A": "tree",
+                  "C-B": "tree"
+                },
+                "panels": {
+                  "term": {
+                    "A": "3",
+                    "B": "3"
+                  }
+                },
+                "note": "Heal: A sees term 3 and steps down"
+              },
+              {
+                "at": "roll",
+                "nodes": {
+                  "A": "done",
+                  "B": "done"
+                },
+                "panels": {
+                  "writes": [
+                    "x = 7 rolled back",
+                    "y = 1 ✓ everywhere"
+                  ]
+                },
+                "note": "A and B drop x = 7 and copy C's log"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. A follower whose randomized timeout fires first runs for leader, and a majority of votes elects it. An entry is committed once a majority stores it. Stale logs can't win elections, so commits survive leader changes. And in a partition, only the majority side can make progress.",
+          "props": {
+            "title": "Raft, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "fires",
+                "text": "Randomized timeouts pick one candidate.",
+                "code": "150–300 ms"
+              },
+              {
+                "at": "stores",
+                "text": "Committed once a majority stores it.",
+                "code": "3 of 5"
+              },
+              {
+                "at": "stale",
+                "text": "Stale logs can't win: commits survive.",
+                "code": "election restriction"
+              },
+              {
+                "at": "partition",
+                "text": "In a partition, only the majority progresses.",
+                "code": "higher term wins"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

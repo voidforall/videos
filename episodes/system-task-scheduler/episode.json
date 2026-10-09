@@ -1,0 +1,712 @@
+{
+  "slug": "system-task-scheduler",
+  "series": "system",
+  "title": "Distributed task scheduler",
+  "kicker": "System design · Task scheduler",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/system/design-interview/distributed-task-scheduler.md",
+  "summary": "From submit to done: queue, leader scheduler, and workers; push vs pull; heartbeats and rescheduling dead workers; and keeping exactly one scheduler in charge.",
+  "captionFixes": [
+    {
+      "match": [
+        "task",
+        "scheduler",
+        "question"
+      ],
+      "display": "Task scheduler, question"
+    },
+    {
+      "match": [
+        "decues"
+      ],
+      "display": "dequeues"
+    },
+    {
+      "match": [
+        "who",
+        "starts"
+      ],
+      "display": "Who starts"
+    },
+    {
+      "match": [
+        "T7"
+      ],
+      "display": "t7"
+    },
+    {
+      "match": [
+        "rights"
+      ],
+      "display": "writes"
+    },
+    {
+      "match": [
+        "token",
+        "a",
+        "stale"
+      ],
+      "display": "token, so a stale"
+    },
+    {
+      "match": [
+        "ECT"
+      ],
+      "display": "etcd"
+    },
+    {
+      "match": [
+        "S11"
+      ],
+      "display": "S1 won,"
+    },
+    {
+      "match": [
+        "watch",
+        "is",
+        "fire"
+      ],
+      "display": "watches fire"
+    },
+    {
+      "match": [
+        "run",
+        "several"
+      ],
+      "display": "Run several"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "From submit to done",
+      "question": "Sketch a distributed task scheduler. What happens from submit to done?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Task scheduler, question one. Sketch a distributed task scheduler, and walk a task from submit to done. Pause and sketch it out.",
+          "pauseAfter": 4,
+          "props": {
+            "question": "Walk one task from <em>submit</em> to <em>done</em>."
+          }
+        },
+        {
+          "type": "graph",
+          "say": "A client submits a task to one of the stateless API servers. It validates the request, puts the task on the queue, and records it in the state store as pending. The leader scheduler dequeues it, and checks the state store for a worker with enough free CPU, memory or GPU. It assigns the task, and marks it scheduled. The worker runs it, and reports running, then completed or failed, back to the scheduler, which updates the state store.",
+          "props": {
+            "title": "Queue, schedule, <em>run</em>, record",
+            "nodes": [
+              {
+                "id": "client",
+                "label": "Client",
+                "x": 190,
+                "y": 330,
+                "w": 180,
+                "h": 70
+              },
+              {
+                "id": "api",
+                "label": "API servers",
+                "x": 610,
+                "y": 330,
+                "w": 240,
+                "h": 70
+              },
+              {
+                "id": "queue",
+                "label": "Task queue",
+                "x": 1000,
+                "y": 330,
+                "w": 240,
+                "h": 70
+              },
+              {
+                "id": "sched",
+                "label": "Scheduler\n(leader)",
+                "x": 1450,
+                "y": 330,
+                "w": 260,
+                "h": 90
+              },
+              {
+                "id": "store",
+                "label": "State store",
+                "x": 1000,
+                "y": 640,
+                "w": 240,
+                "h": 70
+              },
+              {
+                "id": "workers",
+                "label": "Workers",
+                "x": 1450,
+                "y": 640,
+                "w": 260,
+                "h": 70
+              }
+            ],
+            "edges": [
+              {
+                "from": "client",
+                "to": "api",
+                "w": "POST /tasks"
+              },
+              {
+                "from": "api",
+                "to": "queue"
+              },
+              {
+                "from": "api",
+                "to": "store",
+                "w": "pending"
+              },
+              {
+                "from": "queue",
+                "to": "sched"
+              },
+              {
+                "from": "sched",
+                "to": "store"
+              },
+              {
+                "from": "sched",
+                "to": "workers"
+              },
+              {
+                "from": "workers",
+                "to": "sched"
+              }
+            ],
+            "panels": [],
+            "steps": [
+              {
+                "at": "submits",
+                "nodes": {
+                  "client": "active"
+                },
+                "edges": {
+                  "client-api": "relax"
+                },
+                "note": "POST /tasks → any API server"
+              },
+              {
+                "at": "validates",
+                "nodes": {
+                  "client": "base",
+                  "api": "active"
+                },
+                "edges": {
+                  "client-api": "base",
+                  "api-queue": "relax"
+                },
+                "note": "Validate, then enqueue"
+              },
+              {
+                "at": "pending",
+                "nodes": {
+                  "store": "active"
+                },
+                "edges": {
+                  "api-queue": "base",
+                  "api-store": "relax"
+                },
+                "note": "State store: pending"
+              },
+              {
+                "at": "dequeues",
+                "nodes": {
+                  "api": "base",
+                  "store": "base",
+                  "sched": "active"
+                },
+                "edges": {
+                  "api-store": "base",
+                  "queue-sched": "relax"
+                },
+                "note": "The leader scheduler takes the task"
+              },
+              {
+                "at": "enough",
+                "nodes": {
+                  "store": "active"
+                },
+                "edges": {
+                  "queue-sched": "base",
+                  "sched-store": "relax"
+                },
+                "note": "Find a worker with free CPU / RAM / GPU"
+              },
+              {
+                "at": "assigns",
+                "nodes": {
+                  "store": "base",
+                  "workers": "active"
+                },
+                "edges": {
+                  "sched-store": "base",
+                  "sched-workers": "relax"
+                },
+                "note": "Assign: state = scheduled"
+              },
+              {
+                "at": "reports",
+                "nodes": {
+                  "sched": "base"
+                },
+                "edges": {
+                  "sched-workers": "base",
+                  "workers-sched": "relax"
+                },
+                "note": "running → completed | failed"
+              },
+              {
+                "at": "updates",
+                "nodes": {
+                  "workers": "base",
+                  "store": "done"
+                },
+                "edges": {
+                  "workers-sched": "base",
+                  "sched-store": "tree"
+                },
+                "note": "The scheduler records the final state"
+              }
+            ]
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Who starts each assignment? In a push model, the scheduler sends tasks to workers. It has the global view, so it can pack tasks tightly, but it must track every worker's load precisely. In a pull model, idle workers ask for work. They only take what they can run, which gives natural backpressure, and scales more simply. That is why pull is often preferred.",
+          "props": {
+            "title": "Push or <em>pull</em>?",
+            "left": {
+              "at": "push",
+              "label": "Push",
+              "title": "Scheduler sends",
+              "body": "Global view allows tight bin-packing, but it must track every worker's load."
+            },
+            "right": {
+              "at": "pull",
+              "label": "Pull",
+              "title": "Workers ask",
+              "tone": "good",
+              "body": "Workers take only what they can run: natural backpressure, simpler to scale."
+            },
+            "verdict": {
+              "at": "preferred",
+              "text": "Pull is the usual default; push when placement matters.",
+              "code": "worker.poll()"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "When a worker dies",
+      "question": "A worker dies mid-task. How do you notice, and what happens to the task?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. A worker dies in the middle of a task. How does the scheduler notice, and what happens to the task? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "A worker dies <em>mid-task</em>. How do you notice, and then what?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Every worker sends a heartbeat every few seconds, carrying its free resources. W2 is running task t7, when it crashes, and its heartbeats stop. After three missed heartbeats, the scheduler marks W2 dead, marks t7 failed, and reschedules it on a healthy worker, W3. But W2 might not be dead at all, only cut off by the network, and still running t7. So the same task can run twice. Tasks must be idempotent, or their writes must carry a fencing token, so a stale worker's results are rejected.",
+          "props": {
+            "title": "Missed heartbeats, <em>reschedule</em>",
+            "nodes": [
+              {
+                "id": "sched",
+                "label": "Scheduler",
+                "x": 360,
+                "y": 470,
+                "w": 250,
+                "h": 70
+              },
+              {
+                "id": "W1",
+                "x": 900,
+                "y": 290,
+                "w": 170,
+                "h": 64
+              },
+              {
+                "id": "W2",
+                "x": 900,
+                "y": 470,
+                "w": 170,
+                "h": 64
+              },
+              {
+                "id": "W3",
+                "x": 900,
+                "y": 650,
+                "w": 170,
+                "h": 64
+              }
+            ],
+            "edges": [
+              {
+                "from": "W1",
+                "to": "sched"
+              },
+              {
+                "from": "W2",
+                "to": "sched"
+              },
+              {
+                "from": "W3",
+                "to": "sched"
+              }
+            ],
+            "panels": [
+              {
+                "key": "hb",
+                "label": "Since last heartbeat",
+                "type": "table",
+                "columns": [
+                  "W1",
+                  "W2",
+                  "W3"
+                ],
+                "initial": {
+                  "W1": "1s",
+                  "W2": "2s",
+                  "W3": "1s"
+                }
+              },
+              {
+                "key": "task",
+                "label": "Task t7",
+                "type": "list",
+                "initial": [
+                  "running on W2"
+                ]
+              }
+            ],
+            "steps": [
+              {
+                "at": "heartbeat",
+                "edges": {
+                  "W1-sched": "relax",
+                  "W2-sched": "relax",
+                  "W3-sched": "relax"
+                },
+                "note": "Heartbeats every 3 s: alive + free resources"
+              },
+              {
+                "at": "crashes",
+                "nodes": {
+                  "W2": "dim"
+                },
+                "edges": {
+                  "W1-sched": "base",
+                  "W2-sched": "dim",
+                  "W3-sched": "base"
+                },
+                "panels": {
+                  "hb": {
+                    "W2": "4s"
+                  }
+                },
+                "note": "W2 crashes in the middle of t7"
+              },
+              {
+                "at": "missed",
+                "panels": {
+                  "hb": {
+                    "W2": "9s"
+                  }
+                },
+                "note": "Three missed heartbeats…"
+              },
+              {
+                "at": "dead",
+                "nodes": {
+                  "sched": "active"
+                },
+                "panels": {
+                  "task": [
+                    "failed: W2 dead"
+                  ]
+                },
+                "note": "…W2 marked dead, t7 marked failed"
+              },
+              {
+                "at": "reschedules",
+                "add": [
+                  {
+                    "from": "sched",
+                    "to": "W3",
+                    "w": "t7"
+                  }
+                ],
+                "nodes": {
+                  "sched": "base",
+                  "W3": "active"
+                },
+                "edges": {
+                  "sched-W3": "relax"
+                },
+                "panels": {
+                  "task": [
+                    "running on W3"
+                  ]
+                },
+                "note": "Reschedule t7 on healthy W3"
+              },
+              {
+                "at": "network",
+                "nodes": {
+                  "W2": "queued"
+                },
+                "note": "But W2 may only be partitioned…"
+              },
+              {
+                "at": "twice",
+                "panels": {
+                  "task": [
+                    "W3 ✓",
+                    "W2 still running?"
+                  ]
+                },
+                "note": "…so t7 can run twice"
+              },
+              {
+                "at": "fencing",
+                "nodes": {
+                  "W2": "dim"
+                },
+                "note": "Idempotent tasks, or fencing tokens on writes"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "A highly available scheduler",
+      "question": "The scheduler is a single point of failure. How do you make it highly available?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. The scheduler looks like a single point of failure. How do you make it highly available, without two schedulers fighting? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How do you make the scheduler <em>highly available</em>?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Run several scheduler instances, but let only one act. Each holds a session with ZooKeeper or etcd, and races to create the same leader key. S1 won, so only S1 schedules. S2 and S3 stand by, watching the key. When S1 crashes, its session expires, and the key is deleted. The watches fire, and S2 grabs the key, as leader in a new epoch. It rebuilds its view from the state store, and resumes scheduling. And if S1 comes back still thinking it leads, its writes carry the old epoch, and are rejected.",
+          "props": {
+            "title": "One leader, <em>hot standbys</em>",
+            "nodes": [
+              {
+                "id": "zk",
+                "label": "ZooKeeper / etcd",
+                "x": 640,
+                "y": 270,
+                "w": 320,
+                "h": 70
+              },
+              {
+                "id": "S1",
+                "x": 280,
+                "y": 490,
+                "w": 170,
+                "h": 64
+              },
+              {
+                "id": "S2",
+                "x": 640,
+                "y": 490,
+                "w": 170,
+                "h": 64
+              },
+              {
+                "id": "S3",
+                "x": 1000,
+                "y": 490,
+                "w": 170,
+                "h": 64
+              },
+              {
+                "id": "store",
+                "label": "State store",
+                "x": 640,
+                "y": 680,
+                "w": 240,
+                "h": 60,
+                "hidden": true
+              }
+            ],
+            "edges": [
+              {
+                "from": "S1",
+                "to": "zk"
+              },
+              {
+                "from": "S2",
+                "to": "zk"
+              },
+              {
+                "from": "S3",
+                "to": "zk"
+              }
+            ],
+            "panels": [
+              {
+                "key": "lock",
+                "label": "/scheduler/leader",
+                "type": "list",
+                "initial": [
+                  "(free)"
+                ]
+              }
+            ],
+            "steps": [
+              {
+                "at": "races",
+                "edges": {
+                  "S1-zk": "relax",
+                  "S2-zk": "relax",
+                  "S3-zk": "relax"
+                },
+                "note": "All three race to create the leader key"
+              },
+              {
+                "at": "won",
+                "nodes": {
+                  "S1": "active"
+                },
+                "edges": {
+                  "S1-zk": "tree",
+                  "S2-zk": "base",
+                  "S3-zk": "base"
+                },
+                "panels": {
+                  "lock": [
+                    "S1 · epoch 7"
+                  ]
+                },
+                "note": "S1 holds the key: only S1 schedules"
+              },
+              {
+                "at": "watching",
+                "nodes": {
+                  "S2": "queued",
+                  "S3": "queued"
+                },
+                "note": "S2 and S3 stand by, watching the key"
+              },
+              {
+                "at": "crashes",
+                "nodes": {
+                  "S1": "dim"
+                },
+                "edges": {
+                  "S1-zk": "dim"
+                },
+                "note": "S1 crashes…"
+              },
+              {
+                "at": "expires",
+                "panels": {
+                  "lock": [
+                    "(deleted)"
+                  ]
+                },
+                "note": "…its session expires, the key is deleted"
+              },
+              {
+                "at": "grabs",
+                "nodes": {
+                  "S2": "active",
+                  "S3": "base"
+                },
+                "edges": {
+                  "S2-zk": "tree"
+                },
+                "panels": {
+                  "lock": [
+                    "S2 · epoch 8"
+                  ]
+                },
+                "note": "Watch fires: S2 takes the key in epoch 8"
+              },
+              {
+                "at": "rebuilds",
+                "show": [
+                  "store"
+                ],
+                "add": [
+                  {
+                    "from": "S2",
+                    "to": "store",
+                    "w": "reload"
+                  }
+                ],
+                "edges": {
+                  "S2-store": "relax"
+                },
+                "note": "Rebuild state from the store, resume"
+              },
+              {
+                "at": "thinking",
+                "nodes": {
+                  "S1": "queued"
+                },
+                "edges": {
+                  "S2-store": "base"
+                },
+                "note": "Old S1 is back, still thinks it leads…"
+              },
+              {
+                "at": "rejected",
+                "nodes": {
+                  "S1": "dim"
+                },
+                "note": "…its epoch-7 writes are rejected (fencing)"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Stateless API servers, and a queue that absorbs bursts. One leader scheduler matches tasks to workers with room, and workers usually pull. Missed heartbeats mark a worker dead, and its tasks are rescheduled, so tasks must be idempotent. And leader election with epochs keeps exactly one scheduler in charge.",
+          "props": {
+            "title": "Task scheduler, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "absorbs",
+                "text": "Stateless API servers; a queue absorbs bursts.",
+                "code": "pending"
+              },
+              {
+                "at": "matches",
+                "text": "One leader matches tasks to workers with room.",
+                "code": "pull-based"
+              },
+              {
+                "at": "rescheduled",
+                "text": "Missed heartbeats → reschedule; be idempotent.",
+                "code": "at-least-once"
+              },
+              {
+                "at": "epochs",
+                "text": "Election + epochs: exactly one scheduler.",
+                "code": "fencing"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,493 @@
+{
+  "slug": "system-database-sharding",
+  "series": "system",
+  "title": "Database sharding",
+  "kicker": "System design · Sharding",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/system/building-blocks/database-sharding.md",
+  "summary": "Hash, range and directory sharding through one query router; what sharding makes harder; logical shards for rebalancing; and when to shard at all.",
+  "captionFixes": [
+    {
+      "match": [
+        "sharding",
+        "question",
+        "one",
+        "hash",
+        "range"
+      ],
+      "display": "sharding, question one. Hash, range"
+    },
+    {
+      "match": [
+        "off",
+        "pause"
+      ],
+      "display": "off? Pause"
+    },
+    {
+      "match": [
+        "user",
+        "id"
+      ],
+      "display": "user ID"
+    },
+    {
+      "match": [
+        "But",
+        "every",
+        "query"
+      ],
+      "display": "but every query"
+    },
+    {
+      "match": [
+        "scattergather"
+      ],
+      "display": "scatter-gather"
+    },
+    {
+      "match": [
+        "two",
+        "phase"
+      ],
+      "display": "two-phase"
+    },
+    {
+      "match": [
+        "mod",
+        "n"
+      ],
+      "display": "mod N"
+    },
+    {
+      "match": [
+        "Rebalancing",
+        "with"
+      ],
+      "display": "Rebalancing: with"
+    },
+    {
+      "match": [
+        "that",
+        "rebalancing"
+      ],
+      "display": "That rebalancing"
+    },
+    {
+      "match": [
+        "#mod"
+      ],
+      "display": "hash mod"
+    },
+    {
+      "match": [
+        "sharding",
+        "is",
+        "a",
+        "last"
+      ],
+      "display": "Sharding is a last"
+    },
+    {
+      "match": [
+        "out",
+        "loud"
+      ],
+      "display": "out loud."
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Hash, range, or directory",
+      "question": "Hash, range, or directory sharding: what does each one trade off?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Database sharding, question one. Hash, range, or directory sharding: what does each one trade off? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "<em>Hash</em>, <em>range</em> or <em>directory</em> sharding: what's the trade-off?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "With hash sharding, a lookup by user ID hashes the key, and lands on exactly one shard, and data spreads evenly. But a range query, all orders in May, has no idea where those rows live, so the router must scatter it to every shard. Range sharding fixes that: May sits on one shard. The catch is a hotspot: every new order lands in the newest range, so one shard takes all the writes. A directory maps each key to a shard in a lookup table. You can move any key anywhere, but every query pays an extra hop, and the directory must never go down.",
+          "props": {
+            "title": "One router, <em>three</em> placement rules",
+            "nodes": [
+              {
+                "id": "app",
+                "label": "App",
+                "x": 170,
+                "y": 470,
+                "w": 160,
+                "h": 70
+              },
+              {
+                "id": "router",
+                "label": "Query\nrouter",
+                "x": 500,
+                "y": 470,
+                "w": 220,
+                "h": 90
+              },
+              {
+                "id": "S1",
+                "label": "Shard 1",
+                "x": 970,
+                "y": 290,
+                "w": 200,
+                "h": 64
+              },
+              {
+                "id": "S2",
+                "label": "Shard 2",
+                "x": 970,
+                "y": 470,
+                "w": 200,
+                "h": 64
+              },
+              {
+                "id": "S3",
+                "label": "Shard 3",
+                "x": 970,
+                "y": 650,
+                "w": 200,
+                "h": 64
+              },
+              {
+                "id": "dir",
+                "label": "Directory",
+                "x": 500,
+                "y": 680,
+                "w": 220,
+                "h": 60,
+                "hidden": true
+              }
+            ],
+            "edges": [
+              {
+                "from": "app",
+                "to": "router"
+              },
+              {
+                "from": "router",
+                "to": "S1"
+              },
+              {
+                "from": "router",
+                "to": "S2"
+              },
+              {
+                "from": "router",
+                "to": "S3"
+              }
+            ],
+            "panels": [
+              {
+                "key": "rule",
+                "label": "Placement",
+                "type": "list",
+                "initial": []
+              },
+              {
+                "key": "query",
+                "label": "Query",
+                "type": "list",
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "lookup",
+                "nodes": {
+                  "S2": "active"
+                },
+                "edges": {
+                  "app-router": "relax",
+                  "router-S2": "relax"
+                },
+                "panels": {
+                  "rule": [
+                    "hash(user_id) % 3"
+                  ],
+                  "query": [
+                    "user_id = 123"
+                  ]
+                },
+                "note": "Point lookup: the hash picks exactly one shard"
+              },
+              {
+                "at": "evenly",
+                "nodes": {
+                  "S1": "done",
+                  "S2": "done",
+                  "S3": "done"
+                },
+                "edges": {
+                  "router-S2": "base"
+                },
+                "note": "Hashing spreads rows evenly"
+              },
+              {
+                "at": "scatter",
+                "nodes": {
+                  "S1": "active",
+                  "S2": "active",
+                  "S3": "active"
+                },
+                "edges": {
+                  "router-S1": "relax",
+                  "router-S2": "relax",
+                  "router-S3": "relax"
+                },
+                "panels": {
+                  "query": [
+                    "orders in May"
+                  ]
+                },
+                "note": "Range query on a hashed key: ask every shard"
+              },
+              {
+                "at": "fixes",
+                "nodes": {
+                  "S1": "base",
+                  "S3": "base"
+                },
+                "edges": {
+                  "router-S1": "base",
+                  "router-S3": "base"
+                },
+                "panels": {
+                  "rule": [
+                    "range(order_date)"
+                  ]
+                },
+                "note": "Range sharding: May lives on shard 2"
+              },
+              {
+                "at": "hotspot",
+                "nodes": {
+                  "S2": "base",
+                  "S3": "queued"
+                },
+                "edges": {
+                  "router-S2": "base",
+                  "router-S3": "relax"
+                },
+                "panels": {
+                  "query": [
+                    "INSERT today's orders"
+                  ]
+                },
+                "note": "Every new order hits the newest range: hotspot"
+              },
+              {
+                "at": "directory",
+                "show": [
+                  "dir"
+                ],
+                "add": [
+                  {
+                    "from": "router",
+                    "to": "dir",
+                    "w": "key → shard?"
+                  }
+                ],
+                "nodes": {
+                  "S3": "base",
+                  "dir": "active"
+                },
+                "edges": {
+                  "router-S3": "base",
+                  "router-dir": "relax"
+                },
+                "panels": {
+                  "rule": [
+                    "directory lookup"
+                  ],
+                  "query": [
+                    "customer 456"
+                  ]
+                },
+                "note": "Directory: move any key by editing a table…"
+              },
+              {
+                "at": "hop",
+                "nodes": {
+                  "dir": "queued"
+                },
+                "note": "…but an extra hop, and it must never go down"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "What sharding costs you",
+      "question": "What gets harder once your data is sharded?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. What gets harder once your data is sharded, and how do you soften each cost? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What gets <em>harder</em> once your data is sharded?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Sharding makes four things harder. Joins across shards turn into slow scatter-gather, so denormalize, or pick a shard key that keeps related rows together, like the tenant ID. Transactions across shards need two-phase commit, or a saga. Rebalancing: with hash mod N, adding a shard moves most rows. And every operation, from backups to schema changes, now runs once per shard.",
+          "props": {
+            "title": "Four <em>costs</em>",
+            "items": [
+              {
+                "at": "Joins",
+                "label": "Cross-shard joins",
+                "title": "Co-locate",
+                "body": "Shard by tenant_id so related rows live together.",
+                "code": "scatter-gather"
+              },
+              {
+                "at": "Transactions",
+                "label": "Cross-shard writes",
+                "title": "2PC or saga",
+                "body": "ACID across shards is slow and fragile.",
+                "code": "two-phase commit"
+              },
+              {
+                "at": "Rebalancing",
+                "label": "Adding shards",
+                "title": "Rows move",
+                "body": "hash % N remaps most keys when N changes.",
+                "code": "hash % N"
+              },
+              {
+                "at": "operation",
+                "label": "Operations",
+                "title": "Everything × N",
+                "body": "Backups, migrations and monitoring per shard.",
+                "code": "ops overhead"
+              }
+            ]
+          }
+        },
+        {
+          "type": "compare",
+          "say": "That rebalancing cost deserves a fix. With hash mod the number of hosts, going from four hosts to five moves about eighty percent of the rows. Instead, pre-split the key space into, say, a thousand and twenty-four logical shards, and map them onto hosts. Adding a host then moves a few whole logical shards, and only the mapping changes.",
+          "props": {
+            "title": "Move shards, <em>not rows</em>",
+            "lang": "python",
+            "left": {
+              "at": "going",
+              "label": "Hash by host count",
+              "title": "hash % hosts",
+              "tone": "bad",
+              "code": "host = hash(key) % 4    # now % 5\n# ~80% of rows move"
+            },
+            "right": {
+              "at": "logical",
+              "label": "Logical shards",
+              "title": "Fixed shard count",
+              "tone": "good",
+              "code": "shard = hash(key) % 1024   # never changes\nhost = shard_map[shard]    # edit to move"
+            },
+            "verdict": {
+              "at": "mapping",
+              "text": "Fix the shard count; rebalance by moving whole shards.",
+              "code": "shard_map"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "When to shard",
+      "question": "Your database is struggling. When is sharding actually the right move?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. Your database is struggling. When is sharding actually the right move? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "When is sharding <em>actually</em> the right move?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Sharding is a last resort, so climb the ladder first. Fix slow queries and missing indexes. Scale up to a bigger machine. Offload reads to replicas and a cache. Shard only when writes, or the data itself, outgrow a single primary.",
+          "props": {
+            "title": "Climb the <em>ladder</em> first",
+            "items": [
+              {
+                "at": "queries",
+                "label": "Step 1",
+                "title": "Tune",
+                "body": "Slow queries, missing indexes.",
+                "code": "EXPLAIN"
+              },
+              {
+                "at": "bigger",
+                "label": "Step 2",
+                "title": "Scale up",
+                "body": "More CPU, RAM, faster disks.",
+                "code": "vertical"
+              },
+              {
+                "at": "replicas",
+                "label": "Step 3",
+                "title": "Offload reads",
+                "body": "Read replicas and a cache.",
+                "code": "reads ≫ writes"
+              },
+              {
+                "at": "outgrow",
+                "label": "Step 4",
+                "title": "Shard",
+                "body": "Writes or data outgrow one primary.",
+                "code": "last resort"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Hash sharding spreads load, but scatters range queries. Range sharding keeps ranges together, but creates hotspots. A directory is flexible, but adds a hop. Keep related rows on one shard, rebalance with logical shards, and shard only after tuning, scaling up, and replicas.",
+          "props": {
+            "title": "Sharding, <em>in five lines</em>",
+            "items": [
+              {
+                "at": "spreads",
+                "text": "Hash: even load, scattered range queries.",
+                "code": "hash(key) % N"
+              },
+              {
+                "at": "hotspots",
+                "text": "Range: fast ranges, write hotspots.",
+                "code": "order_date"
+              },
+              {
+                "at": "flexible",
+                "text": "Directory: flexible, but an extra hop.",
+                "code": "key → shard"
+              },
+              {
+                "at": "related",
+                "text": "Co-locate related rows; move logical shards.",
+                "code": "tenant_id"
+              },
+              {
+                "at": "only",
+                "text": "Shard only after tuning, scaling up, replicas.",
+                "code": "last resort"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
