@@ -25,6 +25,11 @@
       "id": "build",
       "title": "Build it",
       "blurb": "Concrete implementation problems, interview style: the spec, the data structure, the core operation animated, a pause to write it yourself, then the code."
+    },
+    {
+      "id": "tools",
+      "title": "Tools & frameworks",
+      "blurb": "The tools you actually reach for: Pydantic and FastAPI for services, perf and Valgrind for finding out why native code is slow or broken."
     }
   ],
   "episodes": [
@@ -1343,6 +1348,142 @@
           "duration": 59,
           "video": "media/python-imports-03.mp4",
           "poster": "media/python-imports-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "tools-pydantic",
+      "series": "tools",
+      "title": "Pydantic",
+      "kicker": "Tools · Pydantic",
+      "summary": "Type hints as a runtime schema: parsing and coercion, collected validation errors, constraints and validators, settings from the environment, and what changed in v2.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/python/pydantic.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Parse, don't just check",
+          "question": "What does a Pydantic model do with input like id=\"123\", and with bad input?",
+          "duration": 51,
+          "video": "media/tools-pydantic-01.mp4",
+          "poster": "media/tools-pydantic-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Constraints and validators",
+          "question": "How do you express rules like price > 0, or passwords must match?",
+          "duration": 41,
+          "video": "media/tools-pydantic-02.mp4",
+          "poster": "media/tools-pydantic-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Settings, serialization, and v2",
+          "question": "How do you load config from the environment, serialize models, and what changed in Pydantic v2?",
+          "duration": 72,
+          "video": "media/tools-pydantic-03.mp4",
+          "poster": "media/tools-pydantic-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "tools-fastapi",
+      "series": "tools",
+      "title": "FastAPI",
+      "kicker": "Tools · FastAPI",
+      "summary": "How FastAPI turns a typed function into an API: routing, validation and 422s, dependencies, response models, def vs async def and the thread pool, and lifespan.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/python/fastapi.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "One signature, many jobs",
+          "question": "What does FastAPI do with the type hints on an endpoint?",
+          "duration": 70,
+          "video": "media/tools-fastapi-01.mp4",
+          "poster": "media/tools-fastapi-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "def or async def?",
+          "question": "Should an endpoint be async def or def, and what happens if you get it wrong?",
+          "duration": 61,
+          "video": "media/tools-fastapi-02.mp4",
+          "poster": "media/tools-fastapi-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Dependencies and lifespan",
+          "question": "How do you manage per-request resources and app-wide startup and shutdown?",
+          "duration": 59,
+          "video": "media/tools-fastapi-03.mp4",
+          "poster": "media/tools-fastapi-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "tools-perf",
+      "series": "tools",
+      "title": "perf",
+      "kicker": "Tools · perf",
+      "summary": "Linux's sampling profiler: PMU overflow interrupts and ring buffers, stat vs record vs trace, a 100%-CPU diagnosis with IPC and flame graphs, and the gotchas.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/system/low-level/perf.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "How sampling works",
+          "question": "How does perf profile a program with almost no overhead?",
+          "duration": 66,
+          "video": "media/tools-perf-01.mp4",
+          "poster": "media/tools-perf-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Diagnosing 100% CPU",
+          "question": "A service is pinned at 100% CPU. How do you diagnose it with perf?",
+          "duration": 45,
+          "video": "media/tools-perf-02.mp4",
+          "poster": "media/tools-perf-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "The gotchas",
+          "question": "Why might perf mislead you?",
+          "duration": 64,
+          "video": "media/tools-perf-03.mp4",
+          "poster": "media/tools-perf-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "tools-valgrind",
+      "series": "tools",
+      "title": "Valgrind",
+      "kicker": "Tools · Valgrind",
+      "summary": "A synthetic CPU for finding memory bugs: dynamic recompilation through VEX IR, Memcheck's shadow memory and free quarantine, leak categories, and when to choose sanitizers instead.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/system/low-level/valgrind.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "A synthetic CPU",
+          "question": "How does Valgrind find memory bugs in a binary you never recompiled?",
+          "duration": 44,
+          "video": "media/tools-valgrind-01.mp4",
+          "poster": "media/tools-valgrind-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Memcheck in action",
+          "question": "How does Memcheck catch use-after-free and uninitialized reads?",
+          "duration": 44,
+          "video": "media/tools-valgrind-02.mp4",
+          "poster": "media/tools-valgrind-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Valgrind or sanitizers?",
+          "question": "ASan exists. When would you still reach for Valgrind?",
+          "duration": 77,
+          "video": "media/tools-valgrind-03.mp4",
+          "poster": "media/tools-valgrind-03.jpg"
         }
       ]
     }

@@ -1,0 +1,427 @@
+{
+  "slug": "tools-perf",
+  "series": "tools",
+  "title": "perf",
+  "kicker": "Tools · perf",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/system/low-level/perf.md",
+  "summary": "Linux's sampling profiler: PMU overflow interrupts and ring buffers, stat vs record vs trace, a 100%-CPU diagnosis with IPC and flame graphs, and the gotchas.",
+  "captionFixes": [
+    {
+      "match": [
+        "Perf",
+        "Question"
+      ],
+      "display": "perf, question"
+    },
+    {
+      "match": [
+        "PERF"
+      ],
+      "display": "perf"
+    },
+    {
+      "match": [
+        "Perf"
+      ],
+      "display": "perf"
+    },
+    {
+      "match": [
+        "perf",
+        "shed"
+      ],
+      "display": "perf sched"
+    },
+    {
+      "match": [
+        "dwarf"
+      ],
+      "display": "DWARF"
+    },
+    {
+      "match": [
+        "pebs"
+      ],
+      "display": "PEBS"
+    },
+    {
+      "match": [
+        "i/o"
+      ],
+      "display": "I/O"
+    },
+    {
+      "match": [
+        "on",
+        "CPU"
+      ],
+      "display": "on-CPU"
+    },
+    {
+      "match": [
+        "off",
+        "CPU"
+      ],
+      "display": "off-CPU"
+    },
+    {
+      "match": [
+        "readaflame"
+      ],
+      "display": "read a flame"
+    },
+    {
+      "match": [
+        "sample's"
+      ],
+      "display": "samples"
+    },
+    {
+      "match": [
+        "dash",
+        "D"
+      ],
+      "display": "-d"
+    },
+    {
+      "match": [
+        "n",
+        "events"
+      ],
+      "display": "N events"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "How sampling works",
+      "question": "How does perf profile a program with almost no overhead?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "perf, question one. How does perf profile a running program, down to the function, with almost no overhead? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How does <em>perf</em> profile with almost no overhead?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "The CPU's performance monitoring unit counts an event in hardware: cycles, by default. perf programs the counter to overflow every N events, about four thousand times a second. Each overflow raises a non-maskable interrupt, and the kernel captures the instruction pointer and the call stack, writing the sample into a per-CPU ring buffer. perf record drains that buffer into perf dot data, and perf report symbolizes the samples, or you fold them into a flame graph. Because it samples instead of instrumenting, overhead stays at a few percent. But anything shorter than one sample period can be missed.",
+          "props": {
+            "title": "Count, overflow, <em>sample</em>",
+            "nodes": [
+              {
+                "id": "app",
+                "label": "your code",
+                "x": 170,
+                "y": 470,
+                "w": 180,
+                "h": 64
+              },
+              {
+                "id": "pmu",
+                "label": "PMU counter",
+                "x": 470,
+                "y": 290,
+                "w": 220,
+                "h": 64
+              },
+              {
+                "id": "nmi",
+                "label": "NMI → kernel",
+                "x": 900,
+                "y": 290,
+                "w": 230,
+                "h": 64
+              },
+              {
+                "id": "ring",
+                "label": "per-CPU\nring buffer",
+                "x": 900,
+                "y": 640,
+                "w": 220,
+                "h": 86
+              },
+              {
+                "id": "data",
+                "label": "perf record\n→ perf.data",
+                "x": 1220,
+                "y": 640,
+                "w": 240,
+                "h": 86
+              },
+              {
+                "id": "rep",
+                "label": "perf report ·\nflame graph",
+                "x": 1600,
+                "y": 470,
+                "w": 250,
+                "h": 86
+              }
+            ],
+            "edges": [
+              {
+                "from": "app",
+                "to": "pmu"
+              },
+              {
+                "from": "pmu",
+                "to": "nmi",
+                "w": "overflow"
+              },
+              {
+                "from": "nmi",
+                "to": "ring",
+                "w": "IP + stack"
+              },
+              {
+                "from": "ring",
+                "to": "data"
+              },
+              {
+                "from": "data",
+                "to": "rep"
+              }
+            ],
+            "panels": [],
+            "steps": [
+              {
+                "at": "counts",
+                "nodes": {
+                  "pmu": "active"
+                },
+                "edges": {
+                  "app-pmu": "relax"
+                },
+                "note": "Hardware counts cycles: free"
+              },
+              {
+                "at": "overflow",
+                "edges": {
+                  "app-pmu": "base"
+                },
+                "note": "Overflow every N events (~4 kHz by default)"
+              },
+              {
+                "at": "interrupt",
+                "nodes": {
+                  "pmu": "base",
+                  "nmi": "active"
+                },
+                "edges": {
+                  "pmu-nmi": "relax"
+                },
+                "note": "Overflow → NMI"
+              },
+              {
+                "at": "captures",
+                "nodes": {
+                  "nmi": "base",
+                  "ring": "active"
+                },
+                "edges": {
+                  "pmu-nmi": "base",
+                  "nmi-ring": "relax"
+                },
+                "note": "Kernel records IP + call stack"
+              },
+              {
+                "at": "drains",
+                "nodes": {
+                  "ring": "base",
+                  "data": "active"
+                },
+                "edges": {
+                  "nmi-ring": "base",
+                  "ring-data": "relax"
+                },
+                "note": "perf record drains to perf.data"
+              },
+              {
+                "at": "symbolizes",
+                "nodes": {
+                  "data": "base",
+                  "rep": "done"
+                },
+                "edges": {
+                  "ring-data": "base",
+                  "data-rep": "relax"
+                },
+                "note": "Symbolize → report, flame graph"
+              },
+              {
+                "at": "instrumenting",
+                "edges": {
+                  "data-rep": "base"
+                },
+                "note": "Statistical: a few % overhead, short functions can hide"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "perf has three modes. perf stat counts: totals for the whole run, with no attribution and essentially no overhead. perf record samples: periodic stacks, so you know where the time went. And tracing records every occurrence of an event, like each syscall: exact, but expensive.",
+          "props": {
+            "title": "Three <em>modes</em>",
+            "items": [
+              {
+                "at": "counts",
+                "label": "perf stat",
+                "title": "Counting",
+                "body": "Totals over the run; no attribution.",
+                "code": "~0 overhead"
+              },
+              {
+                "at": "samples",
+                "label": "perf record",
+                "title": "Sampling",
+                "body": "Periodic stacks → where time goes.",
+                "code": "a few %"
+              },
+              {
+                "at": "tracing",
+                "label": "perf trace",
+                "title": "Tracing",
+                "body": "Every event, exact counts.",
+                "code": "expensive"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Diagnosing 100% CPU",
+      "question": "A service is pinned at 100% CPU. How do you diagnose it with perf?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. A service is pinned at one hundred percent CPU. Walk through how you'd diagnose it with perf. Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "A service at <em>100% CPU</em>: how do you diagnose it?"
+          }
+        },
+        {
+          "type": "code",
+          "say": "Start with perf top, attached to the process, for a live view of the hottest symbols. Then count before you sample: perf stat with dash d reports instructions per cycle, and cache and branch misses. An IPC below one means the core is stalling, on memory or on branches, not doing useful work. Next, sample call stacks for thirty seconds, at ninety-nine hertz, an odd rate that avoids lining up with periodic work, and read them in perf report. Finally, fold the stacks into a flame graph: width is time on CPU, height is call depth.",
+          "props": {
+            "title": "Count first, <em>then</em> sample",
+            "file": "diagnose.sh",
+            "tag": "perf",
+            "lang": "shell",
+            "size": 21,
+            "width": 1180,
+            "code": "# 1. Live view: which symbols are hot right now?\nperf top -p $PID\n\n# 2. Counters first: cycles, IPC, cache and branch misses\nperf stat -d -p $PID -- sleep 10\n#    IPC < 1 → stalled on memory or branches\n\n# 3. Sample call stacks for 30 s at 99 Hz\nperf record -F 99 -g -p $PID -- sleep 30\nperf report\n\n# 4. Fold the stacks into a flame graph\nperf script | stackcollapse-perf.pl | flamegraph.pl > flame.svg",
+            "highlights": [
+              {
+                "at": "live",
+                "lines": "2",
+                "note": "Live hot symbols"
+              },
+              {
+                "at": "count",
+                "lines": "5-6",
+                "note": "IPC, cache and branch misses"
+              },
+              {
+                "at": "Next",
+                "lines": "9-10",
+                "note": "Stacks at 99 Hz for 30 s"
+              },
+              {
+                "at": "flame",
+                "lines": "13",
+                "note": "Width = CPU time · height = depth"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "The gotchas",
+      "question": "Why might perf mislead you?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. perf says a function is cold, but you know it's slow. Why might perf mislead you? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Why might <em>perf</em> mislead you?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Four classic gotchas. perf sees only on-CPU time: a thread blocked on a lock or on I/O is invisible, so use off-CPU analysis, like perf sched, or eBPF. Short or inlined functions hide: they're shorter than a sample period, or their cycles land in the caller. Broken stacks: most distro libraries drop frame pointers, so use DWARF or LBR unwinding. And skid: the sampled instruction can be several past the one that caused the event, so use precise sampling, PEBS, with the colon p p suffix.",
+          "props": {
+            "title": "Four <em>gotchas</em>",
+            "items": [
+              {
+                "at": "sees",
+                "label": "Blind spot",
+                "title": "On-CPU only",
+                "body": "Blocked threads are invisible.",
+                "code": "perf sched · eBPF"
+              },
+              {
+                "at": "inlined",
+                "label": "Missing",
+                "title": "Short or inlined",
+                "body": "Below one sample period, or folded into the caller.",
+                "code": "uprobes"
+              },
+              {
+                "at": "frame",
+                "label": "Stacks",
+                "title": "No frame pointers",
+                "body": "Unwind with DWARF or LBR instead.",
+                "code": "--call-graph dwarf"
+              },
+              {
+                "at": "skid",
+                "label": "Precision",
+                "title": "Skid",
+                "body": "Precise sampling pins the real instruction.",
+                "code": "cycles:pp"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. perf samples hardware counter overflows, with a few percent overhead. Count with perf stat first, and let IPC tell you whether you're stalled. Then sample stacks with perf record, and read a flame graph. And remember it only sees on-CPU time, and statistical samples can miss short work.",
+          "props": {
+            "title": "perf, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "overflows",
+                "text": "Sampling on PMU counter overflows.",
+                "code": "few % overhead"
+              },
+              {
+                "at": "IPC",
+                "text": "perf stat first: IPC says stalled or busy.",
+                "code": "perf stat -d"
+              },
+              {
+                "at": "flame",
+                "text": "perf record -g, then a flame graph.",
+                "code": "-F 99 -g"
+              },
+              {
+                "at": "only",
+                "text": "On-CPU only; short work can be missed.",
+                "code": "off-CPU: eBPF"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

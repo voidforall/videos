@@ -1,0 +1,412 @@
+{
+  "slug": "tools-valgrind",
+  "series": "tools",
+  "title": "Valgrind",
+  "kicker": "Tools · Valgrind",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/system/low-level/valgrind.md",
+  "summary": "A synthetic CPU for finding memory bugs: dynamic recompilation through VEX IR, Memcheck's shadow memory and free quarantine, leak categories, and when to choose sanitizers instead.",
+  "captionFixes": [
+    {
+      "match": [
+        "Valgrind",
+        "Question"
+      ],
+      "display": "Valgrind, question"
+    },
+    {
+      "match": [
+        "Memczyk"
+      ],
+      "display": "Memcheck"
+    },
+    {
+      "match": [
+        "Memchex"
+      ],
+      "display": "Memcheck's"
+    },
+    {
+      "match": [
+        "memcheck"
+      ],
+      "display": "Memcheck"
+    },
+    {
+      "match": [
+        "defineness"
+      ],
+      "display": "definedness"
+    },
+    {
+      "match": [
+        "Shadow",
+        "Memory"
+      ],
+      "display": "shadow memory"
+    },
+    {
+      "match": [
+        "Treat"
+      ],
+      "display": "treat"
+    },
+    {
+      "match": [
+        "sanitizer's"
+      ],
+      "display": "sanitizers"
+    },
+    {
+      "match": [
+        "Address",
+        "sanitizer"
+      ],
+      "display": "AddressSanitizer"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "A synthetic CPU",
+      "question": "How does Valgrind find memory bugs in a binary you never recompiled?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Valgrind, question one. How can Valgrind find memory bugs in a binary you never recompiled, and why is it so slow? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How does <em>Valgrind</em> check a binary you never recompiled?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Valgrind never runs your program natively. It disassembles each small block of machine code, and lifts it into an intermediate representation called VEX. The tool, Memcheck, inserts its own checks into that IR: before every memory access, look up the address in shadow memory. Then Valgrind compiles the result back to host code, caches the translation, and runs it. Every load and store now does extra work, and all threads are serialized onto one, which is why programs run ten to fifty times slower.",
+          "props": {
+            "title": "Disassemble, <em>instrument</em>, re-emit",
+            "nodes": [
+              {
+                "id": "bin",
+                "label": "your binary",
+                "x": 170,
+                "y": 470,
+                "w": 190,
+                "h": 64
+              },
+              {
+                "id": "dis",
+                "label": "disassemble\na block",
+                "x": 470,
+                "y": 290,
+                "w": 220,
+                "h": 86
+              },
+              {
+                "id": "ir",
+                "label": "VEX IR",
+                "x": 790,
+                "y": 290,
+                "w": 180,
+                "h": 64
+              },
+              {
+                "id": "tool",
+                "label": "Memcheck\nadds checks",
+                "x": 1110,
+                "y": 290,
+                "w": 230,
+                "h": 86
+              },
+              {
+                "id": "shadow",
+                "label": "shadow memory",
+                "x": 1110,
+                "y": 640,
+                "w": 240,
+                "h": 64
+              },
+              {
+                "id": "host",
+                "label": "host code\n(cached)",
+                "x": 1470,
+                "y": 470,
+                "w": 220,
+                "h": 86
+              },
+              {
+                "id": "cpu",
+                "label": "real CPU ·\none thread",
+                "x": 1470,
+                "y": 680,
+                "w": 220,
+                "h": 86
+              }
+            ],
+            "edges": [
+              {
+                "from": "bin",
+                "to": "dis"
+              },
+              {
+                "from": "dis",
+                "to": "ir"
+              },
+              {
+                "from": "ir",
+                "to": "tool"
+              },
+              {
+                "from": "tool",
+                "to": "shadow"
+              },
+              {
+                "from": "tool",
+                "to": "host"
+              },
+              {
+                "from": "host",
+                "to": "cpu"
+              }
+            ],
+            "panels": [],
+            "steps": [
+              {
+                "at": "natively",
+                "nodes": {
+                  "bin": "active"
+                },
+                "note": "Your program never runs directly"
+              },
+              {
+                "at": "disassembles",
+                "nodes": {
+                  "bin": "base",
+                  "dis": "active"
+                },
+                "edges": {
+                  "bin-dis": "relax"
+                },
+                "note": "Take one superblock of machine code"
+              },
+              {
+                "at": "VEX",
+                "nodes": {
+                  "dis": "base",
+                  "ir": "active"
+                },
+                "edges": {
+                  "bin-dis": "base",
+                  "dis-ir": "relax"
+                },
+                "note": "Lift it to VEX IR"
+              },
+              {
+                "at": "inserts",
+                "nodes": {
+                  "ir": "base",
+                  "tool": "active"
+                },
+                "edges": {
+                  "dis-ir": "base",
+                  "ir-tool": "relax"
+                },
+                "note": "Memcheck inserts checks into the IR"
+              },
+              {
+                "at": "shadow",
+                "nodes": {
+                  "shadow": "active"
+                },
+                "edges": {
+                  "tool-shadow": "relax"
+                },
+                "note": "Every access consults shadow memory"
+              },
+              {
+                "at": "compiles",
+                "nodes": {
+                  "tool": "base",
+                  "shadow": "base",
+                  "host": "active"
+                },
+                "edges": {
+                  "ir-tool": "base",
+                  "tool-shadow": "base",
+                  "tool-host": "relax"
+                },
+                "note": "Re-emit host code, cache it"
+              },
+              {
+                "at": "serialized",
+                "nodes": {
+                  "host": "base",
+                  "cpu": "queued"
+                },
+                "edges": {
+                  "tool-host": "base",
+                  "host-cpu": "relax"
+                },
+                "note": "Threads serialized: 10–50× slower"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Memcheck in action",
+      "question": "How does Memcheck catch use-after-free and uninitialized reads?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. How does Memcheck catch a use-after-free, and a read of uninitialized memory? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How does Memcheck catch <em>use-after-free</em> and <em>uninitialized</em> reads?"
+          }
+        },
+        {
+          "type": "code",
+          "say": "Memcheck shadows every byte. One bit says whether the byte is addressable, and definedness is tracked down to each bit, stored compactly. Reading an uninitialized x is not an error by itself: it's reported only when the value decides a branch, becomes an address, or goes to a system call. Freed blocks aren't reused right away: they wait in a quarantine, marked unaddressable, so a write after delete is caught, with the stacks of where it was allocated and freed. And at exit, a block no pointer can reach is reported as definitely lost.",
+          "props": {
+            "title": "What Memcheck <em>reports</em>",
+            "file": "bugs.cpp",
+            "tag": "memcheck",
+            "lang": "cpp",
+            "size": 22,
+            "width": 1180,
+            "code": "// $ valgrind --leak-check=full --track-origins=yes ./app\nint* p = new int[4];\nint x;                       // never initialized\nif (x > 0) { /* ... */ }     // Conditional jump depends on uninitialised value(s)\n\ndelete[] p;\np[1] = 7;                    // Invalid write of size 4 · inside a block free'd\n\nint* leak = new int[10];     // 40 bytes in 1 blocks are definitely lost",
+            "highlights": [
+              {
+                "at": "shadows",
+                "lines": "1",
+                "note": "--track-origins shows where undefined data came from"
+              },
+              {
+                "at": "branch",
+                "lines": "3-4",
+                "note": "Undefined value decides a branch → error"
+              },
+              {
+                "at": "quarantine",
+                "lines": "6-7",
+                "note": "Freed block quarantined → invalid write"
+              },
+              {
+                "at": "lost",
+                "lines": "9",
+                "note": "Unreachable at exit → definitely lost"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Valgrind or sanitizers?",
+      "question": "ASan exists. When would you still reach for Valgrind?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. AddressSanitizer is much faster. When would you still reach for Valgrind? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "<em>ASan</em> is faster. When is <em>Valgrind</em> still the answer?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "AddressSanitizer is compiled in. It slows a program down only about two times, so it can run on every pull request, but it needs a rebuild, and uninitialized reads need a separate sanitizer. Valgrind works on any binary, with no rebuild, and catches uninitialized reads itself, at ten to fifty times the cost. So: sanitizers in CI, Valgrind for binaries you can't rebuild, or bugs the sanitizers miss.",
+          "props": {
+            "title": "Compiled in, or <em>run under</em>",
+            "left": {
+              "at": "compiled",
+              "label": "ASan",
+              "title": "~2× slower",
+              "tone": "good",
+              "body": "Needs -fsanitize=address; fast enough for every PR. Uninitialized reads need MSan."
+            },
+            "right": {
+              "at": "binary",
+              "label": "Valgrind",
+              "title": "10–50× slower",
+              "body": "Any binary, no rebuild; catches uninitialized reads; threads serialized."
+            },
+            "verdict": {
+              "at": "CI",
+              "text": "Sanitizers in CI; Valgrind when you can't rebuild.",
+              "code": "-fsanitize vs memcheck"
+            }
+          }
+        },
+        {
+          "type": "points",
+          "say": "Read the leak report by category. Definitely lost: nothing points to the block, so it's a real leak. Indirectly lost: reachable only from a lost block, so fix the parent. Possibly lost: only an interior pointer reaches it, often a false alarm. And still reachable: something still points to it at exit, usually a global, often harmless.",
+          "props": {
+            "title": "Four kinds of <em>leak</em>",
+            "items": [
+              {
+                "at": "Definitely",
+                "label": "Definitely lost",
+                "title": "Real leak",
+                "body": "No pointer reaches the block.",
+                "code": "fail the build"
+              },
+              {
+                "at": "Indirectly",
+                "label": "Indirectly lost",
+                "title": "Fix the parent",
+                "body": "Only reachable from a lost block.",
+                "code": "follows parent"
+              },
+              {
+                "at": "Possibly",
+                "label": "Possibly lost",
+                "title": "Interior pointer",
+                "body": "Often a false alarm.",
+                "code": "investigate"
+              },
+              {
+                "at": "reachable",
+                "label": "Still reachable",
+                "title": "Pointed to at exit",
+                "body": "Usually globals; often fine.",
+                "code": "noise"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Valgrind recompiles your binary through VEX IR, adding checks to every access. Memcheck's shadow memory tracks addressability and definedness, and quarantines freed blocks. It costs ten to fifty times, so sanitizers go in CI. And treat definitely lost as a bug.",
+          "props": {
+            "title": "Valgrind, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "recompiles",
+                "text": "Recompiles via VEX IR, instrumenting each access.",
+                "code": "no rebuild"
+              },
+              {
+                "at": "quarantines",
+                "text": "Shadow memory + quarantine catch misuse.",
+                "code": "A-bits · V-bits"
+              },
+              {
+                "at": "costs",
+                "text": "10–50× slower: sanitizers belong in CI.",
+                "code": "ASan ~2×"
+              },
+              {
+                "at": "bug",
+                "text": "Definitely lost is always a bug.",
+                "code": "--leak-check=full"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

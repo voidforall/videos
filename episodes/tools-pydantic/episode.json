@@ -1,0 +1,343 @@
+{
+  "slug": "tools-pydantic",
+  "series": "tools",
+  "title": "Pydantic",
+  "kicker": "Tools · Pydantic",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/python/pydantic.md",
+  "summary": "Type hints as a runtime schema: parsing and coercion, collected validation errors, constraints and validators, settings from the environment, and what changed in v2.",
+  "captionFixes": [
+    {
+      "match": [
+        "Pydantic",
+        "Question"
+      ],
+      "display": "Pydantic, question"
+    },
+    {
+      "match": [
+        "happens",
+        "eh"
+      ],
+      "display": "happens"
+    },
+    {
+      "match": [
+        "1",
+        "2",
+        "3"
+      ],
+      "display": "123"
+    },
+    {
+      "match": [
+        "passes"
+      ],
+      "display": "parses"
+    },
+    {
+      "match": [
+        "pedantic"
+      ],
+      "display": "Pydantic"
+    },
+    {
+      "match": [
+        "passobj"
+      ],
+      "display": "parse_obj"
+    },
+    {
+      "match": [
+        "simple",
+        "rules"
+      ],
+      "display": "Simple rules"
+    },
+    {
+      "match": [
+        "fast",
+        "API"
+      ],
+      "display": "FastAPI"
+    },
+    {
+      "match": [
+        "crossfield"
+      ],
+      "display": "cross-field"
+    },
+    {
+      "match": [
+        "model",
+        "dump"
+      ],
+      "display": "model_dump"
+    },
+    {
+      "match": [
+        "model",
+        "validate"
+      ],
+      "display": "model_validate"
+    },
+    {
+      "match": [
+        "field",
+        "validator"
+      ],
+      "display": "field_validator"
+    },
+    {
+      "match": [
+        "model",
+        "config"
+      ],
+      "display": "model_config"
+    },
+    {
+      "match": [
+        "Dict"
+      ],
+      "display": "dict()"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Parse, don't just check",
+      "question": "What does a Pydantic model do with input like id=\"123\", and with bad input?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Pydantic, question one. You define a model with an integer id, and pass it the string one two three. What happens? And what happens with input that can't be fixed? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "A model gets <em>id=\"123\"</em>, then garbage. What happens?"
+          }
+        },
+        {
+          "type": "code",
+          "say": "A model is a class whose type hints are the schema. Pydantic parses rather than just checking: the string one two three becomes the integer one two three. When input can't be converted, it raises a validation error, and it collects every failure at once, each with its field location and a message, instead of stopping at the first.",
+          "props": {
+            "title": "Type hints <em>are</em> the schema",
+            "file": "models.py",
+            "tag": "pydantic v2",
+            "lang": "python",
+            "size": 21,
+            "width": 1150,
+            "code": "from pydantic import BaseModel, ValidationError\n\nclass User(BaseModel):\n    id: int\n    name: str\n    email: str\n    is_active: bool = True\n\nu = User(id=\"123\", name=\"Ada\", email=\"ada@example.com\")\nu.id                       # 123: the string was coerced to int\n\ntry:\n    User(id=\"abc\", name=None)\nexcept ValidationError as e:\n    print(e)               # every failure, with its location:\n    # id     Input should be a valid integer\n    # name   Input should be a valid string\n    # email  Field required",
+            "highlights": [
+              {
+                "at": "schema",
+                "lines": "3-7",
+                "note": "Fields + types + defaults = the schema"
+              },
+              {
+                "at": "parses",
+                "lines": "9-10",
+                "note": "Lax mode coerces \"123\" → 123"
+              },
+              {
+                "at": "collects",
+                "lines": "14-18",
+                "note": "All errors at once, with locations"
+              }
+            ]
+          }
+        },
+        {
+          "type": "compare",
+          "say": "That conversion is lax mode, the default. If you'd rather reject a string where an integer is expected, switch the model to strict mode: now one two three as a string is an error. Strict is useful at trust boundaries where silent conversion would hide bugs.",
+          "props": {
+            "title": "Lax by default, <em>strict</em> on demand",
+            "lang": "python",
+            "left": {
+              "at": "lax",
+              "label": "Lax (default)",
+              "title": "Coerce when safe",
+              "tone": "good",
+              "code": "class User(BaseModel):\n    id: int\n\nUser(id=\"123\").id   # 123"
+            },
+            "right": {
+              "at": "strict",
+              "label": "Strict",
+              "title": "Exact types only",
+              "code": "class User(BaseModel):\n    model_config = ConfigDict(strict=True)\n    id: int\n\nUser(id=\"123\")      # ValidationError"
+            },
+            "verdict": {
+              "at": "boundaries",
+              "text": "Strict where silent conversion would hide bugs.",
+              "code": "strict=True"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Constraints and validators",
+      "question": "How do you express rules like price > 0, or passwords must match?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. How do you express rules like price must be positive, normalize an email, or passwords must match? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Rules like <em>price &gt; 0</em> and <em>passwords match</em>?"
+          }
+        },
+        {
+          "type": "code",
+          "say": "Simple rules are declarative: Field takes constraints like a minimum length, or greater than zero. A mutable default like an empty list is safe, because Pydantic copies it for each instance. For custom logic on one field, use a field validator: it can transform the value, and whatever it returns replaces the input. For rules across fields, like matching passwords, use a model validator in after mode: it runs on the fully validated model, so every field is available.",
+          "props": {
+            "title": "Declare it, or <em>validate</em> it",
+            "file": "rules.py",
+            "tag": "Field · validators",
+            "lang": "python",
+            "size": 20,
+            "width": 1180,
+            "code": "from pydantic import BaseModel, Field, field_validator, model_validator\n\nclass Product(BaseModel):\n    name: str = Field(min_length=1)\n    price: float = Field(gt=0)\n    tags: list[str] = []                # copied per instance: safe default\n\nclass Signup(BaseModel):\n    email: str\n    password: str\n    confirm: str\n\n    @field_validator(\"email\")\n    @classmethod\n    def normalize(cls, v: str) -> str:\n        return v.strip().lower()        # the return value replaces the input\n\n    @model_validator(mode=\"after\")\n    def passwords_match(self):\n        if self.password != self.confirm:\n            raise ValueError(\"passwords do not match\")\n        return self",
+            "highlights": [
+              {
+                "at": "declarative",
+                "lines": "4-5",
+                "note": "Declarative constraints"
+              },
+              {
+                "at": "copies",
+                "lines": "6",
+                "note": "Mutable defaults are copied per instance"
+              },
+              {
+                "at": "transform",
+                "lines": "13-16",
+                "note": "One field: transform or reject"
+              },
+              {
+                "at": "across",
+                "lines": "18-22",
+                "note": "Cross-field rule on the whole model"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Settings, serialization, and v2",
+      "question": "How do you load config from the environment, serialize models, and what changed in Pydantic v2?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. How do you load configuration from environment variables, how do you serialize a model, and what changed in Pydantic version two? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Config from the <em>environment</em>, serialization, and <em>v2</em>?"
+          }
+        },
+        {
+          "type": "code",
+          "say": "Base settings, from the pydantic settings package, reads each field from an environment variable, or a dot env file, and validates it like any model: the string true becomes a boolean. To go back out, model dump gives a dict, model dump json a JSON string, and model json schema the JSON Schema that FastAPI turns into its API docs.",
+          "props": {
+            "title": "Settings in, <em>JSON</em> out",
+            "file": "config.py",
+            "tag": "pydantic-settings",
+            "lang": "python",
+            "size": 21,
+            "width": 1150,
+            "code": "from pydantic_settings import BaseSettings, SettingsConfigDict\n\nclass Settings(BaseSettings):\n    model_config = SettingsConfigDict(env_file=\".env\")\n    db_url: str\n    api_key: str\n    debug: bool = False                  # DEBUG=true in the env → True\n\nsettings = Settings()                    # reads env vars + .env, validates\n\nu.model_dump()                           # → dict\nu.model_dump_json()                      # → JSON string\nUser.model_json_schema()                 # → JSON Schema (FastAPI's OpenAPI)",
+            "highlights": [
+              {
+                "at": "variable",
+                "lines": "3-7",
+                "note": "Fields read from env vars / .env"
+              },
+              {
+                "at": "boolean",
+                "lines": "9",
+                "note": "Validated like any model"
+              },
+              {
+                "at": "dict",
+                "lines": "11-12",
+                "note": "Serialize to dict or JSON"
+              },
+              {
+                "at": "Schema",
+                "lines": "13",
+                "note": "JSON Schema → OpenAPI docs"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "Version two rewrote the core in Rust, as pydantic core, which made validation several times to tens of times faster. And the API was renamed: dict became model dump; parse obj became model validate; validator became field validator; and the inner Config class became a model config attribute.",
+          "props": {
+            "title": "What <em>v2</em> changed",
+            "items": [
+              {
+                "at": "Rust",
+                "label": "Core",
+                "title": "pydantic-core",
+                "body": "Validation rewritten in Rust; much faster.",
+                "code": "Rust"
+              },
+              {
+                "at": "became",
+                "label": "Serialize",
+                "title": "model_dump()",
+                "body": "Replaces .dict() and .json().",
+                "code": ".dict() →"
+              },
+              {
+                "at": "became#2",
+                "label": "Parse",
+                "title": "model_validate()",
+                "body": "Replaces parse_obj().",
+                "code": "parse_obj() →"
+              },
+              {
+                "at": "attribute",
+                "label": "Config",
+                "title": "model_config",
+                "body": "Replaces class Config; validators renamed.",
+                "code": "@field_validator"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Type hints are the schema, and Pydantic parses, coercing when it's safe. It reports every error at once. Use Field for declarative rules, and validators for custom and cross-field ones. And load settings from the environment with base settings.",
+          "props": {
+            "title": "Pydantic, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "parses",
+                "text": "Type hints are the schema; it parses and coerces.",
+                "code": "lax · strict"
+              },
+              {
+                "at": "every",
+                "text": "All validation errors at once, with locations.",
+                "code": "ValidationError"
+              },
+              {
+                "at": "Field",
+                "text": "Field for constraints; validators for logic.",
+                "code": "model_validator"
+              },
+              {
+                "at": "environment",
+                "text": "BaseSettings loads validated config.",
+                "code": "pydantic-settings"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

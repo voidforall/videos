@@ -1,0 +1,671 @@
+{
+  "slug": "tools-fastapi",
+  "series": "tools",
+  "title": "FastAPI",
+  "kicker": "Tools · FastAPI",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/python/fastapi.md",
+  "summary": "How FastAPI turns a typed function into an API: routing, validation and 422s, dependencies, response models, def vs async def and the thread pool, and lifespan.",
+  "captionFixes": [
+    {
+      "match": [
+        "async",
+        "endpoint",
+        "runs"
+      ],
+      "display": "An async endpoint runs"
+    },
+    {
+      "match": [
+        "Fast",
+        "API",
+        "question"
+      ],
+      "display": "FastAPI, question"
+    },
+    {
+      "match": [
+        "Fast",
+        "API"
+      ],
+      "display": "FastAPI"
+    },
+    {
+      "match": [
+        "fast",
+        "api"
+      ],
+      "display": "FastAPI"
+    },
+    {
+      "match": [
+        "in-point"
+      ],
+      "display": "endpoint"
+    },
+    {
+      "match": [
+        "end",
+        "point"
+      ],
+      "display": "endpoint"
+    },
+    {
+      "match": [
+        "uva",
+        "corn",
+        "and",
+        "asgi",
+        "server"
+      ],
+      "display": "Uvicorn, an ASGI server,"
+    },
+    {
+      "match": [
+        "starlet"
+      ],
+      "display": "Starlette"
+    },
+    {
+      "match": [
+        "open",
+        "api"
+      ],
+      "display": "OpenAPI"
+    },
+    {
+      "match": [
+        "shop",
+        "id"
+      ],
+      "display": "shop ID"
+    },
+    {
+      "match": [
+        "json"
+      ],
+      "display": "JSON"
+    },
+    {
+      "match": [
+        "pedantic"
+      ],
+      "display": "Pydantic"
+    },
+    {
+      "match": [
+        "it's",
+        "return"
+      ],
+      "display": "its return"
+    },
+    {
+      "match": [
+        "and",
+        "a",
+        "sync"
+      ],
+      "display": "an async"
+    },
+    {
+      "match": [
+        "a",
+        "sync"
+      ],
+      "display": "async"
+    },
+    {
+      "match": [
+        "pass",
+        "and",
+        "validate"
+      ],
+      "display": "parse and validate"
+    },
+    {
+      "match": [
+        "CPU",
+        "heavy"
+      ],
+      "display": "CPU-heavy"
+    },
+    {
+      "match": [
+        "set",
+        "up,"
+      ],
+      "display": "setup,"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "One signature, many jobs",
+      "question": "What does FastAPI do with the type hints on an endpoint?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "FastAPI, question one. What does FastAPI actually do with the type hints on an endpoint function, from request to response? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What does FastAPI do with your <em>type hints</em>?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Uvicorn, an ASGI server, receives the request, and Starlette routes it to your function. Then FastAPI reads the signature: shop ID appears in the path, so it's a path parameter, and item is a Pydantic model, so it comes from the JSON body. Pydantic validates and converts everything. If anything is wrong, the client gets an automatic four twenty-two, listing each error, and your function never runs. Next, dependencies are resolved, once per request. Then your function runs, and its return value is filtered through the response model, so fields like a password hash never leak. The same type hints also generate the OpenAPI schema, and interactive docs.",
+          "props": {
+            "title": "One signature, <em>many jobs</em>",
+            "nodes": [
+              {
+                "id": "client",
+                "label": "Client",
+                "x": 150,
+                "y": 470,
+                "w": 150,
+                "h": 64
+              },
+              {
+                "id": "uv",
+                "label": "Uvicorn\n(ASGI)",
+                "x": 400,
+                "y": 470,
+                "w": 190,
+                "h": 86
+              },
+              {
+                "id": "route",
+                "label": "Starlette\nrouting",
+                "x": 660,
+                "y": 470,
+                "w": 190,
+                "h": 86
+              },
+              {
+                "id": "val",
+                "label": "Pydantic: path,\nquery, body",
+                "x": 940,
+                "y": 300,
+                "w": 270,
+                "h": 86
+              },
+              {
+                "id": "deps",
+                "label": "Dependencies",
+                "x": 940,
+                "y": 640,
+                "w": 250,
+                "h": 64
+              },
+              {
+                "id": "fn",
+                "label": "create_item()",
+                "x": 1250,
+                "y": 470,
+                "w": 230,
+                "h": 64
+              },
+              {
+                "id": "resp",
+                "label": "response_model\n→ JSON",
+                "x": 1610,
+                "y": 470,
+                "w": 250,
+                "h": 86
+              },
+              {
+                "id": "e422",
+                "label": "422 + error list",
+                "x": 1250,
+                "y": 250,
+                "w": 300,
+                "h": 60,
+                "hidden": true
+              }
+            ],
+            "edges": [
+              {
+                "from": "client",
+                "to": "uv"
+              },
+              {
+                "from": "uv",
+                "to": "route"
+              },
+              {
+                "from": "route",
+                "to": "val"
+              },
+              {
+                "from": "val",
+                "to": "deps"
+              },
+              {
+                "from": "deps",
+                "to": "fn"
+              },
+              {
+                "from": "fn",
+                "to": "resp"
+              }
+            ],
+            "panels": [],
+            "steps": [
+              {
+                "at": "receives",
+                "nodes": {
+                  "uv": "active"
+                },
+                "edges": {
+                  "client-uv": "relax"
+                },
+                "note": "ASGI server receives the request"
+              },
+              {
+                "at": "routes",
+                "nodes": {
+                  "uv": "base",
+                  "route": "active"
+                },
+                "edges": {
+                  "client-uv": "base",
+                  "uv-route": "relax"
+                },
+                "note": "Starlette matches /items/{shop_id}"
+              },
+              {
+                "at": "signature",
+                "nodes": {
+                  "route": "base",
+                  "val": "active"
+                },
+                "edges": {
+                  "uv-route": "base",
+                  "route-val": "relax"
+                },
+                "note": "Signature → path, query and body parameters"
+              },
+              {
+                "at": "never",
+                "show": [
+                  "e422"
+                ],
+                "add": [
+                  {
+                    "from": "val",
+                    "to": "e422"
+                  }
+                ],
+                "nodes": {
+                  "e422": "queued"
+                },
+                "edges": {
+                  "route-val": "base",
+                  "val-e422": "dim"
+                },
+                "note": "Invalid → automatic 422, function never runs"
+              },
+              {
+                "at": "dependencies",
+                "nodes": {
+                  "val": "base",
+                  "deps": "active"
+                },
+                "edges": {
+                  "val-deps": "relax"
+                },
+                "note": "Dependencies resolved (cached per request)"
+              },
+              {
+                "at": "your#3",
+                "nodes": {
+                  "deps": "base",
+                  "fn": "active"
+                },
+                "edges": {
+                  "val-deps": "base",
+                  "deps-fn": "relax"
+                },
+                "note": "Your function runs"
+              },
+              {
+                "at": "filtered",
+                "nodes": {
+                  "fn": "base",
+                  "resp": "done"
+                },
+                "edges": {
+                  "deps-fn": "base",
+                  "fn-resp": "relax"
+                },
+                "note": "Output filtered by response_model: no leaked fields"
+              },
+              {
+                "at": "OpenAPI",
+                "edges": {
+                  "fn-resp": "base"
+                },
+                "note": "Same types → OpenAPI schema, /docs"
+              }
+            ]
+          }
+        },
+        {
+          "type": "code",
+          "say": "In code: shop ID is in the path, so it's a path parameter. Item is a model, so it's the body. A simple type that isn't in the path, like verbose, becomes a query parameter. The database comes from a dependency. And the response model filters the result.",
+          "props": {
+            "title": "Where each parameter <em>comes from</em>",
+            "file": "items.py",
+            "tag": "FastAPI",
+            "lang": "python",
+            "size": 21,
+            "width": 1180,
+            "code": "@app.post(\"/items/{shop_id}\", response_model=ItemOut, status_code=201)\nasync def create_item(\n    shop_id: int,                                   # in the path → path param\n    item: ItemIn,                                   # a model → JSON body\n    verbose: bool = False,                          # anything else → query\n    db: Annotated[DB, Depends(get_db)],             # injected dependency\n):\n    if item.price <= 0:\n        raise HTTPException(400, \"price must be positive\")\n    return await db.insert(shop_id, item)           # filtered by ItemOut",
+            "highlights": [
+              {
+                "at": "path",
+                "lines": "3",
+                "note": "In the route path → path parameter"
+              },
+              {
+                "at": "body",
+                "lines": "4",
+                "note": "Pydantic model → JSON body"
+              },
+              {
+                "at": "query",
+                "lines": "5",
+                "note": "Simple type, not in path → query"
+              },
+              {
+                "at": "dependency",
+                "lines": "6",
+                "note": "Injected per request"
+              },
+              {
+                "at": "filters",
+                "lines": "1,10",
+                "note": "response_model shapes the output"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "def or async def?",
+      "question": "Should an endpoint be async def or def, and what happens if you get it wrong?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. Should an endpoint be an async function, or a plain synchronous one? And what happens if you get it wrong? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "<em>async def</em> or <em>def</em>, and what if you choose wrong?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "An async endpoint runs directly on the event loop, alongside every other request on that worker. A plain synchronous endpoint is sent to a thread pool and awaited, so blocking calls there are fine. Now the mistake: a blocking call, like requests dot get or time dot sleep, inside an async endpoint. It never yields, so the event loop freezes, and every other request on that worker waits. The thread pool has limits too: forty threads by default, so the forty-first concurrent blocking call waits for a free thread.",
+          "props": {
+            "title": "Event loop or <em>thread pool</em>",
+            "nodes": [
+              {
+                "id": "a",
+                "label": "async def /fast",
+                "x": 220,
+                "y": 290,
+                "w": 290,
+                "h": 64
+              },
+              {
+                "id": "d",
+                "label": "def /legacy",
+                "x": 220,
+                "y": 650,
+                "w": 290,
+                "h": 64
+              },
+              {
+                "id": "bad",
+                "label": "async def + requests.get",
+                "x": 250,
+                "y": 470,
+                "w": 410,
+                "h": 64,
+                "hidden": true
+              },
+              {
+                "id": "loop",
+                "label": "event loop",
+                "x": 760,
+                "y": 290,
+                "w": 230,
+                "h": 70
+              },
+              {
+                "id": "pool",
+                "label": "thread pool · 40",
+                "x": 760,
+                "y": 650,
+                "w": 260,
+                "h": 70
+              }
+            ],
+            "edges": [
+              {
+                "from": "a",
+                "to": "loop"
+              },
+              {
+                "from": "d",
+                "to": "pool"
+              }
+            ],
+            "panels": [
+              {
+                "key": "state",
+                "label": "Worker",
+                "type": "list",
+                "rows": 1,
+                "initial": [
+                  "serving"
+                ]
+              }
+            ],
+            "steps": [
+              {
+                "at": "directly",
+                "nodes": {
+                  "a": "active",
+                  "loop": "active"
+                },
+                "edges": {
+                  "a-loop": "relax"
+                },
+                "note": "async def → runs on the event loop"
+              },
+              {
+                "at": "pool",
+                "nodes": {
+                  "a": "base",
+                  "loop": "base",
+                  "d": "active",
+                  "pool": "active"
+                },
+                "edges": {
+                  "a-loop": "base",
+                  "d-pool": "relax"
+                },
+                "note": "def → thread pool, awaited"
+              },
+              {
+                "at": "mistake",
+                "show": [
+                  "bad"
+                ],
+                "add": [
+                  {
+                    "from": "bad",
+                    "to": "loop"
+                  }
+                ],
+                "nodes": {
+                  "d": "base",
+                  "pool": "base",
+                  "bad": "queued"
+                },
+                "edges": {
+                  "d-pool": "base",
+                  "bad-loop": "relax"
+                },
+                "note": "Blocking call inside async def…"
+              },
+              {
+                "at": "freezes",
+                "nodes": {
+                  "loop": "dim",
+                  "a": "dim"
+                },
+                "edges": {
+                  "a-loop": "dim"
+                },
+                "panels": {
+                  "state": [
+                    "frozen: every request waits"
+                  ]
+                },
+                "note": "…never yields: the loop freezes"
+              },
+              {
+                "at": "limits",
+                "nodes": {
+                  "pool": "queued",
+                  "loop": "base",
+                  "a": "base",
+                  "bad": "dim"
+                },
+                "edges": {
+                  "a-loop": "base",
+                  "bad-loop": "dim"
+                },
+                "panels": {
+                  "state": [
+                    "41st blocking call waits"
+                  ]
+                },
+                "note": "Thread pool: 40 tokens per worker"
+              }
+            ]
+          }
+        },
+        {
+          "type": "compare",
+          "say": "So: write async endpoints only when everything you call is awaitable, like an async HTTP client or database driver. If you call blocking libraries, write a plain function, and let the thread pool handle it. And CPU-heavy work belongs in a process pool, or a task queue, not in either.",
+          "props": {
+            "title": "Match the endpoint to <em>what it calls</em>",
+            "lang": "python",
+            "left": {
+              "at": "awaitable",
+              "label": "async def",
+              "title": "Everything awaited",
+              "tone": "good",
+              "code": "async def get(url):\n    async with httpx.AsyncClient() as c:\n        return (await c.get(url)).json()"
+            },
+            "right": {
+              "at": "blocking",
+              "label": "def",
+              "title": "Blocking libraries",
+              "tone": "good",
+              "code": "def get(url):\n    return requests.get(url).json()\n# runs in the thread pool"
+            },
+            "verdict": {
+              "at": "process",
+              "text": "Unsure? Plain def. CPU work: a process pool or a queue.",
+              "code": "never block the loop"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Dependencies and lifespan",
+      "question": "How do you manage per-request resources and app-wide startup and shutdown?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. How do you give each request a database session that's always closed, and set up shared resources once, at startup? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Per-request <em>sessions</em>, and app-wide <em>startup</em>?"
+          }
+        },
+        {
+          "type": "code",
+          "say": "A dependency with yield is a small context manager. The code before yield is setup, the yielded value is injected, and the code after yield is teardown, which by default runs after the response is sent. For app-wide resources, pass a lifespan: an async context manager that runs startup before its yield, and shutdown after. It replaces the old on-event handlers, which are deprecated.",
+          "props": {
+            "title": "Setup, <em>yield</em>, teardown",
+            "file": "app.py",
+            "tag": "Depends · lifespan",
+            "lang": "python",
+            "size": 21,
+            "width": 1150,
+            "code": "async def get_db():\n    db = Session()\n    try:\n        yield db                      # injected into the endpoint\n    finally:\n        await db.close()              # runs after the response is sent\n\n@asynccontextmanager\nasync def lifespan(app: FastAPI):\n    app.state.pool = await create_pool()    # startup\n    yield\n    await app.state.pool.close()            # shutdown\n\napp = FastAPI(lifespan=lifespan)",
+            "highlights": [
+              {
+                "at": "before",
+                "lines": "2",
+                "note": "Setup per request"
+              },
+              {
+                "at": "injected",
+                "lines": "4",
+                "note": "Injected into the endpoint"
+              },
+              {
+                "at": "teardown",
+                "lines": "5-6",
+                "note": "Teardown after the response"
+              },
+              {
+                "at": "lifespan",
+                "lines": "8-14",
+                "note": "App-wide startup / shutdown"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. FastAPI reads your signature to parse and validate requests, answering four twenty-two on bad input. Dependencies are injected and cached per request, and response models filter what goes out. Use async endpoints only with awaitable calls, and plain functions for blocking ones. And manage resources with yield dependencies and a lifespan.",
+          "props": {
+            "title": "FastAPI, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "signature",
+                "text": "The signature drives parsing, validation, and docs.",
+                "code": "422 on bad input"
+              },
+              {
+                "at": "injected",
+                "text": "Dependencies injected; response models filter output.",
+                "code": "Depends · response_model"
+              },
+              {
+                "at": "awaitable",
+                "text": "async def only with awaitables; else plain def.",
+                "code": "thread pool · 40"
+              },
+              {
+                "at": "lifespan",
+                "text": "yield dependencies and lifespan manage resources.",
+                "code": "setup · teardown"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 // Minimal syntax highlighter → one HTML string per line, using the code-surface classes
 // (.k keyword, .n number, .s string, .cm comment). Input is plain text; output is escaped.
-// highlightCode(code, lang = "cpp"), lang ∈ "cpp" | "python".
+// highlightCode(code, lang = "cpp"), lang ∈ "cpp" | "python" | "shell".
 window.highlightCode = (() => {
   const LANGS = {
     cpp: {
@@ -13,6 +13,11 @@ window.highlightCode = (() => {
       comment: "#.*$",
       keywords: "def class return yield async await with as for in if elif else while try except finally " +
         "raise import from lambda None True False is not and or pass break continue global nonlocal del assert",
+    },
+    shell: {
+      comment: "#.*$",
+      keywords: "perf valgrind sudo sysctl echo export cat uvicorn gunicorn pip python g++ gcc clang " +
+        "record report stat top script trace annotate",
     },
   };
   const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
