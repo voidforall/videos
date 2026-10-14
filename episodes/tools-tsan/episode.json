@@ -1,0 +1,615 @@
+{
+  "slug": "tools-tsan",
+  "series": "tools",
+  "title": "ThreadSanitizer",
+  "kicker": "Tools · ThreadSanitizer",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/cpp/scaffold/TSAN.md",
+  "summary": "Data races as missing happens-before edges, how vector clocks detect them, and what TSan reports and misses.",
+  "captionFixes": [
+    {
+      "match": [
+        "right",
+        "to",
+        "the",
+        "read"
+      ],
+      "display": "write to the read"
+    },
+    {
+      "match": [
+        "xer"
+      ],
+      "display": "x"
+    },
+    {
+      "match": [
+        "limits",
+        "are"
+      ],
+      "display": "limits"
+    },
+    {
+      "match": [
+        "check",
+        "is",
+        "the"
+      ],
+      "display": "check: is the"
+    },
+    {
+      "match": [
+        "thread",
+        "sanitizer"
+      ],
+      "display": "ThreadSanitizer"
+    },
+    {
+      "match": [
+        "Thread",
+        "sanitizer"
+      ],
+      "display": "ThreadSanitizer"
+    },
+    {
+      "match": [
+        "Thread",
+        "Sanitizer"
+      ],
+      "display": "ThreadSanitizer"
+    },
+    {
+      "match": [
+        "happens",
+        "before"
+      ],
+      "display": "happens-before"
+    },
+    {
+      "match": [
+        "M1"
+      ],
+      "display": "m1"
+    },
+    {
+      "match": [
+        "M2"
+      ],
+      "display": "m2"
+    },
+    {
+      "match": [
+        "Bull"
+      ],
+      "display": "bool"
+    },
+    {
+      "match": [
+        "bull"
+      ],
+      "display": "bool"
+    },
+    {
+      "match": [
+        "sanitiser"
+      ],
+      "display": "sanitizer"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "What is a data race?",
+      "question": "What exactly makes two accesses a data race?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "ThreadSanitizer, question one. What exactly makes two memory accesses a data race? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What exactly makes two accesses a <em>data race</em>?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "A data race needs three things. Two threads touch the same location, and at least one of them writes. And nothing orders the two accesses. Ordering means happens before. Within a thread, program order chains each step to the next. Across threads, an unlock synchronizes with the next lock of the same mutex. So there's a path from the write to the read, and no race. Remove the mutex, and the path is gone. That's a data race, which in C++ is undefined behavior: the compiler may assume it never happens, and, for example, hoist a flag load out of a loop.",
+          "props": {
+            "title": "No path, <em>no order</em>",
+            "nodes": [
+              {
+                "id": "w",
+                "label": "T1: x = 42",
+                "x": 300,
+                "y": 290,
+                "w": 250,
+                "h": 64
+              },
+              {
+                "id": "u",
+                "label": "T1: m.unlock()",
+                "x": 300,
+                "y": 450,
+                "w": 250,
+                "h": 64
+              },
+              {
+                "id": "l",
+                "label": "T2: m.lock()",
+                "x": 860,
+                "y": 560,
+                "w": 250,
+                "h": 64
+              },
+              {
+                "id": "r",
+                "label": "T2: read x",
+                "x": 860,
+                "y": 700,
+                "w": 250,
+                "h": 64
+              }
+            ],
+            "edges": [
+              {
+                "from": "w",
+                "to": "u"
+              },
+              {
+                "from": "u",
+                "to": "l",
+                "w": "synchronizes-with"
+              },
+              {
+                "from": "l",
+                "to": "r"
+              }
+            ],
+            "panels": [
+              {
+                "key": "rule",
+                "label": "A data race",
+                "type": "list",
+                "rows": 3,
+                "initial": []
+              },
+              {
+                "key": "verdict",
+                "label": "Verdict",
+                "type": "list",
+                "rows": 2,
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "location",
+                "nodes": {
+                  "w": "active",
+                  "r": "active"
+                },
+                "edges": {
+                  "w-u": "dim",
+                  "u-l": "dim",
+                  "l-r": "dim"
+                },
+                "note": "Same location, one access writes"
+              },
+              {
+                "at": "orders",
+                "panels": {
+                  "rule": [
+                    "same location",
+                    "≥ 1 write",
+                    "no happens-before"
+                  ]
+                },
+                "note": "…and no ordering between them"
+              },
+              {
+                "at": "program",
+                "nodes": {
+                  "w": "base",
+                  "r": "base"
+                },
+                "edges": {
+                  "w-u": "tree",
+                  "l-r": "tree"
+                },
+                "note": "Program order inside each thread"
+              },
+              {
+                "at": "synchronizes",
+                "edges": {
+                  "u-l": "relax"
+                },
+                "note": "unlock → next lock of the same mutex"
+              },
+              {
+                "at": "path",
+                "nodes": {
+                  "w": "done",
+                  "u": "done",
+                  "l": "done",
+                  "r": "done"
+                },
+                "edges": {
+                  "u-l": "tree"
+                },
+                "panels": {
+                  "verdict": [
+                    "write → read: ordered"
+                  ]
+                },
+                "note": "A path exists: no race"
+              },
+              {
+                "at": "Remove",
+                "remove": [
+                  "u-l"
+                ],
+                "nodes": {
+                  "u": "dim",
+                  "l": "dim",
+                  "w": "active",
+                  "r": "active"
+                },
+                "panels": {
+                  "verdict": [
+                    "no path: data race"
+                  ]
+                },
+                "note": "No path between them"
+              },
+              {
+                "at": "undefined",
+                "panels": {
+                  "verdict": [
+                    "no path: data race",
+                    "undefined behavior"
+                  ]
+                },
+                "note": "UB: the optimizer assumes races never happen"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Vector clocks",
+      "question": "How does TSan decide that two accesses are unordered?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. At runtime, how does ThreadSanitizer decide that two accesses were not ordered? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How does TSan decide two accesses are <em>unordered</em>?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Each thread carries a vector clock: its own counter, plus the latest time it has heard from every other thread. Thread one writes x at its time four, and the shadow memory for x records: written by thread one, at four. On unlock, thread one leaves its clock in the mutex. When thread two locks, it merges that clock, taking the maximum of each entry, so it now knows thread one's time four. Thread two reads x. The check: is the last write's time, four, at most what thread two knows of thread one? Yes, so the write happens before the read. Without the lock, thread two's entry for thread one is still zero. Four is greater than zero, so the accesses are concurrent, and ThreadSanitizer reports a race, with both stacks.",
+          "props": {
+            "title": "Did I <em>hear</em> about that write?",
+            "nodes": [
+              {
+                "id": "w",
+                "label": "T1: x = 42",
+                "x": 300,
+                "y": 290,
+                "w": 250,
+                "h": 64
+              },
+              {
+                "id": "u",
+                "label": "T1: m.unlock()",
+                "x": 300,
+                "y": 450,
+                "w": 250,
+                "h": 64
+              },
+              {
+                "id": "l",
+                "label": "T2: m.lock()",
+                "x": 860,
+                "y": 560,
+                "w": 250,
+                "h": 64
+              },
+              {
+                "id": "r",
+                "label": "T2: read x",
+                "x": 860,
+                "y": 700,
+                "w": 250,
+                "h": 64
+              }
+            ],
+            "edges": [
+              {
+                "from": "w",
+                "to": "u"
+              },
+              {
+                "from": "u",
+                "to": "l",
+                "w": "mutex carries T1's clock"
+              },
+              {
+                "from": "l",
+                "to": "r"
+              }
+            ],
+            "panels": [
+              {
+                "key": "t1",
+                "label": "T1 clock",
+                "type": "table",
+                "columns": [
+                  "T1",
+                  "T2"
+                ],
+                "initial": {
+                  "T1": "",
+                  "T2": ""
+                }
+              },
+              {
+                "key": "t2",
+                "label": "T2 clock",
+                "type": "table",
+                "columns": [
+                  "T1",
+                  "T2"
+                ],
+                "initial": {
+                  "T1": "",
+                  "T2": ""
+                }
+              },
+              {
+                "key": "x",
+                "label": "Shadow of x",
+                "type": "list",
+                "rows": 1,
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "carries",
+                "panels": {
+                  "t1": {
+                    "T1": "4",
+                    "T2": "0"
+                  },
+                  "t2": {
+                    "T1": "0",
+                    "T2": "7"
+                  }
+                },
+                "note": "One vector clock per thread"
+              },
+              {
+                "at": "writes",
+                "nodes": {
+                  "w": "active"
+                },
+                "panels": {
+                  "x": [
+                    "W · T1 @ 4"
+                  ]
+                },
+                "note": "Shadow of x: last write by T1 at 4"
+              },
+              {
+                "at": "unlock",
+                "nodes": {
+                  "w": "base",
+                  "u": "active"
+                },
+                "edges": {
+                  "w-u": "tree",
+                  "u-l": "relax"
+                },
+                "panels": {
+                  "t1": {
+                    "T1": "5"
+                  }
+                },
+                "note": "Release: the mutex stores T1's clock"
+              },
+              {
+                "at": "merges",
+                "nodes": {
+                  "u": "base",
+                  "l": "active"
+                },
+                "panels": {
+                  "t2": {
+                    "T1": "4"
+                  }
+                },
+                "note": "Acquire: T2 takes max → knows T1 @ 4"
+              },
+              {
+                "at": "check",
+                "nodes": {
+                  "l": "base",
+                  "r": "active"
+                },
+                "edges": {
+                  "u-l": "tree",
+                  "l-r": "tree"
+                },
+                "note": "Is 4 ≤ T2's view of T1 (4)?"
+              },
+              {
+                "at": "Yes",
+                "nodes": {
+                  "r": "done",
+                  "w": "done"
+                },
+                "panels": {
+                  "x": [
+                    "W · T1 @ 4",
+                    "R · T2: ordered ✓"
+                  ]
+                },
+                "note": "Yes: write happens-before read"
+              },
+              {
+                "at": "Without",
+                "remove": [
+                  "u-l"
+                ],
+                "nodes": {
+                  "u": "dim",
+                  "l": "dim",
+                  "w": "active",
+                  "r": "active"
+                },
+                "panels": {
+                  "t2": {
+                    "T1": "0"
+                  },
+                  "x": [
+                    "W · T1 @ 4",
+                    "R · T2: 4 > 0 ✗"
+                  ]
+                },
+                "note": "Without the lock: T2 knows T1 @ 0"
+              },
+              {
+                "at": "reports",
+                "note": "4 > 0 → concurrent → race reported, both stacks"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Using it",
+      "question": "What does TSan report beyond races, and what are its limits?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. What does ThreadSanitizer report besides data races, and what are its limits? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What does TSan report beyond races, and what are its <em>limits</em>?"
+          }
+        },
+        {
+          "type": "code",
+          "say": "Build with the thread sanitizer flag, plus debug info, and some optimization. A plain bool used as a stop flag is the classic race: the report shows the write, the previous read, and where each thread was created. Make it atomic. It also tracks the order in which mutexes are taken. One thread takes m1 then m2, another takes m2 then m1. Even if this run never deadlocks, it reports a lock order inversion, a potential deadlock.",
+          "props": {
+            "title": "Races, and <em>potential</em> deadlocks",
+            "file": "app.cpp",
+            "tag": "-fsanitize=thread",
+            "lang": "cpp",
+            "size": 20,
+            "width": 1190,
+            "code": "// clang++ -fsanitize=thread -g -O1 app.cpp && ./a.out\nbool done = false;                    // should be std::atomic<bool>\n\nvoid worker()     { while (!done) step(); }        // read\nvoid controller() { sleep_for(1s); done = true; }  // write: races with the read\n\nstd::mutex m1, m2;\nvoid a() { std::lock_guard l1(m1); std::lock_guard l2(m2); }  // m1 → m2\nvoid b() { std::lock_guard l2(m2); std::lock_guard l1(m1); }  // m2 → m1\n\n// WARNING: ThreadSanitizer: data race\n//   Write of size 1 by thread T2: controller() app.cpp:5\n//   Previous read of size 1 by thread T1: worker() app.cpp:4\n// WARNING: ThreadSanitizer: lock-order-inversion (potential deadlock)",
+            "highlights": [
+              {
+                "at": "flag",
+                "lines": "1",
+                "note": "Instrument every access + sync op"
+              },
+              {
+                "at": "classic",
+                "lines": "2-5",
+                "note": "Plain bool shared across threads"
+              },
+              {
+                "at": "report",
+                "lines": "11-13",
+                "note": "Both stacks: the write and the earlier read"
+              },
+              {
+                "at": "order",
+                "lines": "8-9",
+                "note": "m1→m2 here, m2→m1 there"
+              },
+              {
+                "at": "inversion",
+                "lines": "14",
+                "note": "Reported even if this run didn't hang"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "Its limits. It only sees races on paths that actually ran, with real interleavings. Each eight bytes keep only four shadow cells, so an old access can be evicted, and a race missed. Code it didn't compile, like inline assembly or an uninstrumented library, is invisible. And it costs five to fifteen times the CPU, and five to ten times the memory.",
+          "props": {
+            "title": "Where TSan <em>goes blind</em>",
+            "items": [
+              {
+                "at": "ran",
+                "label": "Dynamic",
+                "title": "Only executed interleavings",
+                "body": "Stress tests help; no proof of absence.",
+                "code": "run it in CI"
+              },
+              {
+                "at": "evicted",
+                "label": "History",
+                "title": "4 shadow cells per 8 bytes",
+                "body": "Old accesses get evicted.",
+                "code": "history_size"
+              },
+              {
+                "at": "compile",
+                "label": "Coverage",
+                "title": "Uninstrumented code",
+                "body": "Inline asm, prebuilt libraries.",
+                "code": "rebuild deps"
+              },
+              {
+                "at": "fifteen",
+                "label": "Cost",
+                "title": "5–15× CPU",
+                "body": "5–10× memory; never in the same build as ASan.",
+                "code": "-fsanitize=thread"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. A data race is two accesses, one a write, with no happens before between them. ThreadSanitizer tracks that with vector clocks and shadow memory. It also catches lock order inversions. And it only sees what your tests actually run.",
+          "props": {
+            "title": "TSan, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "race",
+                "text": "Race = same location, a write, no happens-before.",
+                "code": "UB in C++"
+              },
+              {
+                "at": "clocks",
+                "text": "Vector clocks + shadow cells decide order.",
+                "code": "release → acquire"
+              },
+              {
+                "at": "inversions",
+                "text": "Also flags lock-order inversions.",
+                "code": "potential deadlock"
+              },
+              {
+                "at": "sees",
+                "text": "Sees only executed paths: keep it in CI.",
+                "code": "-fsanitize=thread"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,521 @@
+{
+  "slug": "cpp-memory-layout",
+  "series": "cpp",
+  "title": "Memory layout",
+  "kicker": "C++ · Memory layout",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/cpp/concurrency/memory-model.md",
+  "summary": "Where a program's bytes live: text, data, BSS, heap and stack, static and thread-local storage, and stack versus heap.",
+  "captionFixes": [
+    {
+      "match": [
+        "processes",
+        "address"
+      ],
+      "display": "process's address"
+    },
+    {
+      "match": [
+        "RRII"
+      ],
+      "display": "RAII"
+    },
+    {
+      "match": [
+        "big",
+        "in",
+        "an"
+      ],
+      "display": "big, and an"
+    },
+    {
+      "match": [
+        "code.",
+        "read-only"
+      ],
+      "display": "code: read-only"
+    },
+    {
+      "match": [
+        "read",
+        "only"
+      ],
+      "display": "read-only"
+    },
+    {
+      "match": [
+        "non",
+        "zero"
+      ],
+      "display": "non-zero"
+    },
+    {
+      "match": [
+        "Zero",
+        "initialized"
+      ],
+      "display": "Zero-initialized"
+    },
+    {
+      "match": [
+        "thread",
+        "safe"
+      ],
+      "display": "thread-safe"
+    },
+    {
+      "match": [
+        "Thread",
+        "local"
+      ],
+      "display": "Thread-local"
+    },
+    {
+      "match": [
+        "function",
+        "local"
+      ],
+      "display": "function-local"
+    },
+    {
+      "match": [
+        "C++",
+        "eleven"
+      ],
+      "display": "C++11"
+    },
+    {
+      "match": [
+        "C++",
+        "11"
+      ],
+      "display": "C++11"
+    },
+    {
+      "match": [
+        "unique",
+        "pointer"
+      ],
+      "display": "unique_ptr"
+    },
+    {
+      "match": [
+        "fixed",
+        "size"
+      ],
+      "display": "fixed-size"
+    },
+    {
+      "match": [
+        "short",
+        "lived"
+      ],
+      "display": "short-lived"
+    },
+    {
+      "match": [
+        "Address",
+        "sanitizer"
+      ],
+      "display": "AddressSanitizer"
+    },
+    {
+      "match": [
+        "use",
+        "after",
+        "free"
+      ],
+      "display": "use-after-free"
+    },
+    {
+      "match": [
+        "R",
+        "A",
+        "I",
+        "I"
+      ],
+      "display": "RAII"
+    },
+    {
+      "match": [
+        "R-A-I-I"
+      ],
+      "display": "RAII"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Five segments",
+      "question": "Where do a program's code, globals, allocations and locals live?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Memory layout, question one. Where do a program's code, its globals, its heap allocations, and its local variables live? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Where do code, globals, allocations and locals <em>live</em>?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Picture one process's address space, low addresses at the bottom. The text segment holds machine code: read only, and shared between processes running the same binary. Globals and statics with a non zero initial value live in data, and that value is stored in the executable. Zero initialized ones live in BSS: the file records only the size, and the loader maps zeroed pages. The heap holds what new allocates, managed by the allocator. And each thread has its own stack, for locals and call frames. The main stack sits near the top, and grows down.",
+          "props": {
+            "title": "Low to <em>high</em>",
+            "nodes": [
+              {
+                "id": "stack",
+                "label": "stack ↓ (per thread)",
+                "x": 420,
+                "y": 262,
+                "w": 400,
+                "h": 56
+              },
+              {
+                "id": "heap",
+                "label": "heap ↑",
+                "x": 420,
+                "y": 372,
+                "w": 400,
+                "h": 56
+              },
+              {
+                "id": "bss",
+                "label": ".bss (zero-filled)",
+                "x": 420,
+                "y": 482,
+                "w": 400,
+                "h": 56
+              },
+              {
+                "id": "data",
+                "label": ".data (initialized)",
+                "x": 420,
+                "y": 592,
+                "w": 400,
+                "h": 56
+              },
+              {
+                "id": "text",
+                "label": ".text (code, read-only)",
+                "x": 420,
+                "y": 702,
+                "w": 400,
+                "h": 56
+              },
+              {
+                "id": "v_stack",
+                "label": "int local;  // in a function",
+                "x": 1290,
+                "y": 262,
+                "w": 520,
+                "h": 56,
+                "hidden": true
+              },
+              {
+                "id": "v_heap",
+                "label": "new int(42)",
+                "x": 1290,
+                "y": 372,
+                "w": 520,
+                "h": 56,
+                "hidden": true
+              },
+              {
+                "id": "v_bss",
+                "label": "static char buf[1 << 20];",
+                "x": 1290,
+                "y": 482,
+                "w": 520,
+                "h": 56,
+                "hidden": true
+              },
+              {
+                "id": "v_data",
+                "label": "int limit = 100;  // global",
+                "x": 1290,
+                "y": 592,
+                "w": 520,
+                "h": 56,
+                "hidden": true
+              },
+              {
+                "id": "v_text",
+                "label": "int add(int a, int b) { … }",
+                "x": 1290,
+                "y": 702,
+                "w": 520,
+                "h": 56,
+                "hidden": true
+              }
+            ],
+            "edges": [],
+            "panels": [],
+            "steps": [
+              {
+                "at": "text",
+                "show": [
+                  "v_text"
+                ],
+                "add": [
+                  {
+                    "from": "v_text",
+                    "to": "text"
+                  }
+                ],
+                "nodes": {
+                  "text": "active"
+                },
+                "note": "Machine code: read-only, shared"
+              },
+              {
+                "at": "data",
+                "show": [
+                  "v_data"
+                ],
+                "add": [
+                  {
+                    "from": "v_data",
+                    "to": "data"
+                  }
+                ],
+                "nodes": {
+                  "text": "base",
+                  "data": "active"
+                },
+                "note": "Non-zero initial value: stored in the binary"
+              },
+              {
+                "at": "BSS",
+                "show": [
+                  "v_bss"
+                ],
+                "add": [
+                  {
+                    "from": "v_bss",
+                    "to": "bss"
+                  }
+                ],
+                "nodes": {
+                  "data": "base",
+                  "bss": "active"
+                },
+                "note": "Zero-initialized: only the size is recorded"
+              },
+              {
+                "at": "allocates",
+                "show": [
+                  "v_heap"
+                ],
+                "add": [
+                  {
+                    "from": "v_heap",
+                    "to": "heap"
+                  }
+                ],
+                "nodes": {
+                  "bss": "base",
+                  "heap": "active"
+                },
+                "note": "new / malloc: managed by the allocator"
+              },
+              {
+                "at": "locals",
+                "show": [
+                  "v_stack"
+                ],
+                "add": [
+                  {
+                    "from": "v_stack",
+                    "to": "stack"
+                  }
+                ],
+                "nodes": {
+                  "heap": "base",
+                  "stack": "active"
+                },
+                "note": "One stack per thread: locals, call frames"
+              },
+              {
+                "at": "down",
+                "nodes": {
+                  "stack": "done",
+                  "heap": "done",
+                  "bss": "done",
+                  "data": "done",
+                  "text": "done"
+                },
+                "note": "Stack grows down; the heap grows up"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Static storage",
+      "question": "Why does one non-zero element make a big global array bloat the binary?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. Two global arrays of a million ints. One makes the executable four megabytes bigger, the other costs nothing. Why? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Why does one global array <em>bloat the binary</em>, and the other not?"
+          }
+        },
+        {
+          "type": "code",
+          "say": "A global with a value goes in data, and the value is stored in the binary. Without an initializer, or with all zeros, it goes in BSS, which costs no file space at all. But a single non zero element puts the whole four megabyte array into data. A string literal lives in read only data. Thread local gives every thread its own copy. A function local static has static storage too, but it's constructed the first time control reaches it, and that's thread safe since C++ eleven. Locals live in the stack frame. The unique pointer itself is on the stack, while its four megabytes are on the heap.",
+          "props": {
+            "title": "Where each <em>variable</em> lives",
+            "file": "layout.cpp",
+            "tag": "storage",
+            "lang": "cpp",
+            "size": 21,
+            "width": 1190,
+            "code": "int limit = 100;                // .data: the value is stored in the binary\nint counter;                    // .bss: zero-filled at load, no file space\nint zeros[1'000'000] = {};      // .bss too: an all-zero initializer\nint ones[1'000'000] = {1};      // .data: ~4 MB in the executable\nconst char* msg = \"hi\";         // pointer in .data, \"hi\" in .rodata\nthread_local int tls_hits;      // one copy per thread\n\nConfig& config() {\n    static Config c = load();   // static storage, built on the first call,\n    return c;                   // thread-safe since C++11\n}\n\nvoid f() {\n    int local = 0;                               // stack frame\n    auto p = std::make_unique<int[]>(1 << 20);   // 4 MB on the heap\n}",
+            "highlights": [
+              {
+                "at": "value",
+                "lines": "1",
+                "note": "Initialized → .data"
+              },
+              {
+                "at": "initializer",
+                "lines": "2-3",
+                "note": "Zero / none → .bss: free in the file"
+              },
+              {
+                "at": "single",
+                "lines": "4",
+                "note": "One non-zero element → all of it in .data"
+              },
+              {
+                "at": "literal",
+                "lines": "5-6",
+                "note": "Literal in .rodata; thread_local: one per thread"
+              },
+              {
+                "at": "constructed",
+                "lines": "9-10",
+                "note": "Built on first call, thread-safe"
+              },
+              {
+                "at": "frame",
+                "lines": "14-15",
+                "note": "Stack frame: the local and the unique_ptr; heap: its 4 MB"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Stack or heap?",
+      "question": "When should an object live on the stack, and when on the heap?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. When should an object live on the stack, and when on the heap? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Stack or <em>heap</em>?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Allocating on the stack is just moving the stack pointer, and it's freed automatically at scope exit. But it's small: typically eight megabytes for the main thread on Linux, one on Windows. The heap goes through the allocator: bookkeeping, sometimes a lock or a system call, and fragmentation over time. It's big, and an object lives until it's freed, so own it with R A I I. Small, fixed size, short lived objects go on the stack.",
+          "props": {
+            "title": "Bump a pointer, or <em>ask an allocator</em>",
+            "left": {
+              "at": "pointer",
+              "label": "Stack",
+              "title": "Fast, automatic, small",
+              "tone": "good",
+              "body": "One pointer bump; freed at scope exit. ~8 MB main thread (Linux), ~1 MB (Windows)."
+            },
+            "right": {
+              "at": "allocator",
+              "label": "Heap",
+              "title": "Flexible, slower",
+              "body": "Allocator bookkeeping, maybe a lock or syscall, fragmentation. Lives until freed: use RAII."
+            },
+            "verdict": {
+              "at": "small#2",
+              "text": "Small, fixed-size, short-lived → stack. Big or long-lived → heap, owned by RAII.",
+              "code": "std::array vs std::vector"
+            }
+          }
+        },
+        {
+          "type": "points",
+          "say": "And the four classic bugs. A huge local array, or deep recursion, overflows the stack. Returning the address of a local leaves a dangling pointer. Forgetting to free leaks. And touching memory after delete is use after free. Address sanitizer catches the last three.",
+          "props": {
+            "title": "Four <em>classic</em> bugs",
+            "items": [
+              {
+                "at": "overflows",
+                "label": "Stack overflow",
+                "title": "Huge locals, deep recursion",
+                "body": "int big[10'000'000]; in a function",
+                "code": "move it to the heap"
+              },
+              {
+                "at": "dangling",
+                "label": "Dangling",
+                "title": "Address of a local",
+                "body": "return &amp;x; after x is gone",
+                "code": "ASan: use-after-return"
+              },
+              {
+                "at": "leaks",
+                "label": "Leak",
+                "title": "new without delete",
+                "body": "Owner forgot, or threw first.",
+                "code": "std::unique_ptr"
+              },
+              {
+                "at": "touching",
+                "label": "Use-after-free",
+                "title": "Touch after delete",
+                "body": "The memory may be reused.",
+                "code": "-fsanitize=address"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Code is in text, initialized globals in data, zeroed ones in BSS. Function statics are built on first use, safely. The stack is fast but small, the heap is big but managed. And let R A I I own everything on the heap.",
+          "props": {
+            "title": "Memory layout, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "text",
+                "text": "text: code · data: initialized · bss: zeroed.",
+                "code": "size ./a.out"
+              },
+              {
+                "at": "statics",
+                "text": "Function statics: built on first use, thread-safe.",
+                "code": "C++11 magic statics"
+              },
+              {
+                "at": "small",
+                "text": "Stack: fast but small. Heap: big but managed.",
+                "code": "ulimit -s"
+              },
+              {
+                "at": "own",
+                "text": "Let RAII own every heap allocation.",
+                "code": "make_unique"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

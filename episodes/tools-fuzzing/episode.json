@@ -1,0 +1,493 @@
+{
+  "slug": "tools-fuzzing",
+  "series": "tools",
+  "title": "Fuzz testing",
+  "kicker": "Tools · Fuzz testing",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/cpp/scaffold/fuzz-testing.md",
+  "summary": "Coverage-guided fuzzing with libFuzzer: the mutate-run-keep loop, why it cracks nested checks, and how to write a good target.",
+  "captionFixes": [
+    {
+      "match": [
+        "apparent"
+      ],
+      "display": "a parent"
+    },
+    {
+      "match": [
+        "byte",
+        "h"
+      ],
+      "display": "byte H"
+    },
+    {
+      "match": [
+        "Your",
+        "fuzzing"
+      ],
+      "display": "You're fuzzing"
+    },
+    {
+      "match": [
+        "Fuzz",
+        "data",
+        "provider"
+      ],
+      "display": "FuzzedDataProvider"
+    },
+    {
+      "match": [
+        "pass,",
+        "print",
+        "and",
+        "pass",
+        "again"
+      ],
+      "display": "parse, print and parse again"
+    },
+    {
+      "match": [
+        "minus",
+        "one,",
+        "tells"
+      ],
+      "display": "Returning -1 tells"
+    },
+    {
+      "match": [
+        "lib",
+        "fuzzer"
+      ],
+      "display": "libFuzzer"
+    },
+    {
+      "match": [
+        "Lib",
+        "fuzzer"
+      ],
+      "display": "libFuzzer"
+    },
+    {
+      "match": [
+        "Libfuzzer"
+      ],
+      "display": "libFuzzer"
+    },
+    {
+      "match": [
+        "libfuzzer"
+      ],
+      "display": "libFuzzer"
+    },
+    {
+      "match": [
+        "Fuzzed",
+        "data",
+        "provider"
+      ],
+      "display": "FuzzedDataProvider"
+    },
+    {
+      "match": [
+        "OSS",
+        "fuzz"
+      ],
+      "display": "OSS-Fuzz"
+    },
+    {
+      "match": [
+        "AFL",
+        "plus",
+        "plus"
+      ],
+      "display": "AFL++"
+    },
+    {
+      "match": [
+        "coverage",
+        "guided"
+      ],
+      "display": "coverage-guided"
+    },
+    {
+      "match": [
+        "round",
+        "trips"
+      ],
+      "display": "round-trips"
+    },
+    {
+      "match": [
+        "json"
+      ],
+      "display": "JSON"
+    },
+    {
+      "match": [
+        "Jason"
+      ],
+      "display": "JSON"
+    },
+    {
+      "match": [
+        "centipede"
+      ],
+      "display": "Centipede"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "The fuzzing loop",
+      "question": "What makes a fuzzer coverage-guided?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Fuzz testing, question one. Random inputs are cheap. What makes a modern fuzzer coverage guided, and why does that matter? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What makes a fuzzer <em>coverage-guided</em>?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Start from a corpus of seed inputs. The fuzzer picks one, and mutates it: flip bits, insert bytes, splice two inputs, or drop in words from a dictionary. It runs the target in the same process, thousands of times a second. The compiler has instrumented every branch, so each run reports which edges it covered. An input that reaches new code is kept, and becomes a parent for later mutations. Everything else is thrown away. And when a run crashes, or a sanitizer fires, the input is saved to a file, ready to reproduce.",
+          "props": {
+            "title": "Mutate, run, <em>keep what's new</em>",
+            "nodes": [
+              {
+                "id": "corpus",
+                "label": "corpus",
+                "x": 230,
+                "y": 480,
+                "w": 200,
+                "h": 64
+              },
+              {
+                "id": "mut",
+                "label": "mutate",
+                "x": 560,
+                "y": 300,
+                "w": 200,
+                "h": 64
+              },
+              {
+                "id": "run",
+                "label": "run target\n(instrumented)",
+                "x": 960,
+                "y": 300,
+                "w": 260,
+                "h": 86
+              },
+              {
+                "id": "cov",
+                "label": "new coverage?",
+                "x": 960,
+                "y": 620,
+                "w": 260,
+                "h": 64
+              },
+              {
+                "id": "drop",
+                "label": "discard",
+                "x": 1420,
+                "y": 620,
+                "w": 200,
+                "h": 64
+              },
+              {
+                "id": "crash",
+                "label": "crash-<sha1>\n+ report",
+                "x": 1420,
+                "y": 300,
+                "w": 240,
+                "h": 86
+              }
+            ],
+            "edges": [
+              {
+                "from": "corpus",
+                "to": "mut"
+              },
+              {
+                "from": "mut",
+                "to": "run"
+              },
+              {
+                "from": "run",
+                "to": "cov"
+              },
+              {
+                "from": "cov",
+                "to": "corpus",
+                "w": "yes: keep"
+              },
+              {
+                "from": "cov",
+                "to": "drop",
+                "w": "no"
+              },
+              {
+                "from": "run",
+                "to": "crash",
+                "w": "crash"
+              }
+            ],
+            "panels": [],
+            "steps": [
+              {
+                "at": "seed",
+                "nodes": {
+                  "corpus": "active"
+                },
+                "note": "Seed inputs: valid and invalid samples"
+              },
+              {
+                "at": "mutates",
+                "nodes": {
+                  "corpus": "base",
+                  "mut": "active"
+                },
+                "edges": {
+                  "corpus-mut": "relax"
+                },
+                "note": "Bit flips, inserts, splices, dictionary words"
+              },
+              {
+                "at": "process",
+                "nodes": {
+                  "mut": "base",
+                  "run": "active"
+                },
+                "edges": {
+                  "corpus-mut": "base",
+                  "mut-run": "relax"
+                },
+                "note": "In-process: thousands of runs per second"
+              },
+              {
+                "at": "edges",
+                "nodes": {
+                  "run": "base",
+                  "cov": "active"
+                },
+                "edges": {
+                  "mut-run": "base",
+                  "run-cov": "relax"
+                },
+                "note": "Instrumented branches report coverage"
+              },
+              {
+                "at": "kept",
+                "nodes": {
+                  "cov": "base",
+                  "corpus": "done"
+                },
+                "edges": {
+                  "run-cov": "base",
+                  "cov-corpus": "tree"
+                },
+                "note": "New coverage → joins the corpus"
+              },
+              {
+                "at": "thrown",
+                "nodes": {
+                  "drop": "dim"
+                },
+                "edges": {
+                  "cov-drop": "dim"
+                },
+                "note": "Nothing new → discarded"
+              },
+              {
+                "at": "crashes",
+                "nodes": {
+                  "crash": "active"
+                },
+                "edges": {
+                  "run-crash": "relax"
+                },
+                "note": "Crash or sanitizer report → input saved"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Writing a target",
+      "question": "Why does coverage feedback find \"HI!\" in seconds when random input wouldn't?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. A bug only triggers when the input starts with H, I, exclamation mark. Why does a coverage guided fuzzer find it in seconds, when random bytes would almost never? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Why does coverage find <em>\"HI!\"</em> in seconds?"
+          }
+        },
+        {
+          "type": "code",
+          "say": "A lib fuzzer target is one function that takes bytes, and returns zero. Compile with the fuzzer flag, plus address sanitizer, so silent memory corruption becomes a crash. Random inputs would need all three bytes right at once: one chance in sixteen million. But the first byte H opens a new branch, so that input is kept. The fuzzer then only has to guess the second byte, then the third. Three small searches, instead of one huge one. Returning minus one tells the fuzzer never to add that input to the corpus.",
+          "props": {
+            "title": "One function, <em>raw bytes</em>",
+            "file": "fuzz_hi.cpp",
+            "tag": "libFuzzer",
+            "lang": "cpp",
+            "size": 21,
+            "width": 1180,
+            "code": "#include <cstddef>\n#include <cstdint>\n#include <cstdlib>\n\n// clang++ -g -O1 -fsanitize=fuzzer,address fuzz_hi.cpp -o fuzz_hi\n// ./fuzz_hi corpus/ -max_len=64 -dict=hi.dict\nextern \"C\" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {\n    if (size > 0 && data[0] == 'H')           // new branch → input kept\n        if (size > 1 && data[1] == 'I')       // mutate the kept input\n            if (size > 2 && data[2] == '!')\n                std::abort();                 // found in ~4,000 runs\n    return 0;                                 // -1: never add this input\n}",
+            "highlights": [
+              {
+                "at": "returns",
+                "lines": "7",
+                "note": "The entry point libFuzzer calls"
+              },
+              {
+                "at": "flag",
+                "lines": "5",
+                "note": "Fuzzer + ASan in one build"
+              },
+              {
+                "at": "sixteen",
+                "lines": "8-11",
+                "note": "Blind: 1 in 256³ ≈ 16.7 million"
+              },
+              {
+                "at": "kept",
+                "lines": "8",
+                "note": "'H' reaches new code → kept"
+              },
+              {
+                "at": "second",
+                "lines": "9-10",
+                "note": "Then 'I', then '!': ~256 tries each"
+              },
+              {
+                "at": "never",
+                "lines": "12",
+                "note": "-1 rejects the input from the corpus"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Good targets",
+      "question": "What makes a fuzz target effective?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. You're fuzzing a JSON parser. What makes the fuzz target effective, and what breaks it? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What makes a fuzz target <em>effective</em>?"
+          }
+        },
+        {
+          "type": "code",
+          "say": "Fuzzed data provider turns raw bytes into typed values, like a depth limit, and a string. The target must be deterministic: the same bytes must take the same path, so no randomness, and no global state left behind. Never call exit. Keep it fast, so millions of inputs fit in a run. And give it an oracle beyond crashes: here, parse, print, and parse again, and assert that the result round trips.",
+          "props": {
+            "title": "Fast, deterministic, <em>with an oracle</em>",
+            "file": "fuzz_json.cpp",
+            "tag": "FuzzedDataProvider",
+            "lang": "cpp",
+            "size": 21,
+            "width": 1180,
+            "code": "#include <fuzzer/FuzzedDataProvider.h>\n\nextern \"C\" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {\n    FuzzedDataProvider fdp(data, size);\n    int depth = fdp.ConsumeIntegralInRange(0, 16);   // typed values from raw bytes\n    std::string text = fdp.ConsumeRemainingBytesAsString();\n\n    auto doc = json::parse(text, depth);             // no exit(), no randomness\n    if (doc) assert(json::parse(doc->dump(), depth) == doc);   // round-trip oracle\n    return 0;\n}",
+            "highlights": [
+              {
+                "at": "typed",
+                "lines": "4-6",
+                "note": "Split raw bytes into typed arguments"
+              },
+              {
+                "at": "deterministic",
+                "lines": "8",
+                "note": "Same bytes → same path"
+              },
+              {
+                "at": "fast",
+                "lines": "8",
+                "note": "Fast + no exit(): millions of runs"
+              },
+              {
+                "at": "oracle",
+                "lines": "9",
+                "note": "Round-trip invariant as the oracle"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "Then feed it well. Seed the corpus with real samples, valid and broken. Add a dictionary of tokens, like braces and keywords. Run it continuously, for example on OSS fuzz, and keep every crash as a regression test. Lib fuzzer itself is in maintenance mode, its authors moved on to Centipede, but it is still supported, and AFL plus plus runs the same targets.",
+          "props": {
+            "title": "Feed it <em>well</em>",
+            "items": [
+              {
+                "at": "Seed",
+                "label": "Corpus",
+                "title": "Seed with real samples",
+                "body": "Valid and broken inputs.",
+                "code": "./fuzz corpus/"
+              },
+              {
+                "at": "dictionary",
+                "label": "Dictionary",
+                "title": "Tokens of the format",
+                "body": "\"{\", \"true\", \"null\"…",
+                "code": "-dict=json.dict"
+              },
+              {
+                "at": "continuously",
+                "label": "Continuous",
+                "title": "Run it all the time",
+                "body": "Every crash becomes a regression test.",
+                "code": "OSS-Fuzz · CI"
+              },
+              {
+                "at": "maintenance",
+                "label": "Engines",
+                "title": "Same target, many engines",
+                "body": "libFuzzer is in maintenance mode.",
+                "code": "AFL++ · Centipede"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. A fuzzer mutates inputs, and keeps the ones that reach new code. That turns one impossible search into many small ones. Pair it with sanitizers, so corruption crashes. And keep the target fast and deterministic, with an oracle.",
+          "props": {
+            "title": "Fuzzing, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "keeps",
+                "text": "Mutate, run, keep inputs that reach new code.",
+                "code": "coverage-guided"
+              },
+              {
+                "at": "small",
+                "text": "Nested checks become small, separate searches.",
+                "code": "256 + 256 + 256"
+              },
+              {
+                "at": "sanitizers",
+                "text": "Pair with sanitizers so corruption crashes.",
+                "code": "fuzzer,address"
+              },
+              {
+                "at": "deterministic",
+                "text": "Targets: fast, deterministic, with an oracle.",
+                "code": "LLVMFuzzerTestOneInput"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

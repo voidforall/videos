@@ -1,0 +1,532 @@
+{
+  "slug": "cpp-futures",
+  "series": "cpp",
+  "title": "Futures and promises",
+  "kicker": "C++ · Futures and promises",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/cpp/concurrency/promise-and-future.md",
+  "summary": "The promise-future channel, exceptions and broken promises, std::async launch policies and their traps, packaged_task, and shared_future.",
+  "captionFixes": [
+    {
+      "match": [
+        "Look",
+        "for",
+        "deferred"
+      ],
+      "display": "Check for deferred"
+    },
+    {
+      "match": [
+        "Async"
+      ],
+      "display": "async"
+    },
+    {
+      "match": [
+        "Deferred"
+      ],
+      "display": "deferred"
+    },
+    {
+      "match": [
+        "a",
+        "sink"
+      ],
+      "display": "async"
+    },
+    {
+      "match": [
+        "Package",
+        "task"
+      ],
+      "display": "packaged_task"
+    },
+    {
+      "match": [
+        "packaged",
+        "tusk"
+      ],
+      "display": "packaged_task"
+    },
+    {
+      "match": [
+        "threadpools",
+        "handback"
+      ],
+      "display": "thread pools hand back"
+    },
+    {
+      "match": [
+        "every",
+        "copies"
+      ],
+      "display": "every copy's"
+    },
+    {
+      "match": [
+        "re-throws"
+      ],
+      "display": "rethrows"
+    },
+    {
+      "match": [
+        "Promise",
+        "packaged_task"
+      ],
+      "display": "Promise, packaged_task,"
+    },
+    {
+      "match": [
+        "standard",
+        "async"
+      ],
+      "display": "std::async"
+    },
+    {
+      "match": [
+        "Standard",
+        "async"
+      ],
+      "display": "std::async"
+    },
+    {
+      "match": [
+        "set",
+        "value"
+      ],
+      "display": "set_value"
+    },
+    {
+      "match": [
+        "set",
+        "exception"
+      ],
+      "display": "set_exception"
+    },
+    {
+      "match": [
+        "broken",
+        "promise"
+      ],
+      "display": "broken_promise"
+    },
+    {
+      "match": [
+        "packaged",
+        "task"
+      ],
+      "display": "packaged_task"
+    },
+    {
+      "match": [
+        "Packaged",
+        "task"
+      ],
+      "display": "packaged_task"
+    },
+    {
+      "match": [
+        "shared",
+        "future"
+      ],
+      "display": "shared_future"
+    },
+    {
+      "match": [
+        "heap",
+        "allocated"
+      ],
+      "display": "heap-allocated"
+    },
+    {
+      "match": [
+        "move",
+        "only"
+      ],
+      "display": "move-only"
+    },
+    {
+      "match": [
+        "one",
+        "shot"
+      ],
+      "display": "one-shot"
+    },
+    {
+      "match": [
+        "a",
+        "sync"
+      ],
+      "display": "async"
+    },
+    {
+      "match": [
+        "A",
+        "sync"
+      ],
+      "display": "Async"
+    },
+    {
+      "match": [
+        "Launch",
+        "a",
+        "sync"
+      ],
+      "display": "launch::async"
+    },
+    {
+      "match": [
+        "Launch",
+        "async"
+      ],
+      "display": "launch::async"
+    },
+    {
+      "match": [
+        "Launch",
+        "deferred"
+      ],
+      "display": "launch::deferred"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "A one-shot channel",
+      "question": "How does a value, or an exception, travel from a promise to its future?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Futures, question one. How does a value, or an exception, travel from a promise in one thread to a future in another? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How does a value travel from a <em>promise</em> to its <em>future</em>?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "A promise and its future share one heap allocated state. The consumer calls get, and blocks until that state is ready. The producer calls set value. The state stores it, and wakes the consumer. Get moves the value out, so it can be called only once. If the work throws, set exception stores the exception instead, and get rethrows it in the consumer's thread. And if the promise is destroyed without setting anything, get throws a broken promise error, instead of waiting forever.",
+          "props": {
+            "title": "One shared state, <em>one shot</em>",
+            "nodes": [
+              {
+                "id": "prod",
+                "label": "producer thread\npromise<int>",
+                "x": 330,
+                "y": 330,
+                "w": 300,
+                "h": 86
+              },
+              {
+                "id": "state",
+                "label": "shared state\n(value | exception)",
+                "x": 900,
+                "y": 600,
+                "w": 320,
+                "h": 86
+              },
+              {
+                "id": "cons",
+                "label": "consumer thread\nfuture<int>",
+                "x": 1470,
+                "y": 330,
+                "w": 300,
+                "h": 86
+              },
+              {
+                "id": "broken",
+                "label": "future_error:\nbroken_promise",
+                "x": 330,
+                "y": 600,
+                "w": 300,
+                "h": 86,
+                "hidden": true
+              }
+            ],
+            "edges": [
+              {
+                "from": "prod",
+                "to": "state",
+                "w": "set_value / set_exception"
+              },
+              {
+                "from": "state",
+                "to": "cons",
+                "w": "get()"
+              }
+            ],
+            "panels": [],
+            "steps": [
+              {
+                "at": "share",
+                "nodes": {
+                  "state": "active"
+                },
+                "note": "promise + future share one heap-allocated state"
+              },
+              {
+                "at": "blocks",
+                "nodes": {
+                  "state": "base",
+                  "cons": "queued"
+                },
+                "note": "get() blocks until the state is ready"
+              },
+              {
+                "at": "producer",
+                "nodes": {
+                  "prod": "active"
+                },
+                "edges": {
+                  "prod-state": "relax"
+                },
+                "note": "set_value(42)"
+              },
+              {
+                "at": "wakes",
+                "nodes": {
+                  "prod": "done",
+                  "state": "done",
+                  "cons": "active"
+                },
+                "edges": {
+                  "prod-state": "tree",
+                  "state-cons": "relax"
+                },
+                "note": "State is ready: the consumer wakes"
+              },
+              {
+                "at": "once",
+                "nodes": {
+                  "cons": "done"
+                },
+                "edges": {
+                  "state-cons": "tree"
+                },
+                "note": "get() moves the value out: call it once"
+              },
+              {
+                "at": "throws",
+                "nodes": {
+                  "prod": "active",
+                  "state": "active"
+                },
+                "edges": {
+                  "prod-state": "relax",
+                  "state-cons": "base"
+                },
+                "note": "set_exception(std::current_exception())"
+              },
+              {
+                "at": "rethrows",
+                "nodes": {
+                  "prod": "base",
+                  "state": "base",
+                  "cons": "active"
+                },
+                "edges": {
+                  "prod-state": "base",
+                  "state-cons": "relax"
+                },
+                "note": "get() rethrows in the consumer's thread"
+              },
+              {
+                "at": "destroyed",
+                "nodes": {
+                  "prod": "dim",
+                  "cons": "base"
+                },
+                "edges": {
+                  "prod-state": "dim",
+                  "state-cons": "base"
+                },
+                "show": [
+                  "broken"
+                ],
+                "note": "Promise destroyed unset → broken_promise"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "std::async traps",
+      "question": "What do async's launch policies do, and how can async silently run synchronously?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. What do the launch policies of standard async do? And how can a call to async silently run synchronously? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "<em>std::async</em>: policies, and how it runs <em>synchronously</em>"
+          }
+        },
+        {
+          "type": "code",
+          "say": "Launch async runs the function as if on a new thread, starting now. Launch deferred runs nothing until get, and then runs on the calling thread. With no policy, the library may choose either. Two traps. A future from async, with the async policy, blocks in its destructor until the task finishes. Ignore the return value, and the temporary dies right there, so the call waits: no background work at all. And a deferred task never becomes ready on its own, so a loop waiting for ready spins forever. Check for deferred first, or always pass a policy.",
+          "props": {
+            "title": "Two <em>traps</em>",
+            "file": "async.cpp",
+            "tag": "std::async",
+            "lang": "cpp",
+            "size": 21,
+            "width": 1190,
+            "code": "auto a = std::async(std::launch::async, work);     // new thread, now\nauto d = std::async(std::launch::deferred, work);  // in d.get(), this thread\nauto e = std::async(work);                         // either one\n\nvoid flush_in_background() {\n    std::async(std::launch::async, flush_logs);    // temporary dies at ';'\n}                                                  // → waited for flush_logs\n\nwhile (e.wait_for(100ms) != std::future_status::ready) {}  // deferred: forever\nif (e.wait_for(0s) == std::future_status::deferred) e.get();",
+            "highlights": [
+              {
+                "at": "starting",
+                "lines": "1",
+                "note": "launch::async: a new thread, now"
+              },
+              {
+                "at": "until",
+                "lines": "2",
+                "note": "launch::deferred: lazily, inside get()"
+              },
+              {
+                "at": "either",
+                "lines": "3",
+                "note": "Default: async | deferred"
+              },
+              {
+                "at": "destructor",
+                "lines": "5-7",
+                "note": "~future waits: a discarded result is a sync call"
+              },
+              {
+                "at": "spins",
+                "lines": "9",
+                "note": "Deferred is never 'ready'"
+              },
+              {
+                "at": "Check",
+                "lines": "10",
+                "note": "Detect deferred, or pass a policy"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "packaged_task and shared_future",
+      "question": "When do you need packaged_task, and when shared_future?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. Promise, packaged task, and async all produce futures. When do you need packaged task? And when a shared future? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "When <em>packaged_task</em>, and when <em>shared_future</em>?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Three ways to get a future. A promise is the raw channel: you decide when to set the value. Packaged task wraps a callable, and sets the value when it's called, wherever and whenever that is. Async wraps the callable and also decides where it runs.",
+          "props": {
+            "title": "Three <em>providers</em>",
+            "items": [
+              {
+                "at": "raw",
+                "label": "std::promise",
+                "title": "The raw channel",
+                "body": "You call set_value or set_exception.",
+                "code": "custom protocols"
+              },
+              {
+                "at": "wraps",
+                "label": "std::packaged_task",
+                "title": "A callable + its future",
+                "body": "You decide where and when it runs.",
+                "code": "thread pools"
+              },
+              {
+                "at": "decides",
+                "label": "std::async",
+                "title": "Callable + a thread",
+                "body": "The library runs it for you.",
+                "code": "quick parallelism"
+              }
+            ]
+          }
+        },
+        {
+          "type": "code",
+          "say": "That makes packaged task the building block of thread pools. Submit wraps the function, keeps the future for the caller, and moves the task into a queue. It's move only: one task, one result. A worker thread pops it, and calls it, which stores the value, or the exception. A plain future has one reader. When several threads need the same result, call share: shared future is copyable, and every copy's get returns it.",
+          "props": {
+            "title": "The <em>thread-pool</em> pattern",
+            "file": "pool.cpp",
+            "tag": "packaged_task",
+            "lang": "cpp",
+            "size": 20,
+            "width": 1190,
+            "code": "std::future<int> submit(std::function<int()> fn) {\n    std::packaged_task<int()> task(std::move(fn));\n    std::future<int> fut = task.get_future();      // the caller keeps this end\n    queue.push(std::move(task));                   // move-only: one task, one result\n    return fut;\n}\n\nvoid worker_loop() {                               // on each pool thread\n    while (std::optional<std::packaged_task<int()>> task = queue.pop())\n        (*task)();                                 // stores the value or the exception\n}\n\nstd::shared_future<Config> cfg = load_config_async().share();\nstd::jthread a([cfg] { use(cfg.get()); });         // copyable: every waiter\nstd::jthread b([cfg] { use(cfg.get()); });         // gets the same result",
+            "highlights": [
+              {
+                "at": "wraps",
+                "lines": "2",
+                "note": "Wrap the callable"
+              },
+              {
+                "at": "keeps",
+                "lines": "3",
+                "note": "Caller keeps the future"
+              },
+              {
+                "at": "queue",
+                "lines": "4",
+                "note": "Move-only into the queue"
+              },
+              {
+                "at": "pops",
+                "lines": "9-10",
+                "note": "A worker runs it later"
+              },
+              {
+                "at": "share",
+                "lines": "13",
+                "note": "share(): many readers"
+              },
+              {
+                "at": "every",
+                "lines": "14-15",
+                "note": "Each copy's get() sees the result"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. A promise and future are a one shot channel, carrying a value, or an exception. Destroying an unset promise breaks it. The future from async waits in its destructor. And packaged task is how thread pools hand back results.",
+          "props": {
+            "title": "Futures, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "channel",
+                "text": "promise → future: one value or one exception.",
+                "code": "get() once"
+              },
+              {
+                "at": "breaks",
+                "text": "Unset promise destroyed → broken_promise.",
+                "code": "future_error"
+              },
+              {
+                "at": "destructor",
+                "text": "async's future waits in its destructor.",
+                "code": "keep it, or it's sync"
+              },
+              {
+                "at": "pools",
+                "text": "packaged_task powers thread pools.",
+                "code": "shared_future: many readers"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

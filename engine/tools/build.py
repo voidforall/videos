@@ -71,16 +71,19 @@ def transcribe(wav: Path) -> list[dict]:
 def apply_fixes(words: list[dict], fixes: list[dict]) -> list[dict]:
     """Each fix replaces a run of words. A display with at least as many words is applied word for
     word (timings kept; surplus words split the last word's time span); otherwise the run collapses into one. Matching ignores case
-    and surrounding punctuation; the last matched word's trailing punctuation is kept."""
-    def core(text: str) -> str:
-        return re.sub(r"^[^\w+]+|[^\w+]+$", "", text).lower()
+    and surrounding punctuation (case too, unless the fix sets "matchCase": true); the last matched word's
+    trailing punctuation is kept."""
+    def core(text: str, keep_case: bool = False) -> str:
+        bare = re.sub(r"^[^\w+]+|[^\w+]+$", "", text)
+        return bare if keep_case else bare.lower()
 
     result, i = [], 0
     while i < len(words):
         for fix in fixes:
             n = len(fix["match"])
             run = words[i:i + n]
-            if len(run) == n and [core(w["text"]) for w in run] == [core(m) for m in fix["match"]]:
+            exact = fix.get("matchCase", False)
+            if len(run) == n and [core(w["text"], exact) for w in run] == [core(m, exact) for m in fix["match"]]:
                 tail = re.search(r"[^\w+)]*$", run[-1]["text"]).group(0)
                 shown = fix["display"].split(" ")
                 if len(shown) >= n:  # keep per-word timing; surplus words split the last word's span

@@ -41,8 +41,10 @@ Each scene has exactly one narration line (`say`). Scenes animate on **cues** â€
 Number words and digits match each other (`"eight"` = `"8"`). A cue that is not in the transcript
 throws, so a wording change can never silently desync a scene â€” the snap/render step fails loudly.
 
-Caption fixes ignore case and punctuation. A display with the same word count (`"Right expands"`
-for `["Write", "expands"]`) keeps per-word timing; otherwise the run collapses into one word.
+Caption fixes ignore case and punctuation (add `"matchCase": true` to a fix that should only match
+that exact capitalization, e.g. a sentence-initial `"Lock-free"` listed before a lowercase `"lock-free"`).
+A display with at least as many words (`"Right expands"` for `["Write", "expands"]`) keeps per-word
+timing, so cues on those words still work; otherwise the run collapses into one word.
 Global fixes live in `engine/caption-fixes.json`.
 
 ## Templates (`engine/templates/`)

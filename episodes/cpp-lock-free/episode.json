@@ -1,0 +1,772 @@
+{
+  "slug": "cpp-lock-free",
+  "series": "cpp",
+  "title": "Lock-free programming",
+  "kicker": "C++ · Lock-free programming",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/cpp/concurrency/lock-free-programming.md",
+  "summary": "Compare-and-swap loops, weak versus strong, progress guarantees, a Treiber stack, the ABA problem, and safe memory reclamation.",
+  "captionFixes": [
+    {
+      "match": [
+        "lock-free",
+        "programming"
+      ],
+      "display": "Lock-free programming"
+    },
+    {
+      "match": [
+        "Lock",
+        "free"
+      ],
+      "display": "Lock-free",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "Lock-free"
+      ],
+      "display": "Lock-free",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "lock-free"
+      ],
+      "display": "lock-free"
+    },
+    {
+      "match": [
+        "current",
+        "values"
+      ],
+      "display": "current value"
+    },
+    {
+      "match": [
+        "scene"
+      ],
+      "display": "seen"
+    },
+    {
+      "match": [
+        "Find",
+        "a",
+        "loop"
+      ],
+      "display": "Inside a loop"
+    },
+    {
+      "match": [
+        "you",
+        "strong"
+      ],
+      "display": "use strong"
+    },
+    {
+      "match": [
+        "discheduled"
+      ],
+      "display": "descheduled"
+    },
+    {
+      "match": [
+        "Weight",
+        "free"
+      ],
+      "display": "Wait-free",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "weight",
+        "free"
+      ],
+      "display": "wait-free"
+    },
+    {
+      "match": [
+        "Traber"
+      ],
+      "display": "Treiber"
+    },
+    {
+      "match": [
+        "ends",
+        "next"
+      ],
+      "display": "n's next"
+    },
+    {
+      "match": [
+        "tops",
+        "next"
+      ],
+      "display": "top's next"
+    },
+    {
+      "match": [
+        "A/B",
+        "a",
+        "problem"
+      ],
+      "display": "ABA problem"
+    },
+    {
+      "match": [
+        "answers",
+        "e"
+      ],
+      "display": "answers"
+    },
+    {
+      "match": [
+        "weaken",
+        "loops"
+      ],
+      "display": "weak in loops"
+    },
+    {
+      "match": [
+        "Blocking",
+        "obstruction-free"
+      ],
+      "display": "Blocking, obstruction-free"
+    },
+    {
+      "match": [
+        "obstruction",
+        "free,",
+        "a"
+      ],
+      "display": "Obstruction-free: a"
+    },
+    {
+      "match": [
+        "lock",
+        "free,",
+        "at"
+      ],
+      "display": "Lock-free: at"
+    },
+    {
+      "match": [
+        "Weight",
+        "free,",
+        "every"
+      ],
+      "display": "Wait-free: every",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "Blocking",
+        "if"
+      ],
+      "display": "Blocking: if",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "compare",
+        "and",
+        "swap"
+      ],
+      "display": "compare-and-swap"
+    },
+    {
+      "match": [
+        "Compare",
+        "exchange"
+      ],
+      "display": "compare_exchange"
+    },
+    {
+      "match": [
+        "compare",
+        "exchange"
+      ],
+      "display": "compare_exchange"
+    },
+    {
+      "match": [
+        "lock",
+        "free"
+      ],
+      "display": "lock-free"
+    },
+    {
+      "match": [
+        "Lock",
+        "free"
+      ],
+      "display": "Lock-free"
+    },
+    {
+      "match": [
+        "wait",
+        "free"
+      ],
+      "display": "wait-free"
+    },
+    {
+      "match": [
+        "Wait",
+        "free"
+      ],
+      "display": "Wait-free"
+    },
+    {
+      "match": [
+        "obstruction",
+        "free"
+      ],
+      "display": "obstruction-free"
+    },
+    {
+      "match": [
+        "Obstruction",
+        "free"
+      ],
+      "display": "Obstruction-free"
+    },
+    {
+      "match": [
+        "fetch",
+        "max"
+      ],
+      "display": "fetch_max"
+    },
+    {
+      "match": [
+        "fetch",
+        "add"
+      ],
+      "display": "fetch_add"
+    },
+    {
+      "match": [
+        "load",
+        "linked"
+      ],
+      "display": "load-linked"
+    },
+    {
+      "match": [
+        "store",
+        "conditional"
+      ],
+      "display": "store-conditional"
+    },
+    {
+      "match": [
+        "one",
+        "shot"
+      ],
+      "display": "one-shot"
+    },
+    {
+      "match": [
+        "double",
+        "width"
+      ],
+      "display": "double-width"
+    },
+    {
+      "match": [
+        "R",
+        "C",
+        "U"
+      ],
+      "display": "RCU"
+    },
+    {
+      "match": [
+        "A",
+        "B",
+        "A"
+      ],
+      "display": "ABA"
+    },
+    {
+      "match": [
+        "tribal"
+      ],
+      "display": "Treiber"
+    },
+    {
+      "match": [
+        "Tribal"
+      ],
+      "display": "Treiber"
+    },
+    {
+      "match": [
+        "Treber"
+      ],
+      "display": "Treiber"
+    },
+    {
+      "match": [
+        "real",
+        "time"
+      ],
+      "display": "real-time"
+    },
+    {
+      "match": [
+        "C++",
+        "26"
+      ],
+      "display": "C++26"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "The CAS loop",
+      "question": "How do you atomically apply an update that has no single instruction, like max?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Lock-free programming, question one. There's no atomic fetch max before C++26. How do you atomically raise a value to a new maximum? Pause and write it yourself.",
+          "pauseAfter": 4,
+          "props": {
+            "question": "Atomically raise a value to a new <em>maximum</em>.",
+            "label": "Your turn",
+            "pauseLabel": "Pause · write it yourself"
+          }
+        },
+        {
+          "type": "code",
+          "say": "When no single instruction does your update, use a compare and swap loop. Load the current value. Compare exchange stores the new value only if the atomic still holds what you saw. If another thread got there first, it fails, and writes the current value back into seen. So the loop retries with fresh data, without reloading, and stops early once the peak is already big enough. The weak form may fail even when the values match, because on ARM it's built from load linked and store conditional. Inside a loop that's harmless, and often cheaper. With no loop, like a one shot claim, use strong, or a spurious failure becomes a wrong answer.",
+          "props": {
+            "title": "Compare-and-swap, <em>in a loop</em>",
+            "file": "cas.cpp",
+            "tag": "lock-free",
+            "lang": "cpp",
+            "size": 21,
+            "width": 1180,
+            "code": "#include <atomic>\n\n// Raise `peak` to at least `value`. There is no fetch_max before C++26.\nvoid update_max(std::atomic<int>& peak, int value) {\n    int seen = peak.load(std::memory_order_relaxed);\n    while (seen < value &&\n           !peak.compare_exchange_weak(seen, value)) {\n        // failed: another thread changed peak, and `seen` now holds its value\n    }\n}\n\n// One-shot claim, no loop: a spurious failure would be a wrong answer.\nbool try_claim(std::atomic<bool>& taken) {\n    bool expected = false;\n    return taken.compare_exchange_strong(expected, true);\n}",
+            "highlights": [
+              {
+                "at": "Load",
+                "lines": "5",
+                "note": "Read what you think is current"
+              },
+              {
+                "at": "only",
+                "lines": "7",
+                "note": "Store only if peak still == seen"
+              },
+              {
+                "at": "writes",
+                "lines": "8",
+                "note": "On failure, seen = the current value"
+              },
+              {
+                "at": "early",
+                "lines": "6",
+                "note": "Stop once peak ≥ value"
+              },
+              {
+                "at": "weak",
+                "lines": "7",
+                "note": "weak may fail spuriously (LL/SC)"
+              },
+              {
+                "at": "strong",
+                "lines": "13-15",
+                "note": "No loop → compare_exchange_strong"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Progress guarantees",
+      "question": "Blocking, lock-free, wait-free: what does each one promise?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. Blocking, obstruction free, lock free, and wait free. What does each one actually promise? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Blocking, lock-free, <em>wait-free</em>: what does each promise?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Blocking: if the thread holding the lock is descheduled, every thread waiting on it stalls. Obstruction free: a thread finishes if it runs alone. Lock free: at every moment some thread completes, so the system always makes progress, though one unlucky thread may retry forever. Wait free: every thread finishes in a bounded number of its own steps. A compare and swap loop is lock free. A single fetch add on x86 is wait free.",
+          "props": {
+            "title": "Four <em>progress</em> guarantees",
+            "items": [
+              {
+                "at": "Blocking",
+                "label": "Blocking",
+                "title": "A stalled holder stalls all",
+                "body": "Mutexes, condition variables.",
+                "code": "std::mutex"
+              },
+              {
+                "at": "alone",
+                "label": "Obstruction-free",
+                "title": "Finishes if run alone",
+                "body": "Contention can livelock it.",
+                "code": "rare in practice"
+              },
+              {
+                "at": "system",
+                "label": "Lock-free",
+                "title": "Someone always progresses",
+                "body": "One thread may starve.",
+                "code": "CAS loop"
+              },
+              {
+                "at": "bounded",
+                "label": "Wait-free",
+                "title": "Everyone, in bounded steps",
+                "body": "No starvation at all.",
+                "code": "fetch_add on x86"
+              }
+            ]
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Lock free doesn't mean faster. An uncontended mutex costs about one atomic operation to lock, and one to unlock. Lock free wins when a lock holder might be preempted or interrupted, as in signal handlers or real-time threads, and for tiny, hot operations. It costs subtle code, and memory reclamation, so measure first.",
+          "props": {
+            "title": "Lock-free ≠ <em>faster</em>",
+            "left": {
+              "at": "uncontended",
+              "label": "Mutex",
+              "title": "Simple, often fast enough",
+              "body": "Uncontended: ~2 atomic ops. Contended: threads sleep in the kernel."
+            },
+            "right": {
+              "at": "preempted",
+              "label": "Lock-free",
+              "title": "No one can block everyone",
+              "tone": "good",
+              "body": "Wins with preemption, interrupts, real-time, tiny hot paths."
+            },
+            "verdict": {
+              "at": "measure",
+              "text": "Reach for lock-free when a stalled holder is the problem.",
+              "code": "measure first"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Treiber stack and ABA",
+      "question": "Why can a CAS succeed even though the stack changed underneath it?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. In a lock-free stack, how can a compare and swap succeed, even though the stack changed underneath it? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Why can a <em>CAS succeed</em> on a stack that changed?"
+          }
+        },
+        {
+          "type": "code",
+          "say": "The Treiber stack is one atomic pointer to the top. Push links the new node to the current top, then swings top to it with a compare and swap. On failure, the compare exchange refreshes n's next for free. Pop reads top, and tries to swing it to top's next. Release on push and acquire on pop publish the node's contents. But that delete is the problem.",
+          "props": {
+            "title": "The <em>Treiber</em> stack",
+            "file": "stack.cpp",
+            "tag": "lock-free",
+            "lang": "cpp",
+            "size": 21,
+            "width": 1180,
+            "code": "struct Node { int value; Node* next; };\nstd::atomic<Node*> top{nullptr};\n\nvoid push(int v) {\n    Node* n = new Node{v, top.load(std::memory_order_relaxed)};\n    while (!top.compare_exchange_weak(n->next, n,\n                                      std::memory_order_release,\n                                      std::memory_order_relaxed)) {}\n}\n\nbool pop(int& out) {\n    Node* old = top.load(std::memory_order_acquire);\n    while (old && !top.compare_exchange_weak(old, old->next,\n                                             std::memory_order_acquire)) {}\n    if (!old) return false;\n    out = old->value;\n    delete old;        // unsafe: another pop may still be reading old->next\n    return true;\n}",
+            "highlights": [
+              {
+                "at": "atomic",
+                "lines": "2",
+                "note": "The whole stack: one atomic pointer"
+              },
+              {
+                "at": "links",
+                "lines": "5",
+                "note": "Link to the top you saw…"
+              },
+              {
+                "at": "swings",
+                "lines": "6-8",
+                "note": "…then CAS top: n->next → n"
+              },
+              {
+                "at": "Pop",
+                "lines": "12-14",
+                "note": "CAS top: old → old->next"
+              },
+              {
+                "at": "delete",
+                "lines": "17",
+                "note": "Freed while others may read it"
+              }
+            ]
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Thread one starts a pop. It reads top, A, and A's next, B. Then it's preempted. Thread two pops A, pops B, and frees both. Then it pushes a new node, and the allocator reuses A's address. Thread one wakes up. It compares top against A, and they match, so the swap succeeds, and top now points to B, which was freed. That's the A B A problem: the same address doesn't mean the same node.",
+          "props": {
+            "title": "Same address, <em>different node</em>",
+            "nodes": [
+              {
+                "id": "top",
+                "label": "top",
+                "x": 700,
+                "y": 260,
+                "w": 150,
+                "h": 64
+              },
+              {
+                "id": "A",
+                "label": "A",
+                "x": 380,
+                "y": 430,
+                "w": 150,
+                "h": 64
+              },
+              {
+                "id": "B",
+                "label": "B",
+                "x": 700,
+                "y": 610,
+                "w": 150,
+                "h": 64
+              },
+              {
+                "id": "C",
+                "label": "C",
+                "x": 1020,
+                "y": 430,
+                "w": 150,
+                "h": 64
+              }
+            ],
+            "edges": [
+              {
+                "from": "top",
+                "to": "A"
+              },
+              {
+                "from": "A",
+                "to": "B"
+              },
+              {
+                "from": "B",
+                "to": "C"
+              }
+            ],
+            "panels": [
+              {
+                "key": "t1",
+                "label": "T1 saw",
+                "type": "list",
+                "rows": 2,
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "reads",
+                "nodes": {
+                  "A": "active",
+                  "B": "queued"
+                },
+                "panels": {
+                  "t1": [
+                    "old = A",
+                    "next = B"
+                  ]
+                },
+                "note": "T1 reads top = A, next = B"
+              },
+              {
+                "at": "preempted",
+                "nodes": {
+                  "A": "base",
+                  "B": "base"
+                },
+                "note": "…and is preempted"
+              },
+              {
+                "at": "pops",
+                "remove": [
+                  "top-A"
+                ],
+                "add": [
+                  {
+                    "from": "top",
+                    "to": "C"
+                  }
+                ],
+                "nodes": {
+                  "A": "dim",
+                  "B": "dim"
+                },
+                "note": "T2 pops A, then pops B"
+              },
+              {
+                "at": "frees",
+                "note": "…and frees both"
+              },
+              {
+                "at": "reuses",
+                "remove": [
+                  "top-C",
+                  "A-B"
+                ],
+                "add": [
+                  {
+                    "from": "top",
+                    "to": "A"
+                  },
+                  {
+                    "from": "A",
+                    "to": "C"
+                  }
+                ],
+                "nodes": {
+                  "A": "active"
+                },
+                "note": "Push: the allocator reuses A's address"
+              },
+              {
+                "at": "match",
+                "nodes": {
+                  "A": "base"
+                },
+                "panels": {
+                  "t1": [
+                    "old = A ✓ matches",
+                    "next = B (stale)"
+                  ]
+                },
+                "note": "T1: top == A? Yes"
+              },
+              {
+                "at": "freed",
+                "remove": [
+                  "top-A"
+                ],
+                "add": [
+                  {
+                    "from": "top",
+                    "to": "B"
+                  }
+                ],
+                "nodes": {
+                  "B": "active"
+                },
+                "edges": {
+                  "top-B": "relax"
+                },
+                "note": "top → B, which was freed"
+              },
+              {
+                "at": "address#2",
+                "panels": {
+                  "t1": [
+                    "same address",
+                    "≠ same node"
+                  ]
+                },
+                "note": "ABA: the CAS can't see what happened in between"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "04",
+      "title": "Freeing memory safely",
+      "question": "When is it safe to free a node in a lock-free structure?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question four. In a lock-free structure, when is it actually safe to free a node? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "When is it <em>safe to free</em> a node?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Four answers. Tag the pointer with a version counter that changes on every update, so a reused address no longer matches; that needs a double width compare and swap, or spare pointer bits. Hazard pointers: each thread publishes the node it's about to read, and a node is freed only when no hazard points to it. Epochs and R C U: retire nodes, and free them once every thread has passed a quiescent point. Or atomic shared pointer, simple but usually not lock free. C++26 adds hazard pointers and R C U to the standard library.",
+          "props": {
+            "title": "Safe memory <em>reclamation</em>",
+            "items": [
+              {
+                "at": "version",
+                "label": "Tagged pointer",
+                "title": "Version counter",
+                "body": "Reused address, new tag: CAS fails.",
+                "code": "cmpxchg16b"
+              },
+              {
+                "at": "Hazard",
+                "label": "Hazard pointers",
+                "title": "Publish what you read",
+                "body": "Free only unprotected nodes.",
+                "code": "std::hazard_pointer (C++26)"
+              },
+              {
+                "at": "quiescent",
+                "label": "Epochs · RCU",
+                "title": "Retire, free later",
+                "body": "After every reader has moved on.",
+                "code": "std::rcu (C++26)"
+              },
+              {
+                "at": "simple",
+                "label": "atomic<shared_ptr>",
+                "title": "Reference counted",
+                "body": "Simple; usually not lock-free.",
+                "code": "C++20"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. A compare and swap loop retries with the value it just saw. Use weak in loops, and strong for one shot. Lock free means the system always progresses, not that it's faster. And the hard part isn't the swap. It's knowing when memory can be freed.",
+          "props": {
+            "title": "Lock-free, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "retries",
+                "text": "A CAS loop retries with the value it just saw.",
+                "code": "compare_exchange_weak"
+              },
+              {
+                "at": "weak",
+                "text": "weak in loops; strong for one-shot.",
+                "code": "spurious failures"
+              },
+              {
+                "at": "progresses",
+                "text": "Lock-free = someone progresses, not 'faster'.",
+                "code": "measure first"
+              },
+              {
+                "at": "freed",
+                "text": "The hard part is reclamation (and ABA).",
+                "code": "hazard pointers · RCU"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,610 @@
+{
+  "slug": "tools-googletest",
+  "series": "tools",
+  "title": "GoogleTest",
+  "kicker": "Tools · GoogleTest",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/cpp/scaffold/gtest.md",
+  "summary": "EXPECT versus ASSERT, fixtures and their per-test lifecycle, parameterized, typed and death tests, and running suites well.",
+  "captionFixes": [
+    {
+      "match": [
+        "sweet",
+        "name"
+      ],
+      "display": "suite name"
+    },
+    {
+      "match": [
+        "expect"
+      ],
+      "display": "EXPECT"
+    },
+    {
+      "match": [
+        "assert"
+      ],
+      "display": "ASSERT"
+    },
+    {
+      "match": [
+        "assert?"
+      ],
+      "display": "ASSERT?"
+    },
+    {
+      "match": [
+        "calls",
+        "setup"
+      ],
+      "display": "calls SetUp"
+    },
+    {
+      "match": [
+        "tier",
+        "down"
+      ],
+      "display": "TearDown"
+    },
+    {
+      "match": [
+        "parametrized"
+      ],
+      "display": "parameterized"
+    },
+    {
+      "match": [
+        "Type",
+        "tests"
+      ],
+      "display": "Typed tests"
+    },
+    {
+      "match": [
+        "GTest",
+        "main"
+      ],
+      "display": "gtest_main"
+    },
+    {
+      "match": [
+        "a",
+        "death",
+        "test",
+        "checks"
+      ],
+      "display": "a death test checks"
+    },
+    {
+      "match": [
+        "Google",
+        "test"
+      ],
+      "display": "GoogleTest"
+    },
+    {
+      "match": [
+        "Google",
+        "Test"
+      ],
+      "display": "GoogleTest"
+    },
+    {
+      "match": [
+        "Googletest"
+      ],
+      "display": "GoogleTest"
+    },
+    {
+      "match": [
+        "test",
+        "F"
+      ],
+      "display": "TEST_F"
+    },
+    {
+      "match": [
+        "test",
+        "Fs"
+      ],
+      "display": "TEST_Fs"
+    },
+    {
+      "match": [
+        "test",
+        "P"
+      ],
+      "display": "TEST_P"
+    },
+    {
+      "match": [
+        "Test",
+        "P"
+      ],
+      "display": "TEST_P"
+    },
+    {
+      "match": [
+        "get",
+        "param"
+      ],
+      "display": "GetParam"
+    },
+    {
+      "match": [
+        "type",
+        "param"
+      ],
+      "display": "TypeParam"
+    },
+    {
+      "match": [
+        "test",
+        "with",
+        "param"
+      ],
+      "display": "TestWithParam"
+    },
+    {
+      "match": [
+        "instantiate",
+        "test",
+        "suite",
+        "P"
+      ],
+      "display": "INSTANTIATE_TEST_SUITE_P"
+    },
+    {
+      "match": [
+        "death",
+        "test"
+      ],
+      "display": "DeathTest"
+    },
+    {
+      "match": [
+        "Assert",
+        "equal"
+      ],
+      "display": "ASSERT_EQ"
+    },
+    {
+      "match": [
+        "Expect",
+        "equal"
+      ],
+      "display": "EXPECT_EQ"
+    },
+    {
+      "match": [
+        "non",
+        "fatal"
+      ],
+      "display": "non-fatal"
+    },
+    {
+      "match": [
+        "Set",
+        "up"
+      ],
+      "display": "SetUp"
+    },
+    {
+      "match": [
+        "setup",
+        "test",
+        "suite"
+      ],
+      "display": "SetUpTestSuite"
+    },
+    {
+      "match": [
+        "Teardown"
+      ],
+      "display": "TearDown"
+    },
+    {
+      "match": [
+        "tear",
+        "down"
+      ],
+      "display": "TearDown"
+    },
+    {
+      "match": [
+        "G",
+        "test",
+        "main"
+      ],
+      "display": "gtest_main"
+    },
+    {
+      "match": [
+        "C",
+        "test"
+      ],
+      "display": "CTest"
+    },
+    {
+      "match": [
+        "read",
+        "only"
+      ],
+      "display": "read-only"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "EXPECT or ASSERT?",
+      "question": "When should a check be EXPECT, and when ASSERT?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Google Test, question one. When should a check be EXPECT, and when should it be ASSERT? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "When <em>EXPECT</em>, and when <em>ASSERT</em>?"
+          }
+        },
+        {
+          "type": "code",
+          "say": "A test is a macro with a suite name and a test name. Assert equal is fatal: on failure, it returns from the current function. Use it when continuing makes no sense, like indexing past the end of a short row. Expect equal is non fatal: it records the failure and keeps going, so one run shows every broken field. Stream extra context into any check. A fixture class holds shared setup. Each test F gets a fresh fixture object, so tests can't leak state into each other.",
+          "props": {
+            "title": "Fatal, or <em>keep going</em>",
+            "file": "parser_test.cpp",
+            "tag": "gtest",
+            "lang": "cpp",
+            "size": 21,
+            "width": 1180,
+            "code": "#include <gtest/gtest.h>\n\nTEST(ParserTest, SplitsTwoFields) {\n    auto row = Split(\"a,b\", ',');\n    ASSERT_EQ(row.size(), 2u);         // fatal: stop before indexing past the end\n    EXPECT_EQ(row[0], \"a\");            // non-fatal: record, keep going\n    EXPECT_EQ(row[1], \"b\") << \"input was a,b\";\n}\n\nclass OrderBookTest : public ::testing::Test {\nprotected:\n    void SetUp() override { book_.Add({.id = 1, .px = 100, .qty = 10}); }\n    OrderBook book_;                   // a fresh fixture for every TEST_F\n};\n\nTEST_F(OrderBookTest, CancelEmptiesTheBook) {\n    EXPECT_TRUE(book_.Cancel(1));\n    EXPECT_TRUE(book_.Empty());\n}",
+            "highlights": [
+              {
+                "at": "macro",
+                "lines": "3",
+                "note": "TEST(Suite, Name)"
+              },
+              {
+                "at": "returns",
+                "lines": "5",
+                "note": "ASSERT_*: return from this function"
+              },
+              {
+                "at": "records",
+                "lines": "6-7",
+                "note": "EXPECT_*: record and continue"
+              },
+              {
+                "at": "Stream",
+                "lines": "7",
+                "note": "<< adds context to the failure message"
+              },
+              {
+                "at": "fixture",
+                "lines": "10-13",
+                "note": "Shared setup lives in a fixture"
+              },
+              {
+                "at": "fresh",
+                "lines": "16-18",
+                "note": "TEST_F: a new fixture per test"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Fixture lifecycle",
+      "question": "Two TEST_Fs share a fixture. Do they share its state?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. Two test F tests use the same fixture. Do they share its state? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Two <em>TEST_F</em>s share a fixture. Do they share <em>state</em>?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "No. For every test, Google Test constructs a new fixture object. Then it calls SetUp, runs the test body, calls TearDown, and destroys the object. The next test starts again from a brand new fixture, so order never matters. And because ASSERT only returns from the function it's in, TearDown still runs after a fatal failure. For expensive resources, like a database, a static SetUp test suite runs once for the whole suite, and that state is shared, so treat it as read only.",
+          "props": {
+            "title": "A fresh fixture, <em>every time</em>",
+            "nodes": [
+              {
+                "id": "ctor",
+                "label": "new fixture",
+                "x": 200,
+                "y": 330,
+                "w": 230,
+                "h": 64
+              },
+              {
+                "id": "setup",
+                "label": "SetUp()",
+                "x": 530,
+                "y": 330,
+                "w": 210,
+                "h": 64
+              },
+              {
+                "id": "body",
+                "label": "test body",
+                "x": 860,
+                "y": 330,
+                "w": 210,
+                "h": 64
+              },
+              {
+                "id": "tear",
+                "label": "TearDown()",
+                "x": 1190,
+                "y": 330,
+                "w": 220,
+                "h": 64
+              },
+              {
+                "id": "dtor",
+                "label": "delete fixture",
+                "x": 1530,
+                "y": 330,
+                "w": 240,
+                "h": 64
+              },
+              {
+                "id": "next",
+                "label": "next TEST_F:\nbrand-new fixture",
+                "x": 530,
+                "y": 610,
+                "w": 300,
+                "h": 86
+              },
+              {
+                "id": "suite",
+                "label": "SetUpTestSuite()\nonce per suite",
+                "x": 1190,
+                "y": 610,
+                "w": 300,
+                "h": 86,
+                "hidden": true
+              }
+            ],
+            "edges": [
+              {
+                "from": "ctor",
+                "to": "setup"
+              },
+              {
+                "from": "setup",
+                "to": "body"
+              },
+              {
+                "from": "body",
+                "to": "tear"
+              },
+              {
+                "from": "tear",
+                "to": "dtor"
+              },
+              {
+                "from": "dtor",
+                "to": "next",
+                "w": "repeat"
+              }
+            ],
+            "panels": [],
+            "steps": [
+              {
+                "at": "constructs",
+                "nodes": {
+                  "ctor": "active"
+                },
+                "note": "Constructor: a new object per test"
+              },
+              {
+                "at": "calls",
+                "nodes": {
+                  "ctor": "done",
+                  "setup": "active"
+                },
+                "edges": {
+                  "ctor-setup": "tree"
+                },
+                "note": "SetUp(): per-test setup"
+              },
+              {
+                "at": "runs",
+                "nodes": {
+                  "setup": "done",
+                  "body": "active"
+                },
+                "edges": {
+                  "setup-body": "tree"
+                },
+                "note": "The test body"
+              },
+              {
+                "at": "calls#2",
+                "nodes": {
+                  "body": "done",
+                  "tear": "active"
+                },
+                "edges": {
+                  "body-tear": "tree"
+                },
+                "note": "TearDown(): undo side effects"
+              },
+              {
+                "at": "destroys",
+                "nodes": {
+                  "tear": "done",
+                  "dtor": "active"
+                },
+                "edges": {
+                  "tear-dtor": "tree"
+                },
+                "note": "Destructor: fixture gone"
+              },
+              {
+                "at": "next",
+                "nodes": {
+                  "dtor": "done",
+                  "next": "active"
+                },
+                "edges": {
+                  "dtor-next": "relax"
+                },
+                "note": "Next test: brand-new fixture, no shared state"
+              },
+              {
+                "at": "fatal",
+                "nodes": {
+                  "next": "base",
+                  "tear": "active"
+                },
+                "note": "ASSERT failed? TearDown still runs"
+              },
+              {
+                "at": "expensive",
+                "nodes": {
+                  "tear": "done"
+                },
+                "show": [
+                  "suite"
+                ],
+                "note": "static SetUpTestSuite(): once per suite"
+              },
+              {
+                "at": "shared",
+                "nodes": {
+                  "suite": "queued"
+                },
+                "note": "Suite state is shared: keep it read-only"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Many inputs, many types",
+      "question": "How do you run one test over many inputs, or many types?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. How do you run one test body over many inputs, or many types, without copying it? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "One test body, many <em>inputs</em> or <em>types</em>?"
+          }
+        },
+        {
+          "type": "code",
+          "say": "A value parameterized test derives from test with param. Test P reads get param, and instantiate test suite P supplies the values: each becomes its own test. Typed tests do the same for types: list the implementations, and type param is each one in turn. And a death test checks that code aborts with a message. It runs in a child process, and by convention its suite name ends in death test, so it runs first.",
+          "props": {
+            "title": "Parameterized, typed, <em>death</em>",
+            "file": "params_test.cpp",
+            "tag": "gtest",
+            "lang": "cpp",
+            "size": 20,
+            "width": 1190,
+            "code": "class IsPrimeTest : public ::testing::TestWithParam<int> {};\n\nTEST_P(IsPrimeTest, AcceptsPrimes) {\n    EXPECT_TRUE(IsPrime(GetParam())) << GetParam();\n}\nINSTANTIATE_TEST_SUITE_P(Small, IsPrimeTest, ::testing::Values(2, 3, 5, 7, 11));\n\ntemplate <typename T> class StackTest : public ::testing::Test {};\nusing Impls = ::testing::Types<VectorStack<int>, ListStack<int>>;\nTYPED_TEST_SUITE(StackTest, Impls);\n\nTYPED_TEST(StackTest, StartsEmpty) {\n    TypeParam s;                       // each implementation in turn\n    EXPECT_TRUE(s.empty());\n}\n\nTEST(DivideDeathTest, ZeroAborts) {\n    EXPECT_DEATH(Divide(1, 0), \"division by zero\");   // runs in a child process\n}",
+            "highlights": [
+              {
+                "at": "reads",
+                "lines": "1-4",
+                "note": "GetParam(): this run's value"
+              },
+              {
+                "at": "supplies",
+                "lines": "6",
+                "note": "Each value → its own test"
+              },
+              {
+                "at": "implementations",
+                "lines": "8-10",
+                "note": "One suite per type list"
+              },
+              {
+                "at": "turn",
+                "lines": "12-14",
+                "note": "TypeParam is each type in turn"
+              },
+              {
+                "at": "aborts",
+                "lines": "17-18",
+                "note": "Child process; *DeathTest suites run first"
+              }
+            ]
+          }
+        },
+        {
+          "type": "code",
+          "say": "Run a subset with a filter: globs, and a minus sign to exclude. To chase a flaky test, repeat it a few hundred times, and shuffle the order to expose tests that depend on each other. Shuffle prints its seed, so you can replay a bad order. In CMake, link G test main, and discover tests, so every single test becomes its own C test entry.",
+          "props": {
+            "title": "Run it <em>well</em>",
+            "file": "terminal",
+            "tag": "shell",
+            "lang": "shell",
+            "size": 22,
+            "width": 1180,
+            "code": "# run a subset: Suite.Test globs, '-' excludes\n./tests --gtest_filter='OrderBook*:-*Slow*'\n\n# flaky? repeat it. order-dependent? shuffle (the seed is printed)\n./tests --gtest_repeat=200 --gtest_shuffle --gtest_break_on_failure\n\n# CMake: one CTest entry per TEST, discovered from the binary\n#   target_link_libraries(tests PRIVATE GTest::gtest_main)\n#   gtest_discover_tests(tests)\nctest --output-on-failure -j8",
+            "highlights": [
+              {
+                "at": "filter",
+                "lines": "2",
+                "note": "Suite.Test globs; '-' excludes"
+              },
+              {
+                "at": "repeat",
+                "lines": "5",
+                "note": "Repeat to reproduce flakiness"
+              },
+              {
+                "at": "seed",
+                "lines": "5",
+                "note": "Shuffle exposes order dependence"
+              },
+              {
+                "at": "discover",
+                "lines": "8-10",
+                "note": "One CTest entry per TEST"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. ASSERT stops the current function; EXPECT keeps going. Every test F gets a fresh fixture. Parameterized and typed tests reuse one body. And repeat and shuffle flush out flaky tests.",
+          "props": {
+            "title": "GoogleTest, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "stops",
+                "text": "ASSERT stops the function; EXPECT keeps going.",
+                "code": "ASSERT_EQ · EXPECT_EQ"
+              },
+              {
+                "at": "fresh",
+                "text": "Each TEST_F gets a fresh fixture.",
+                "code": "SetUp · TearDown"
+              },
+              {
+                "at": "reuse",
+                "text": "TEST_P and TYPED_TEST reuse one body.",
+                "code": "Values · Types"
+              },
+              {
+                "at": "flush",
+                "text": "Repeat and shuffle flush out flaky tests.",
+                "code": "--gtest_shuffle"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

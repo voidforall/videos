@@ -1486,6 +1486,286 @@
           "poster": "media/tools-valgrind-03.jpg"
         }
       ]
+    },
+    {
+      "slug": "tools-asan",
+      "series": "tools",
+      "title": "AddressSanitizer",
+      "kicker": "Tools · AddressSanitizer",
+      "summary": "Compile-time instrumentation plus shadow memory: redzones, quarantine, the bugs it reports, and what it can't see.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/cpp/scaffold/ASAN.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Shadow memory",
+          "question": "How does AddressSanitizer know an address is bad, on every single access?",
+          "duration": 55,
+          "video": "media/tools-asan-01.mp4",
+          "poster": "media/tools-asan-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "What it catches",
+          "question": "Which bugs does ASan report, and how does it catch a use-after-free?",
+          "duration": 42,
+          "video": "media/tools-asan-02.mp4",
+          "poster": "media/tools-asan-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Blind spots",
+          "question": "What can AddressSanitizer miss, and what do you pair it with?",
+          "duration": 68,
+          "video": "media/tools-asan-03.mp4",
+          "poster": "media/tools-asan-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "tools-tsan",
+      "series": "tools",
+      "title": "ThreadSanitizer",
+      "kicker": "Tools · ThreadSanitizer",
+      "summary": "Data races as missing happens-before edges, how vector clocks detect them, and what TSan reports and misses.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/cpp/scaffold/TSAN.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "What is a data race?",
+          "question": "What exactly makes two accesses a data race?",
+          "duration": 45,
+          "video": "media/tools-tsan-01.mp4",
+          "poster": "media/tools-tsan-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Vector clocks",
+          "question": "How does TSan decide that two accesses are unordered?",
+          "duration": 53,
+          "video": "media/tools-tsan-02.mp4",
+          "poster": "media/tools-tsan-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Using it",
+          "question": "What does TSan report beyond races, and what are its limits?",
+          "duration": 76,
+          "video": "media/tools-tsan-03.mp4",
+          "poster": "media/tools-tsan-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "tools-fuzzing",
+      "series": "tools",
+      "title": "Fuzz testing",
+      "kicker": "Tools · Fuzz testing",
+      "summary": "Coverage-guided fuzzing with libFuzzer: the mutate-run-keep loop, why it cracks nested checks, and how to write a good target.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/cpp/scaffold/fuzz-testing.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "The fuzzing loop",
+          "question": "What makes a fuzzer coverage-guided?",
+          "duration": 45,
+          "video": "media/tools-fuzzing-01.mp4",
+          "poster": "media/tools-fuzzing-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Writing a target",
+          "question": "Why does coverage feedback find \"HI!\" in seconds when random input wouldn't?",
+          "duration": 47,
+          "video": "media/tools-fuzzing-02.mp4",
+          "poster": "media/tools-fuzzing-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Good targets",
+          "question": "What makes a fuzz target effective?",
+          "duration": 75,
+          "video": "media/tools-fuzzing-03.mp4",
+          "poster": "media/tools-fuzzing-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "tools-googletest",
+      "series": "tools",
+      "title": "GoogleTest",
+      "kicker": "Tools · GoogleTest",
+      "summary": "EXPECT versus ASSERT, fixtures and their per-test lifecycle, parameterized, typed and death tests, and running suites well.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/cpp/scaffold/gtest.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "EXPECT or ASSERT?",
+          "question": "When should a check be EXPECT, and when ASSERT?",
+          "duration": 40,
+          "video": "media/tools-googletest-01.mp4",
+          "poster": "media/tools-googletest-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Fixture lifecycle",
+          "question": "Two TEST_Fs share a fixture. Do they share its state?",
+          "duration": 40,
+          "video": "media/tools-googletest-02.mp4",
+          "poster": "media/tools-googletest-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Many inputs, many types",
+          "question": "How do you run one test over many inputs, or many types?",
+          "duration": 72,
+          "video": "media/tools-googletest-03.mp4",
+          "poster": "media/tools-googletest-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "tools-gmock",
+      "series": "tools",
+      "title": "GoogleMock",
+      "kicker": "Tools · GoogleMock",
+      "summary": "Mocking through a seam: MOCK_METHOD, expectations with matchers, cardinalities and actions, precedence, and nice, naggy and strict mocks.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/cpp/scaffold/gmock.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Mocking a dependency",
+          "question": "How do you swap a real dependency for a mock in C++?",
+          "duration": 62,
+          "video": "media/tools-gmock-01.mp4",
+          "poster": "media/tools-gmock-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Expectations",
+          "question": "Two EXPECT_CALLs match the same call. Which one wins?",
+          "duration": 49,
+          "video": "media/tools-gmock-02.mp4",
+          "poster": "media/tools-gmock-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Nice, naggy, strict",
+          "question": "ON_CALL or EXPECT_CALL? And what do NiceMock and StrictMock change?",
+          "duration": 66,
+          "video": "media/tools-gmock-03.mp4",
+          "poster": "media/tools-gmock-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "cpp-lock-free",
+      "series": "cpp",
+      "title": "Lock-free programming",
+      "kicker": "C++ · Lock-free programming",
+      "summary": "Compare-and-swap loops, weak versus strong, progress guarantees, a Treiber stack, the ABA problem, and safe memory reclamation.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/cpp/concurrency/lock-free-programming.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "The CAS loop",
+          "question": "How do you atomically apply an update that has no single instruction, like max?",
+          "duration": 52,
+          "video": "media/cpp-lock-free-01.mp4",
+          "poster": "media/cpp-lock-free-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Progress guarantees",
+          "question": "Blocking, lock-free, wait-free: what does each one promise?",
+          "duration": 58,
+          "video": "media/cpp-lock-free-02.mp4",
+          "poster": "media/cpp-lock-free-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Treiber stack and ABA",
+          "question": "Why can a CAS succeed even though the stack changed underneath it?",
+          "duration": 58,
+          "video": "media/cpp-lock-free-03.mp4",
+          "poster": "media/cpp-lock-free-03.jpg"
+        },
+        {
+          "id": "04",
+          "title": "Freeing memory safely",
+          "question": "When is it safe to free a node in a lock-free structure?",
+          "duration": 60,
+          "video": "media/cpp-lock-free-04.mp4",
+          "poster": "media/cpp-lock-free-04.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "cpp-futures",
+      "series": "cpp",
+      "title": "Futures and promises",
+      "kicker": "C++ · Futures and promises",
+      "summary": "The promise-future channel, exceptions and broken promises, std::async launch policies and their traps, packaged_task, and shared_future.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/cpp/concurrency/promise-and-future.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "A one-shot channel",
+          "question": "How does a value, or an exception, travel from a promise to its future?",
+          "duration": 41,
+          "video": "media/cpp-futures-01.mp4",
+          "poster": "media/cpp-futures-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "std::async traps",
+          "question": "What do async's launch policies do, and how can async silently run synchronously?",
+          "duration": 46,
+          "video": "media/cpp-futures-02.mp4",
+          "poster": "media/cpp-futures-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "packaged_task and shared_future",
+          "question": "When do you need packaged_task, and when shared_future?",
+          "duration": 68,
+          "video": "media/cpp-futures-03.mp4",
+          "poster": "media/cpp-futures-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "cpp-memory-layout",
+      "series": "cpp",
+      "title": "Memory layout",
+      "kicker": "C++ · Memory layout",
+      "summary": "Where a program's bytes live: text, data, BSS, heap and stack, static and thread-local storage, and stack versus heap.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/cpp/concurrency/memory-model.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Five segments",
+          "question": "Where do a program's code, globals, allocations and locals live?",
+          "duration": 48,
+          "video": "media/cpp-memory-layout-01.mp4",
+          "poster": "media/cpp-memory-layout-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Static storage",
+          "question": "Why does one non-zero element make a big global array bloat the binary?",
+          "duration": 51,
+          "video": "media/cpp-memory-layout-02.mp4",
+          "poster": "media/cpp-memory-layout-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Stack or heap?",
+          "question": "When should an object live on the stack, and when on the heap?",
+          "duration": 68,
+          "video": "media/cpp-memory-layout-03.mp4",
+          "poster": "media/cpp-memory-layout-03.jpg"
+        }
+      ]
     }
   ]
 }

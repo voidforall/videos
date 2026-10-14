@@ -1,0 +1,594 @@
+{
+  "slug": "tools-asan",
+  "series": "tools",
+  "title": "AddressSanitizer",
+  "kicker": "Tools · AddressSanitizer",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/cpp/scaffold/ASAN.md",
+  "summary": "Compile-time instrumentation plus shadow memory: redzones, quarantine, the bugs it reports, and what it can't see.",
+  "captionFixes": [
+    {
+      "match": [
+        "load",
+        "in",
+        "store"
+      ],
+      "display": "load and store"
+    },
+    {
+      "match": [
+        "pass",
+        "to",
+        "heap"
+      ],
+      "display": "past a heap"
+    },
+    {
+      "match": [
+        "Red",
+        "zones"
+      ],
+      "display": "Redzones",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "red",
+        "zones"
+      ],
+      "display": "redzones"
+    },
+    {
+      "match": [
+        "red",
+        "zone"
+      ],
+      "display": "redzone"
+    },
+    {
+      "match": [
+        "bite"
+      ],
+      "display": "byte"
+    },
+    {
+      "match": [
+        "bites"
+      ],
+      "display": "bytes"
+    },
+    {
+      "match": [
+        "address",
+        "sanitizer"
+      ],
+      "display": "AddressSanitizer"
+    },
+    {
+      "match": [
+        "Address",
+        "sanitizer"
+      ],
+      "display": "AddressSanitizer"
+    },
+    {
+      "match": [
+        "thread",
+        "sanitizer"
+      ],
+      "display": "ThreadSanitizer"
+    },
+    {
+      "match": [
+        "Thread",
+        "sanitizer"
+      ],
+      "display": "ThreadSanitizer"
+    },
+    {
+      "match": [
+        "leak",
+        "sanitizer"
+      ],
+      "display": "LeakSanitizer"
+    },
+    {
+      "match": [
+        "Leak",
+        "sanitizer"
+      ],
+      "display": "LeakSanitizer"
+    },
+    {
+      "match": [
+        "memory",
+        "sanitizer"
+      ],
+      "display": "MemorySanitizer"
+    },
+    {
+      "match": [
+        "Memory",
+        "sanitizer"
+      ],
+      "display": "MemorySanitizer"
+    },
+    {
+      "match": [
+        "undefined",
+        "behavior",
+        "sanitizer"
+      ],
+      "display": "UndefinedBehaviorSanitizer"
+    },
+    {
+      "match": [
+        "undefined",
+        "behaviour",
+        "sanitizer"
+      ],
+      "display": "UndefinedBehaviorSanitizer"
+    },
+    {
+      "match": [
+        "sanitiser"
+      ],
+      "display": "sanitizer"
+    },
+    {
+      "match": [
+        "sanitisers"
+      ],
+      "display": "sanitizers"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Shadow memory",
+      "question": "How does AddressSanitizer know an address is bad, on every single access?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "AddressSanitizer, question one. How does it know that an address is bad, on every single load and store, at only about twice the cost? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How does <em>ASan</em> check every access, at only ~2× the cost?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "AddressSanitizer keeps one shadow byte for every eight bytes of memory. New int ten allocates forty bytes: five granules, each with shadow zero, meaning all eight bytes are addressable. Around the block, the allocator adds redzones, poisoned with a negative shadow value. The compiler inserts a check before every load and store: shift the address right by three, add a fixed offset, and read that one byte. Writing element ten lands in the right redzone. Its shadow is poisoned, so the program stops with a heap buffer overflow, printing the bad access and where the block was allocated. And a partial granule, like the last five bytes of a thirteen byte buffer, gets shadow five: only its first five bytes are valid.",
+          "props": {
+            "title": "One shadow byte per <em>eight</em>",
+            "nodes": [
+              {
+                "id": "lrz",
+                "label": "redzone",
+                "x": 150,
+                "y": 330,
+                "w": 146,
+                "h": 64
+              },
+              {
+                "id": "g0",
+                "label": "a[0..1]",
+                "x": 312,
+                "y": 330,
+                "w": 146,
+                "h": 64
+              },
+              {
+                "id": "g1",
+                "label": "a[2..3]",
+                "x": 474,
+                "y": 330,
+                "w": 146,
+                "h": 64
+              },
+              {
+                "id": "g2",
+                "label": "a[4..5]",
+                "x": 636,
+                "y": 330,
+                "w": 146,
+                "h": 64
+              },
+              {
+                "id": "g3",
+                "label": "a[6..7]",
+                "x": 798,
+                "y": 330,
+                "w": 146,
+                "h": 64
+              },
+              {
+                "id": "g4",
+                "label": "a[8..9]",
+                "x": 960,
+                "y": 330,
+                "w": 146,
+                "h": 64
+              },
+              {
+                "id": "rrz",
+                "label": "redzone",
+                "x": 1122,
+                "y": 330,
+                "w": 146,
+                "h": 64
+              },
+              {
+                "id": "slrz",
+                "label": "fa",
+                "x": 150,
+                "y": 590,
+                "w": 110,
+                "h": 64,
+                "hidden": true
+              },
+              {
+                "id": "sg0",
+                "label": "00",
+                "x": 312,
+                "y": 590,
+                "w": 110,
+                "h": 64,
+                "hidden": true
+              },
+              {
+                "id": "sg1",
+                "label": "00",
+                "x": 474,
+                "y": 590,
+                "w": 110,
+                "h": 64,
+                "hidden": true
+              },
+              {
+                "id": "sg2",
+                "label": "00",
+                "x": 636,
+                "y": 590,
+                "w": 110,
+                "h": 64,
+                "hidden": true
+              },
+              {
+                "id": "sg3",
+                "label": "00",
+                "x": 798,
+                "y": 590,
+                "w": 110,
+                "h": 64,
+                "hidden": true
+              },
+              {
+                "id": "sg4",
+                "label": "00",
+                "x": 960,
+                "y": 590,
+                "w": 110,
+                "h": 64,
+                "hidden": true
+              },
+              {
+                "id": "srrz",
+                "label": "fa",
+                "x": 1122,
+                "y": 590,
+                "w": 110,
+                "h": 64,
+                "hidden": true
+              }
+            ],
+            "edges": [],
+            "panels": [
+              {
+                "key": "legend",
+                "label": "Shadow values",
+                "type": "list",
+                "rows": 3,
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "eight",
+                "nodes": {
+                  "g0": "active"
+                },
+                "show": [
+                  "sg0"
+                ],
+                "add": [
+                  {
+                    "from": "g0",
+                    "to": "sg0"
+                  }
+                ],
+                "edges": {
+                  "g0-sg0": "relax"
+                },
+                "note": "8 bytes of memory → 1 shadow byte"
+              },
+              {
+                "at": "40",
+                "nodes": {
+                  "g0": "done",
+                  "g1": "done",
+                  "g2": "done",
+                  "g3": "done",
+                  "g4": "done"
+                },
+                "show": [
+                  "sg1",
+                  "sg2",
+                  "sg3",
+                  "sg4"
+                ],
+                "add": [
+                  {
+                    "from": "g1",
+                    "to": "sg1"
+                  },
+                  {
+                    "from": "g2",
+                    "to": "sg2"
+                  },
+                  {
+                    "from": "g3",
+                    "to": "sg3"
+                  },
+                  {
+                    "from": "g4",
+                    "to": "sg4"
+                  }
+                ],
+                "edges": {
+                  "g0-sg0": "base"
+                },
+                "panels": {
+                  "legend": [
+                    "00 · all 8 bytes OK"
+                  ]
+                },
+                "note": "new int[10]: 5 granules, shadow 00"
+              },
+              {
+                "at": "allocator",
+                "show": [
+                  "slrz",
+                  "srrz"
+                ],
+                "add": [
+                  {
+                    "from": "lrz",
+                    "to": "slrz"
+                  },
+                  {
+                    "from": "rrz",
+                    "to": "srrz"
+                  }
+                ],
+                "nodes": {
+                  "lrz": "dim",
+                  "rrz": "dim"
+                },
+                "panels": {
+                  "legend": [
+                    "00 · all 8 bytes OK",
+                    "fa · heap redzone (poisoned)"
+                  ]
+                },
+                "note": "Redzones around the block: poisoned"
+              },
+              {
+                "at": "shift",
+                "note": "Check: *((addr >> 3) + offset) before each access"
+              },
+              {
+                "at": "lands",
+                "nodes": {
+                  "rrz": "active",
+                  "srrz": "active"
+                },
+                "edges": {
+                  "rrz-srrz": "relax"
+                },
+                "note": "a[10] → right redzone → shadow fa"
+              },
+              {
+                "at": "stops",
+                "note": "heap-buffer-overflow + allocation stack"
+              },
+              {
+                "at": "partial",
+                "nodes": {
+                  "rrz": "dim",
+                  "srrz": "base"
+                },
+                "edges": {
+                  "rrz-srrz": "base"
+                },
+                "panels": {
+                  "legend": [
+                    "00 · all 8 bytes OK",
+                    "fa · heap redzone (poisoned)",
+                    "05 · only the first 5 bytes OK"
+                  ]
+                },
+                "note": "char[13]: shadow 00, then 05"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "What it catches",
+      "question": "Which bugs does ASan report, and how does it catch a use-after-free?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. Which bugs does AddressSanitizer report, and how does it catch a use after free? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Which bugs does ASan report, and how does it catch <em>use-after-free</em>?"
+          }
+        },
+        {
+          "type": "code",
+          "say": "Build with the address sanitizer flag, keeping frame pointers for good stacks. A write one past a heap array hits the redzone. For use after free, the runtime replaces new and delete: a freed block is poisoned and parked in a quarantine instead of being reused, so the stale write is caught, and the report shows where the block was allocated and where it was freed. Locals get redzones inside the stack frame, so the loop is stopped at index ten. And on Linux, leak sanitizer runs at exit, reporting blocks nobody points to.",
+          "props": {
+            "title": "Four reports, <em>one flag</em>",
+            "file": "bugs.cpp",
+            "tag": "-fsanitize=address",
+            "lang": "cpp",
+            "size": 21,
+            "width": 1180,
+            "code": "// g++ -g -fsanitize=address -fno-omit-frame-pointer bugs.cpp\nvoid heap_overflow() {\n    int* a = new int[10];\n    a[10] = 42;                 // heap-buffer-overflow: lands in the redzone\n    delete[] a;\n}\n\nvoid use_after_free() {\n    int* p = new int(1);\n    delete p;                   // poisoned and parked in quarantine\n    *p = 10;                    // heap-use-after-free: stacks of new and delete\n}\n\nvoid stack_overflow() {\n    char buf[10];               // the compiler adds redzones in the frame\n    for (int i = 0; i < 15; ++i)\n        buf[i] = 'A';           // stack-buffer-overflow at i == 10\n}\n\nint* leak() { return new int[100]; }   // LeakSanitizer reports it at exit",
+            "highlights": [
+              {
+                "at": "flag",
+                "lines": "1",
+                "note": "Instrument + link the runtime"
+              },
+              {
+                "at": "hits",
+                "lines": "4",
+                "note": "One past the end → redzone"
+              },
+              {
+                "at": "quarantine",
+                "lines": "10-11",
+                "note": "Freed block stays poisoned for a while"
+              },
+              {
+                "at": "Locals",
+                "lines": "15-17",
+                "note": "Stack redzones catch i == 10"
+              },
+              {
+                "at": "Linux",
+                "lines": "20",
+                "note": "Unreachable at exit → leak report"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Blind spots",
+      "question": "What can AddressSanitizer miss, and what do you pair it with?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. What can AddressSanitizer miss, and which other sanitizers do you pair it with? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What does ASan <em>miss</em>, and what do you pair it with?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "It only sees code paths you run. An index far past the end can jump over the redzone into another live block, which looks valid. The quarantine is finite, so a very late use after free may hit reused memory. And it never reports reads of uninitialized memory.",
+          "props": {
+            "title": "What ASan <em>can't see</em>",
+            "items": [
+              {
+                "at": "run",
+                "label": "Coverage",
+                "title": "Only executed paths",
+                "body": "Pair it with tests and fuzzing.",
+                "code": "run it in CI"
+              },
+              {
+                "at": "jump",
+                "label": "Far overflow",
+                "title": "Skips the redzone",
+                "body": "a[1000] can land in another valid block.",
+                "code": "redzones are finite"
+              },
+              {
+                "at": "finite",
+                "label": "Late reuse",
+                "title": "Quarantine is bounded",
+                "body": "A very old dangling pointer may hit reused memory.",
+                "code": "quarantine_size_mb"
+              },
+              {
+                "at": "uninitialized",
+                "label": "Uninit reads",
+                "title": "Not its job",
+                "body": "Use MemorySanitizer, or Valgrind.",
+                "code": "-fsanitize=memory"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "So sanitizers come as a family. The undefined behavior sanitizer, for signed overflow, bad shifts and misaligned pointers; it combines with the address sanitizer in one build. The memory sanitizer, for uninitialized reads, which needs Clang and every library instrumented. And the thread sanitizer, for data races, which needs a separate build, because it can't be combined with the address sanitizer.",
+          "props": {
+            "title": "The sanitizer <em>family</em>",
+            "items": [
+              {
+                "at": "signed",
+                "label": "UBSan",
+                "title": "Undefined behavior",
+                "body": "Signed overflow, shifts, misaligned access.",
+                "code": "address,undefined"
+              },
+              {
+                "at": "uninitialized",
+                "label": "MSan",
+                "title": "Uninitialized reads",
+                "body": "Clang only; instrument everything.",
+                "code": "-fsanitize=memory"
+              },
+              {
+                "at": "races",
+                "label": "TSan",
+                "title": "Data races",
+                "body": "Separate build: not with ASan.",
+                "code": "-fsanitize=thread"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. One shadow byte describes eight bytes. Redzones catch overflows, and the quarantine catches use after free. It costs about two times, so run it on every test. And pair it with the undefined behavior and thread sanitizers.",
+          "props": {
+            "title": "ASan, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "eight",
+                "text": "One shadow byte per 8 bytes; a check before every access.",
+                "code": "(addr >> 3) + offset"
+              },
+              {
+                "at": "overflows",
+                "text": "Redzones catch overflows; quarantine catches use-after-free.",
+                "code": "heap · stack · globals"
+              },
+              {
+                "at": "costs",
+                "text": "About 2× slower: run every test with it.",
+                "code": "-fsanitize=address"
+              },
+              {
+                "at": "pair",
+                "text": "Add UBSan; run TSan in a separate build.",
+                "code": "address,undefined"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
