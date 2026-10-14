@@ -9,7 +9,7 @@
     {
       "id": "cpp",
       "title": "C++",
-      "blurb": "Language design questions interviewers probe: ownership, interfaces, lambdas, and the object model."
+      "blurb": "Language and runtime questions interviewers probe: ownership, interfaces, the object model, memory layout, and concurrency from atomics to lock-free code."
     },
     {
       "id": "python",
@@ -29,7 +29,7 @@
     {
       "id": "tools",
       "title": "Tools & frameworks",
-      "blurb": "The tools you actually reach for: Pydantic and FastAPI for services, perf and Valgrind for finding out why native code is slow or broken."
+      "blurb": "The tools you actually reach for: Pydantic and FastAPI for services; perf, Valgrind and the sanitizers for finding out why native code is slow or broken; GoogleTest, GoogleMock and fuzzing for proving it works."
     }
   ],
   "episodes": [
