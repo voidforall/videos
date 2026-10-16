@@ -1,0 +1,900 @@
+{
+  "slug": "os-tlb",
+  "series": "os",
+  "title": "TLBs and page tables",
+  "kicker": "OS · TLBs and page tables",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/system/os/tlb.md",
+  "summary": "How the TLB makes paging fast, what happens to it on a context switch, multi-level page tables, and when huge pages help.",
+  "captionFixes": [
+    {
+      "match": [
+        "TLB",
+        "Question",
+        "1"
+      ],
+      "display": "TLBs, question one"
+    },
+    {
+      "match": [
+        "Summon"
+      ],
+      "display": "Sum an"
+    },
+    {
+      "match": [
+        "16",
+        "byte"
+      ],
+      "display": "16-byte"
+    },
+    {
+      "match": [
+        "1",
+        "to",
+        "2000"
+      ],
+      "display": "one to two thousand"
+    },
+    {
+      "match": [
+        "a",
+        "SID"
+      ],
+      "display": "ASID"
+    },
+    {
+      "match": [
+        "PC",
+        "ID"
+      ],
+      "display": "PCID"
+    },
+    {
+      "match": [
+        "X86"
+      ],
+      "display": "x86",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "shoot-down"
+      ],
+      "display": "shootdown"
+    },
+    {
+      "match": [
+        "CR",
+        "3"
+      ],
+      "display": "CR3"
+    },
+    {
+      "match": [
+        "9-bits"
+      ],
+      "display": "9 bits"
+    },
+    {
+      "match": [
+        "12-bits"
+      ],
+      "display": "12 bits"
+    },
+    {
+      "match": [
+        "TLB",
+        "Reach"
+      ],
+      "display": "TLB reach",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "for",
+        "one",
+        "byte",
+        "write"
+      ],
+      "display": "for a one-byte write"
+    },
+    {
+      "match": [
+        "Riddi"
+      ],
+      "display": "Redis"
+    },
+    {
+      "match": [
+        "latency",
+        "sensitive"
+      ],
+      "display": "latency-sensitive"
+    },
+    {
+      "match": [
+        "cache's"
+      ],
+      "display": "caches"
+    },
+    {
+      "match": [
+        "1500"
+      ],
+      "display": "1,500"
+    },
+    {
+      "match": [
+        "A",
+        "S",
+        "I",
+        "D"
+      ],
+      "display": "ASID"
+    },
+    {
+      "match": [
+        "P",
+        "C",
+        "I",
+        "D"
+      ],
+      "display": "PCID"
+    },
+    {
+      "match": [
+        "C",
+        "R",
+        "three"
+      ],
+      "display": "CR3"
+    },
+    {
+      "match": [
+        "C",
+        "R",
+        "3"
+      ],
+      "display": "CR3"
+    },
+    {
+      "match": [
+        "I",
+        "D"
+      ],
+      "display": "ID"
+    },
+    {
+      "match": [
+        "multi",
+        "level"
+      ],
+      "display": "multi-level"
+    },
+    {
+      "match": [
+        "Multi",
+        "level"
+      ],
+      "display": "Multi-level"
+    },
+    {
+      "match": [
+        "page",
+        "sized"
+      ],
+      "display": "page-sized"
+    },
+    {
+      "match": [
+        "page",
+        "walk"
+      ],
+      "display": "page-walk"
+    },
+    {
+      "match": [
+        "copy",
+        "on",
+        "write"
+      ],
+      "display": "copy-on-write"
+    },
+    {
+      "match": [
+        "M",
+        "advise"
+      ],
+      "display": "madvise"
+    },
+    {
+      "match": [
+        "m",
+        "advise"
+      ],
+      "display": "madvise"
+    },
+    {
+      "match": [
+        "sixteen",
+        "byte"
+      ],
+      "display": "16-byte"
+    },
+    {
+      "match": [
+        "sixty",
+        "four"
+      ],
+      "display": "64"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "The TLB",
+      "question": "Paging adds a memory lookup to every access. Why isn't everything twice as slow?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "TLBs, question one. Paging adds a page table lookup to every memory access. So why isn't every program twice as slow? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Paging adds a lookup to every access. Why isn't it <em>2× slower</em>?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "The TLB, the translation lookaside buffer, is a small cache of recent translations, inside the CPU. Sum an array of ten ints, on tiny sixteen byte pages. Element zero misses: the page table is walked, and the translation for page six is cached. Elements one and two hit. Element three is on a new page: a miss. Then three hits. Element seven misses, and the last two hit. Three misses, seven hits: a seventy percent hit rate, just from spatial locality. With real four kilobyte pages, one miss covers a thousand ints. And loops that come back hit again, from temporal locality.",
+          "props": {
+            "title": "Hits from <em>locality</em>",
+            "nodes": [
+              {
+                "id": "p6",
+                "label": "VPN 06",
+                "x": 260,
+                "y": 300,
+                "w": 170,
+                "h": 64
+              },
+              {
+                "id": "p7",
+                "label": "VPN 07",
+                "x": 260,
+                "y": 450,
+                "w": 170,
+                "h": 64
+              },
+              {
+                "id": "p8",
+                "label": "VPN 08",
+                "x": 260,
+                "y": 600,
+                "w": 170,
+                "h": 64
+              },
+              {
+                "id": "a0",
+                "label": "a[0]",
+                "x": 520,
+                "y": 300,
+                "w": 116,
+                "h": 64
+              },
+              {
+                "id": "a1",
+                "label": "a[1]",
+                "x": 650,
+                "y": 300,
+                "w": 116,
+                "h": 64
+              },
+              {
+                "id": "a2",
+                "label": "a[2]",
+                "x": 780,
+                "y": 300,
+                "w": 116,
+                "h": 64
+              },
+              {
+                "id": "a3",
+                "label": "a[3]",
+                "x": 520,
+                "y": 450,
+                "w": 116,
+                "h": 64
+              },
+              {
+                "id": "a4",
+                "label": "a[4]",
+                "x": 650,
+                "y": 450,
+                "w": 116,
+                "h": 64
+              },
+              {
+                "id": "a5",
+                "label": "a[5]",
+                "x": 780,
+                "y": 450,
+                "w": 116,
+                "h": 64
+              },
+              {
+                "id": "a6",
+                "label": "a[6]",
+                "x": 910,
+                "y": 450,
+                "w": 116,
+                "h": 64
+              },
+              {
+                "id": "a7",
+                "label": "a[7]",
+                "x": 520,
+                "y": 600,
+                "w": 116,
+                "h": 64
+              },
+              {
+                "id": "a8",
+                "label": "a[8]",
+                "x": 650,
+                "y": 600,
+                "w": 116,
+                "h": 64
+              },
+              {
+                "id": "a9",
+                "label": "a[9]",
+                "x": 780,
+                "y": 600,
+                "w": 116,
+                "h": 64
+              }
+            ],
+            "edges": [],
+            "panels": [
+              {
+                "key": "tlb",
+                "label": "TLB",
+                "type": "list",
+                "rows": 1,
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "Sum",
+                "note": "for (i = 0; i < 10; i++) sum += a[i];"
+              },
+              {
+                "at": "misses",
+                "nodes": {
+                  "a0": "active",
+                  "p6": "queued"
+                },
+                "panels": {
+                  "tlb": [
+                    "VPN 06"
+                  ]
+                },
+                "note": "a[0]: miss → walk, cache VPN 06"
+              },
+              {
+                "at": "hit",
+                "nodes": {
+                  "a1": "done",
+                  "a2": "done"
+                },
+                "note": "a[1], a[2]: hit"
+              },
+              {
+                "at": "new",
+                "nodes": {
+                  "a3": "active",
+                  "p7": "queued"
+                },
+                "panels": {
+                  "tlb": [
+                    "VPN 06",
+                    "VPN 07"
+                  ]
+                },
+                "note": "a[3]: new page → miss"
+              },
+              {
+                "at": "Then",
+                "nodes": {
+                  "a4": "done",
+                  "a5": "done",
+                  "a6": "done"
+                },
+                "note": "a[4..6]: hits"
+              },
+              {
+                "at": "misses#2",
+                "nodes": {
+                  "a7": "active",
+                  "p8": "queued"
+                },
+                "panels": {
+                  "tlb": [
+                    "VPN 06",
+                    "VPN 07",
+                    "VPN 08"
+                  ]
+                },
+                "note": "a[7]: miss"
+              },
+              {
+                "at": "last",
+                "nodes": {
+                  "a8": "done",
+                  "a9": "done"
+                },
+                "note": "a[8], a[9]: hits"
+              },
+              {
+                "at": "spatial",
+                "note": "3 misses, 7 hits: 70%, from spatial locality"
+              },
+              {
+                "at": "covers",
+                "note": "4 KB pages: one miss per 1,024 ints"
+              },
+              {
+                "at": "temporal",
+                "nodes": {
+                  "p6": "base",
+                  "p7": "base",
+                  "p8": "base"
+                },
+                "note": "Come back soon → hit again: temporal locality"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "Real TLBs are small: around sixty four entries in the first level, and one to two thousand in the second. On a miss, x86 and ARM walk the page table in hardware. MIPS left it to software: a trap to the kernel, which refilled the TLB itself, and could use any table format it liked. Either way, a miss costs tens of cycles when the walk hits in cache, and hundreds when it goes all the way to main memory.",
+          "props": {
+            "title": "Small, and <em>usually enough</em>",
+            "items": [
+              {
+                "at": "small",
+                "label": "Size",
+                "title": "Small",
+                "body": "~64 first-level entries; ~1–2K second-level.",
+                "code": "per core"
+              },
+              {
+                "at": "hardware",
+                "label": "x86 · ARM",
+                "title": "Hardware page walk",
+                "body": "The MMU walks the table itself.",
+                "code": "no kernel entry"
+              },
+              {
+                "at": "software",
+                "label": "MIPS",
+                "title": "Software refill",
+                "body": "A trap; the kernel fills the TLB.",
+                "code": "any table format"
+              },
+              {
+                "at": "cycles",
+                "label": "Miss cost",
+                "title": "Tens to hundreds of cycles",
+                "body": "Cached walk vs. a trip to DRAM.",
+                "code": "perf: dTLB-load-misses"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "TLBs and context switches",
+      "question": "After a context switch, the TLB still holds the old process's translations. What can the OS do?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. After a context switch, the TLB still holds the old process's translations. What can the OS do about them? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "After a switch, the TLB holds <em>stale</em> translations. Now what?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Virtual page ten maps to different frames in different processes, so stale entries would be wrong. The simple fix is to flush the TLB on every switch, and the new process starts cold. The better fix is to tag each entry with an address space I D: A S I D on ARM, P C I D on x86. Entries from several processes coexist, only matching tags hit, and a process that runs again soon finds its translations still there. Either way, kernel mappings, identical in every process, are marked global, and survive.",
+          "props": {
+            "title": "Flush, or <em>tag</em>",
+            "left": {
+              "at": "flush",
+              "label": "Flush",
+              "title": "Simple, starts cold",
+              "body": "Invalidate everything on each switch; every process re-misses."
+            },
+            "right": {
+              "at": "tag",
+              "label": "Tag (ASID / PCID)",
+              "title": "Entries coexist",
+              "tone": "good",
+              "body": "Only matching tags hit; returning processes find warm entries."
+            },
+            "verdict": {
+              "at": "global",
+              "text": "Kernel mappings are global: they survive either way.",
+              "code": "PTE G bit"
+            }
+          }
+        },
+        {
+          "type": "points",
+          "say": "Changing a mapping is the other case. After unmapping memory, or changing its protection, the kernel must invalidate those entries. But other CPUs, running threads of the same process, may have cached them too. So the kernel interrupts each of those CPUs, and makes it invalidate its own copy. That's a TLB shootdown, and it's why unmapping memory in a busy multithreaded program is surprisingly expensive.",
+          "props": {
+            "title": "TLB <em>shootdowns</em>",
+            "items": [
+              {
+                "at": "unmapping",
+                "label": "Change a mapping",
+                "title": "Invalidate it",
+                "body": "munmap, mprotect, page migration.",
+                "code": "invlpg"
+              },
+              {
+                "at": "cached",
+                "label": "Other CPUs",
+                "title": "Have copies too",
+                "body": "Threads of the same process, elsewhere.",
+                "code": "shared mm"
+              },
+              {
+                "at": "interrupts",
+                "label": "Shootdown",
+                "title": "Interrupt each one",
+                "body": "An IPI to every CPU that may hold it.",
+                "code": "and wait for them"
+              },
+              {
+                "at": "expensive",
+                "label": "Cost",
+                "title": "Surprisingly expensive",
+                "body": "Batch unmaps; avoid churn in hot paths.",
+                "code": "munmap is not free"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Multi-level page tables",
+      "question": "A flat page table is 4 MB per process. How do real systems make it smaller?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. A flat page table for a 32 bit address space takes four megabytes per process, mostly empty. How do real systems make it smaller? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "A flat page table is <em>4 MB</em>. How do we shrink it?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Chop the flat table into page sized pieces, and add a directory of pieces. If a whole piece would be empty, don't allocate it: mark its directory entry invalid. A process using a few megabytes, scattered across a huge address space, then needs only a handful of table pages. x86-64 uses four levels, for 48 bit addresses: nine bits index each level, and twelve bits are the offset. C R three points to the top level. Each entry points to the next table, until the last level gives the frame. The catch: a TLB miss now costs four memory reads, not one. CPUs cache the upper levels, in page walk caches, and the TLB hides most of the rest.",
+          "props": {
+            "title": "A tree of <em>tables</em>",
+            "nodes": [
+              {
+                "id": "cr3",
+                "label": "CR3",
+                "x": 200,
+                "y": 300,
+                "w": 150,
+                "h": 72
+              },
+              {
+                "id": "l4",
+                "label": "PML4",
+                "x": 470,
+                "y": 300,
+                "w": 210,
+                "h": 72
+              },
+              {
+                "id": "l3",
+                "label": "PDPT",
+                "x": 780,
+                "y": 300,
+                "w": 210,
+                "h": 72,
+                "hidden": true
+              },
+              {
+                "id": "l2",
+                "label": "PD",
+                "x": 1090,
+                "y": 300,
+                "w": 210,
+                "h": 72,
+                "hidden": true
+              },
+              {
+                "id": "l1",
+                "label": "PT",
+                "x": 1400,
+                "y": 300,
+                "w": 210,
+                "h": 72,
+                "hidden": true
+              },
+              {
+                "id": "frame",
+                "label": "4 KB frame",
+                "x": 1400,
+                "y": 560,
+                "w": 240,
+                "h": 72,
+                "hidden": true
+              },
+              {
+                "id": "inv",
+                "label": "invalid entry:\nno table allocated",
+                "x": 560,
+                "y": 580,
+                "w": 330,
+                "h": 96,
+                "hidden": true
+              }
+            ],
+            "edges": [
+              {
+                "from": "cr3",
+                "to": "l4"
+              }
+            ],
+            "panels": [],
+            "steps": [
+              {
+                "at": "Chop",
+                "nodes": {
+                  "l4": "active"
+                },
+                "note": "Chop the flat table into page-sized pieces"
+              },
+              {
+                "at": "empty",
+                "show": [
+                  "inv"
+                ],
+                "add": [
+                  {
+                    "from": "l4",
+                    "to": "inv"
+                  }
+                ],
+                "nodes": {
+                  "l4": "base",
+                  "inv": "dim"
+                },
+                "edges": {
+                  "l4-inv": "dim"
+                },
+                "note": "Empty piece: not allocated, entry invalid"
+              },
+              {
+                "at": "handful",
+                "note": "Sparse address space → a few table pages"
+              },
+              {
+                "at": "four",
+                "show": [
+                  "l3",
+                  "l2",
+                  "l1"
+                ],
+                "add": [
+                  {
+                    "from": "l4",
+                    "to": "l3"
+                  },
+                  {
+                    "from": "l3",
+                    "to": "l2"
+                  },
+                  {
+                    "from": "l2",
+                    "to": "l1"
+                  }
+                ],
+                "note": "x86-64: four levels, 48-bit addresses"
+              },
+              {
+                "at": "nine",
+                "note": "9 + 9 + 9 + 9 index bits, 12 offset bits"
+              },
+              {
+                "at": "points",
+                "nodes": {
+                  "cr3": "active",
+                  "l4": "active"
+                },
+                "edges": {
+                  "cr3-l4": "relax"
+                },
+                "note": "CR3 → the top-level table"
+              },
+              {
+                "at": "next",
+                "nodes": {
+                  "cr3": "done",
+                  "l4": "done",
+                  "l3": "active",
+                  "l2": "active",
+                  "l1": "active"
+                },
+                "edges": {
+                  "cr3-l4": "tree",
+                  "l4-l3": "relax",
+                  "l3-l2": "relax",
+                  "l2-l1": "relax"
+                },
+                "note": "Each entry → the next table"
+              },
+              {
+                "at": "frame",
+                "show": [
+                  "frame"
+                ],
+                "add": [
+                  {
+                    "from": "l1",
+                    "to": "frame"
+                  }
+                ],
+                "nodes": {
+                  "l3": "done",
+                  "l2": "done",
+                  "l1": "done",
+                  "frame": "done"
+                },
+                "edges": {
+                  "l4-l3": "tree",
+                  "l3-l2": "tree",
+                  "l2-l1": "tree",
+                  "l1-frame": "tree"
+                },
+                "note": "The last level gives the 4 KB frame"
+              },
+              {
+                "at": "catch",
+                "nodes": {
+                  "l4": "queued",
+                  "l3": "queued",
+                  "l2": "queued",
+                  "l1": "queued"
+                },
+                "note": "TLB miss: 4 memory reads"
+              },
+              {
+                "at": "hides",
+                "nodes": {
+                  "l4": "base",
+                  "l3": "base",
+                  "l2": "base",
+                  "l1": "base"
+                },
+                "note": "Page-walk caches + the TLB hide most of it"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "04",
+      "title": "Huge pages",
+      "question": "When do huge pages help, and why do some databases say to turn them off?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question four. When do huge pages help? And why do some databases tell you to turn them off? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "When do <em>huge pages</em> help, and when do they hurt?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "TLB reach is entries times page size. Fifteen hundred entries of four kilobytes cover six megabytes. With two megabyte pages, the same entries cover three gigabytes. A huge page also ends the walk one level early. So workloads with big, randomly accessed memory, like databases, JVM heaps, and trading engines, take far fewer misses.",
+          "props": {
+            "title": "TLB <em>reach</em>",
+            "items": [
+              {
+                "at": "reach",
+                "label": "TLB reach",
+                "title": "Entries × page size",
+                "body": "1,536 × 4 KB = 6 MB · × 2 MB = 3 GB.",
+                "code": "second-level TLB"
+              },
+              {
+                "at": "early",
+                "label": "Shorter walk",
+                "title": "One level fewer",
+                "body": "The PD entry maps 2 MB directly.",
+                "code": "3 reads, not 4"
+              },
+              {
+                "at": "randomly",
+                "label": "Who benefits",
+                "title": "Big, random working sets",
+                "body": "Databases, JVM heaps, trading engines.",
+                "code": "perf stat -e dTLB-load-misses"
+              }
+            ]
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Static huge pages are reserved up front, and requested explicitly: predictable, but you manage the pool. Transparent huge pages are automatic: the kernel uses two megabyte pages when it can, and a background thread collapses small pages later. The catch is latency. Finding two contiguous megabytes can mean compacting memory, in the middle of an allocation. And after a fork, copy on write copies two megabytes for a one byte write. That's why Redis says to disable them, and why many latency-sensitive systems set them to madvise, opting in per region.",
+          "props": {
+            "title": "Static or <em>transparent</em>",
+            "left": {
+              "at": "Static",
+              "label": "Static",
+              "title": "Reserved, explicit",
+              "tone": "good",
+              "body": "hugetlbfs or MAP_HUGETLB. Predictable; you size the pool."
+            },
+            "right": {
+              "at": "Transparent",
+              "label": "Transparent (THP)",
+              "title": "Automatic, with stalls",
+              "body": "Compaction stalls; after fork, COW copies 2 MB per write."
+            },
+            "verdict": {
+              "at": "opting",
+              "text": "Latency-sensitive: THP = madvise, opt in per region.",
+              "code": "madvise(p, n, MADV_HUGEPAGE)"
+            }
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. The TLB caches translations, and locality makes it hit almost always. On a context switch, tagged entries avoid a full flush. Multi level tables only allocate what's used, at the cost of a longer walk. And huge pages multiply TLB reach, but transparent ones can add latency spikes.",
+          "props": {
+            "title": "TLBs, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "caches",
+                "text": "The TLB caches translations; locality makes it hit.",
+                "code": "spatial · temporal"
+              },
+              {
+                "at": "tagged",
+                "text": "ASID / PCID tags avoid flushing on a switch.",
+                "code": "shootdowns on unmap"
+              },
+              {
+                "at": "allocate",
+                "text": "Multi-level tables allocate only what's used.",
+                "code": "4 levels, 9 bits each"
+              },
+              {
+                "at": "multiply",
+                "text": "Huge pages multiply TLB reach.",
+                "code": "THP: watch the latency"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

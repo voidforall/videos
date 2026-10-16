@@ -1,0 +1,1101 @@
+{
+  "slug": "os-io",
+  "series": "os",
+  "title": "I/O",
+  "kicker": "OS · I/O",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/interview/os-io.md",
+  "summary": "What read() and write() really do, the page cache and writeback, select and poll versus epoll, io_uring, and zero-copy with sendfile.",
+  "captionFixes": [
+    {
+      "match": [
+        "edge",
+        "triggered",
+        "weight"
+      ],
+      "display": "edge-triggered wait"
+    },
+    {
+      "match": [
+        "while",
+        "level",
+        "triggered"
+      ],
+      "display": "while level-triggered"
+    },
+    {
+      "match": [
+        "Apple",
+        "wait"
+      ],
+      "display": "epoll_wait"
+    },
+    {
+      "match": [
+        "Apple",
+        "weight"
+      ],
+      "display": "epoll_wait"
+    },
+    {
+      "match": [
+        "Apple"
+      ],
+      "display": "epoll"
+    },
+    {
+      "match": [
+        "EO",
+        "Uring"
+      ],
+      "display": "io_uring"
+    },
+    {
+      "match": [
+        "and",
+        "interrupt"
+      ],
+      "display": "an interrupt"
+    },
+    {
+      "match": [
+        "page.",
+        "By",
+        "DMA,"
+      ],
+      "display": "page, by DMA"
+    },
+    {
+      "match": [
+        "write",
+        "is",
+        "the",
+        "reverse"
+      ],
+      "display": "Write is the reverse"
+    },
+    {
+      "match": [
+        "poll",
+        "takes"
+      ],
+      "display": "Poll takes",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "a",
+        "write",
+        "and",
+        "accept"
+      ],
+      "display": "a write, an accept"
+    },
+    {
+      "match": [
+        "set",
+        "up"
+      ],
+      "display": "setup"
+    },
+    {
+      "match": [
+        "sockets",
+        "except",
+        "open-close"
+      ],
+      "display": "sockets, accept, open, close"
+    },
+    {
+      "match": [
+        "Engine",
+        "X"
+      ],
+      "display": "Nginx"
+    },
+    {
+      "match": [
+        "Sendfile"
+      ],
+      "display": "sendfile",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "I",
+        "checked",
+        "after",
+        "a",
+        "partial",
+        "read",
+        "and"
+      ],
+      "display": "I checked: after a partial read, an"
+    },
+    {
+      "match": [
+        "Edge-triggered",
+        "weight"
+      ],
+      "display": "edge-triggered wait"
+    },
+    {
+      "match": [
+        "while",
+        "Level-triggered"
+      ],
+      "display": "while level-triggered"
+    },
+    {
+      "match": [
+        "f",
+        "sync"
+      ],
+      "display": "fsync"
+    },
+    {
+      "match": [
+        "F",
+        "sync"
+      ],
+      "display": "fsync"
+    },
+    {
+      "match": [
+        "Epoll",
+        "wait"
+      ],
+      "display": "epoll_wait"
+    },
+    {
+      "match": [
+        "epoll",
+        "wait"
+      ],
+      "display": "epoll_wait"
+    },
+    {
+      "match": [
+        "io",
+        "uring"
+      ],
+      "display": "io_uring"
+    },
+    {
+      "match": [
+        "I/O",
+        "uring"
+      ],
+      "display": "io_uring"
+    },
+    {
+      "match": [
+        "IO",
+        "uring"
+      ],
+      "display": "io_uring"
+    },
+    {
+      "match": [
+        "S",
+        "Q",
+        "poll"
+      ],
+      "display": "SQPOLL"
+    },
+    {
+      "match": [
+        "SQ",
+        "poll"
+      ],
+      "display": "SQPOLL"
+    },
+    {
+      "match": [
+        "Level",
+        "triggered"
+      ],
+      "display": "Level-triggered"
+    },
+    {
+      "match": [
+        "Edge",
+        "triggered"
+      ],
+      "display": "Edge-triggered"
+    },
+    {
+      "match": [
+        "edge",
+        "triggered"
+      ],
+      "display": "edge-triggered"
+    },
+    {
+      "match": [
+        "level",
+        "triggered"
+      ],
+      "display": "level-triggered"
+    },
+    {
+      "match": [
+        "E",
+        "poll"
+      ],
+      "display": "epoll"
+    },
+    {
+      "match": [
+        "send",
+        "file"
+      ],
+      "display": "sendfile"
+    },
+    {
+      "match": [
+        "Send",
+        "file"
+      ],
+      "display": "sendfile"
+    },
+    {
+      "match": [
+        "completion",
+        "based"
+      ],
+      "display": "completion-based"
+    },
+    {
+      "match": [
+        "Chrome",
+        "OS"
+      ],
+      "display": "ChromeOS"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "A read(), end to end",
+      "question": "What happens between calling read() on a file and getting the bytes back?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Input and output, question one. You call read on a file. What happens between that call and the bytes landing in your buffer? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What happens inside a <em>read()</em>?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Read traps into the kernel, which turns the file descriptor into an open file, and checks the buffer. Then it looks in the page cache: the kernel's cache of file contents. On a hit, it copies the bytes into your buffer, and returns, with no disk at all. On a miss, it adds a page to the cache, and sends a block I/O request to the device. Your thread sleeps. The device writes the data straight into that page, by DMA, then raises an interrupt. The handler marks the page ready, and wakes your thread, which copies the bytes out. The kernel also reads ahead, guessing you'll want the next pages too.",
+          "props": {
+            "title": "Through the <em>page cache</em>",
+            "nodes": [
+              {
+                "id": "app",
+                "label": "read(fd, buf, n)",
+                "x": 260,
+                "y": 300,
+                "w": 300,
+                "h": 80
+              },
+              {
+                "id": "sys",
+                "label": "kernel: fd → file,\ncheck the buffer",
+                "x": 660,
+                "y": 300,
+                "w": 320,
+                "h": 96,
+                "hidden": true
+              },
+              {
+                "id": "cache",
+                "label": "page cache",
+                "x": 1060,
+                "y": 300,
+                "w": 260,
+                "h": 80,
+                "hidden": true
+              },
+              {
+                "id": "bio",
+                "label": "block I/O request\nthread sleeps",
+                "x": 1500,
+                "y": 300,
+                "w": 320,
+                "h": 96,
+                "hidden": true
+              },
+              {
+                "id": "dev",
+                "label": "SSD: DMA into\nthe cache page",
+                "x": 1500,
+                "y": 600,
+                "w": 300,
+                "h": 96,
+                "hidden": true
+              },
+              {
+                "id": "irq",
+                "label": "interrupt:\npage ready, wake",
+                "x": 660,
+                "y": 600,
+                "w": 300,
+                "h": 96,
+                "hidden": true
+              }
+            ],
+            "edges": [],
+            "panels": [],
+            "steps": [
+              {
+                "at": "traps",
+                "show": [
+                  "sys"
+                ],
+                "add": [
+                  {
+                    "from": "app",
+                    "to": "sys"
+                  }
+                ],
+                "nodes": {
+                  "app": "active",
+                  "sys": "active"
+                },
+                "edges": {
+                  "app-sys": "relax"
+                },
+                "note": "Trap into the kernel"
+              },
+              {
+                "at": "checks",
+                "nodes": {
+                  "app": "base"
+                },
+                "edges": {
+                  "app-sys": "base"
+                },
+                "note": "fd → open file; validate the buffer"
+              },
+              {
+                "at": "cache",
+                "show": [
+                  "cache"
+                ],
+                "add": [
+                  {
+                    "from": "sys",
+                    "to": "cache"
+                  }
+                ],
+                "nodes": {
+                  "sys": "base",
+                  "cache": "active"
+                },
+                "edges": {
+                  "sys-cache": "relax"
+                },
+                "note": "Look up the page cache"
+              },
+              {
+                "at": "hit",
+                "nodes": {
+                  "cache": "done",
+                  "app": "done"
+                },
+                "edges": {
+                  "sys-cache": "base"
+                },
+                "note": "Hit: copy to your buffer, return. No disk."
+              },
+              {
+                "at": "miss",
+                "show": [
+                  "bio"
+                ],
+                "add": [
+                  {
+                    "from": "cache",
+                    "to": "bio",
+                    "w": "miss"
+                  }
+                ],
+                "nodes": {
+                  "cache": "active",
+                  "app": "base",
+                  "bio": "active"
+                },
+                "edges": {
+                  "cache-bio": "relax"
+                },
+                "note": "Miss: add a page, send a block request"
+              },
+              {
+                "at": "sleeps",
+                "nodes": {
+                  "cache": "base",
+                  "app": "queued"
+                },
+                "note": "Your thread sleeps"
+              },
+              {
+                "at": "DMA",
+                "show": [
+                  "dev"
+                ],
+                "add": [
+                  {
+                    "from": "bio",
+                    "to": "dev"
+                  }
+                ],
+                "nodes": {
+                  "bio": "base",
+                  "dev": "active"
+                },
+                "edges": {
+                  "cache-bio": "base",
+                  "bio-dev": "relax"
+                },
+                "note": "The device DMAs into the page"
+              },
+              {
+                "at": "interrupt",
+                "show": [
+                  "irq"
+                ],
+                "add": [
+                  {
+                    "from": "dev",
+                    "to": "irq"
+                  }
+                ],
+                "nodes": {
+                  "dev": "base",
+                  "irq": "active"
+                },
+                "edges": {
+                  "bio-dev": "base",
+                  "dev-irq": "relax"
+                },
+                "note": "Interrupt when done"
+              },
+              {
+                "at": "wakes",
+                "add": [
+                  {
+                    "from": "irq",
+                    "to": "app",
+                    "w": "wake"
+                  }
+                ],
+                "nodes": {
+                  "irq": "base",
+                  "app": "active"
+                },
+                "edges": {
+                  "dev-irq": "base",
+                  "irq-app": "relax"
+                },
+                "note": "Page ready; wake the thread"
+              },
+              {
+                "at": "out",
+                "nodes": {
+                  "app": "done"
+                },
+                "edges": {
+                  "irq-app": "tree"
+                },
+                "note": "Copy the bytes out, return"
+              },
+              {
+                "at": "ahead",
+                "nodes": {
+                  "cache": "queued"
+                },
+                "note": "Read-ahead: fetch the next pages too"
+              }
+            ]
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Write is the reverse, and faster than you'd think. It copies your bytes into the page cache, marks those pages dirty, and returns. Flusher threads write them to disk later: by default, once the data is thirty seconds old, or sooner, when dirty memory passes ten percent. At twenty percent, the writers themselves are throttled. So a successful write survives a crash only after f sync.",
+          "props": {
+            "title": "write() returns <em>early</em>",
+            "left": {
+              "at": "reverse",
+              "label": "write()",
+              "title": "Returns at memory speed",
+              "tone": "good",
+              "body": "Copies into the page cache, marks pages dirty."
+            },
+            "right": {
+              "at": "Flusher",
+              "label": "Writeback",
+              "title": "Later, in the background",
+              "body": "Data older than 30 s, or dirty > 10% of memory; at 20%, writers are throttled."
+            },
+            "verdict": {
+              "at": "survives",
+              "text": "Durable only after fsync.",
+              "code": "fsync · fdatasync · O_DIRECT"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "select, poll, epoll",
+      "question": "Ten thousand connections, ten of them active. Why does epoll scale when poll doesn't?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. A server holds ten thousand connections, and ten of them have data. Why does epoll scale, when poll doesn't? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "10,000 connections, 10 active. Why does <em>epoll</em> scale?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Poll takes the whole list of descriptors on every call. The kernel checks all ten thousand, and you scan all ten thousand results, to find the ten that are ready. Select works the same way, and only handles descriptors below 1024. Epoll separates registering from waiting. You add each descriptor once, and the kernel hooks a callback onto it. When data arrives, the callback puts that descriptor on a ready list. Epoll wait hands you just that list: the cost tracks the ready descriptors, not the watched ones.",
+          "props": {
+            "title": "Scan everything, or <em>be told</em>",
+            "left": {
+              "at": "Poll",
+              "label": "select · poll",
+              "title": "O(watched) per call",
+              "body": "Pass every fd each call; kernel and you scan them all. select: fds < 1024."
+            },
+            "right": {
+              "at": "Epoll",
+              "label": "epoll",
+              "title": "O(ready) per call",
+              "tone": "good",
+              "body": "Register once; readiness callbacks fill a ready list."
+            },
+            "verdict": {
+              "at": "tracks",
+              "text": "epoll_wait returns only what's ready.",
+              "code": "Nginx · Redis · libuv"
+            }
+          }
+        },
+        {
+          "type": "code",
+          "say": "Register each socket once. Epoll wait blocks, and returns only ready descriptors. Level triggered, the default, keeps reporting a descriptor as long as it has unread data. Edge triggered reports it only when new data arrives. So you must keep reading until the socket says it would block: leave five bytes behind, and epoll won't mention them again until more data comes. I checked: after a partial read, an edge triggered wait timed out, while level triggered returned at once.",
+          "props": {
+            "title": "Edge-triggered: <em>drain it</em>",
+            "file": "server.c",
+            "tag": "epoll",
+            "lang": "cpp",
+            "size": 20,
+            "width": 1200,
+            "code": "int ep = epoll_create1(0);\nstruct epoll_event ev = { .events = EPOLLIN | EPOLLET, .data.fd = sock };\nepoll_ctl(ep, EPOLL_CTL_ADD, sock, &ev);         // register once\n\nfor (;;) {\n    int n = epoll_wait(ep, events, 64, -1);      // only ready fds come back\n    for (int i = 0; i < n; i++) {\n        int fd = events[i].data.fd;\n        for (;;) {                               // edge-triggered: drain it\n            ssize_t r = read(fd, buf, sizeof buf);\n            if (r > 0) { handle(fd, buf, r); continue; }\n            if (r < 0 && errno == EAGAIN) break; // empty: wait for the next edge\n            close(fd); break;                    // EOF or error\n        }\n    }\n}",
+            "highlights": [
+              {
+                "at": "once",
+                "lines": "3",
+                "note": "Register once"
+              },
+              {
+                "at": "returns",
+                "lines": "6",
+                "note": "Only ready fds come back"
+              },
+              {
+                "at": "arrives",
+                "lines": "2",
+                "note": "EPOLLET: report changes only"
+              },
+              {
+                "at": "block",
+                "lines": "9-12",
+                "note": "Read until EAGAIN"
+              },
+              {
+                "at": "behind",
+                "lines": "12",
+                "note": "Leftover bytes: no new event"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "io_uring",
+      "question": "How does io_uring do I/O without a system call per operation?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. Epoll still needs a system call to wait, and another to read. How does io uring do I/O without a system call per operation? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How does <em>io_uring</em> avoid a syscall per operation?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "io uring shares two ring buffers between your process and the kernel. You describe each operation, a read, a write, an accept, as an entry on the submission queue. One call submits a whole batch. The kernel runs them asynchronously, and posts a result for each one on the completion queue. You read results straight from shared memory, with no system call. With S Q poll, a kernel thread watches the submission queue, so while it's busy, even submitting needs no call. And unlike epoll, which tells you a socket is ready, so you then call read, io uring is completion based: it tells you the read is done.",
+          "props": {
+            "title": "Two shared <em>rings</em>",
+            "nodes": [
+              {
+                "id": "sq",
+                "label": "submission queue\n(you write entries)",
+                "x": 520,
+                "y": 300,
+                "w": 380,
+                "h": 96
+              },
+              {
+                "id": "cq",
+                "label": "completion queue\n(you read results)",
+                "x": 520,
+                "y": 590,
+                "w": 380,
+                "h": 96
+              },
+              {
+                "id": "k",
+                "label": "kernel\nruns ops async",
+                "x": 1250,
+                "y": 445,
+                "w": 300,
+                "h": 96
+              },
+              {
+                "id": "poll",
+                "label": "SQPOLL thread\nwatches the queue",
+                "x": 1250,
+                "y": 270,
+                "w": 320,
+                "h": 80,
+                "hidden": true
+              }
+            ],
+            "edges": [],
+            "panels": [],
+            "steps": [
+              {
+                "at": "shares",
+                "nodes": {
+                  "sq": "active",
+                  "cq": "active"
+                },
+                "note": "Two rings in memory shared with the kernel"
+              },
+              {
+                "at": "entry",
+                "nodes": {
+                  "cq": "base"
+                },
+                "note": "One entry per operation: read, write, accept…"
+              },
+              {
+                "at": "batch",
+                "add": [
+                  {
+                    "from": "sq",
+                    "to": "k",
+                    "w": "io_uring_enter"
+                  }
+                ],
+                "nodes": {
+                  "sq": "base",
+                  "k": "active"
+                },
+                "edges": {
+                  "sq-k": "relax"
+                },
+                "note": "One call submits a whole batch"
+              },
+              {
+                "at": "posts",
+                "add": [
+                  {
+                    "from": "k",
+                    "to": "cq"
+                  }
+                ],
+                "nodes": {
+                  "k": "base",
+                  "cq": "active"
+                },
+                "edges": {
+                  "sq-k": "base",
+                  "k-cq": "relax"
+                },
+                "note": "A completion entry for each op"
+              },
+              {
+                "at": "shared",
+                "nodes": {
+                  "cq": "done"
+                },
+                "edges": {
+                  "k-cq": "tree"
+                },
+                "note": "Reap results from memory: no syscall"
+              },
+              {
+                "at": "watches",
+                "show": [
+                  "poll"
+                ],
+                "add": [
+                  {
+                    "from": "poll",
+                    "to": "sq"
+                  }
+                ],
+                "nodes": {
+                  "poll": "active"
+                },
+                "edges": {
+                  "poll-sq": "relax"
+                },
+                "note": "SQPOLL: even submission is syscall-free"
+              },
+              {
+                "at": "ready",
+                "nodes": {
+                  "poll": "base"
+                },
+                "edges": {
+                  "poll-sq": "base"
+                },
+                "note": "epoll: 'ready', then you call read()"
+              },
+              {
+                "at": "done",
+                "nodes": {
+                  "cq": "active"
+                },
+                "note": "io_uring: 'done', here's the result"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "Buffers and files can be registered once, so the kernel skips setup on every operation. Operations can be linked, so the next starts when one completes. It covers far more than files: sockets, accept, open, close. The caveat is security. io uring has been a rich source of kernel exploits, and Google disables it on ChromeOS and for Android apps.",
+          "props": {
+            "title": "More <em>tricks</em>, one caveat",
+            "items": [
+              {
+                "at": "registered",
+                "label": "Registration",
+                "title": "Buffers and files, once",
+                "body": "Skips per-operation lookup and pinning.",
+                "code": "io_uring_register"
+              },
+              {
+                "at": "linked",
+                "label": "Linked ops",
+                "title": "Chain them",
+                "body": "The next starts when one completes.",
+                "code": "IOSQE_IO_LINK"
+              },
+              {
+                "at": "sockets",
+                "label": "Coverage",
+                "title": "Not just files",
+                "body": "Sockets, accept, open, close, statx…",
+                "code": "Linux 5.1+"
+              },
+              {
+                "at": "security",
+                "label": "Caveat",
+                "title": "A big attack surface",
+                "body": "Google disables it on ChromeOS and Android apps.",
+                "code": "check your seccomp policy"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "04",
+      "title": "Zero-copy",
+      "question": "Serving a file over a socket with read and write: how many copies, and how does sendfile cut them?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question four. A server sends a file over a socket, with read, then write. How many times is each byte copied? And how does sendfile cut that down? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "read + write to a socket: how many <em>copies</em>?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Read, then write, moves every byte four times. The disk DMAs it into the page cache. Read copies it, using the CPU, into your buffer. Write copies it again, into the socket buffer. And the network card DMAs it out. Two of those copies are pure CPU work, plus two system calls for every chunk. Sendfile does the whole transfer inside the kernel: the data never visits your process. And with a network card that can gather from scattered pages, the socket buffer holds only descriptors, and the card reads straight from the page cache: no CPU copies at all.",
+          "props": {
+            "title": "Four copies, or <em>none</em>",
+            "nodes": [
+              {
+                "id": "disk",
+                "label": "disk",
+                "x": 230,
+                "y": 300,
+                "w": 200,
+                "h": 80
+              },
+              {
+                "id": "pc",
+                "label": "page cache",
+                "x": 620,
+                "y": 300,
+                "w": 250,
+                "h": 80
+              },
+              {
+                "id": "user",
+                "label": "your buffer",
+                "x": 1000,
+                "y": 590,
+                "w": 250,
+                "h": 80
+              },
+              {
+                "id": "sock",
+                "label": "socket buffer",
+                "x": 1380,
+                "y": 300,
+                "w": 270,
+                "h": 80
+              },
+              {
+                "id": "nic",
+                "label": "network card",
+                "x": 1380,
+                "y": 590,
+                "w": 270,
+                "h": 80
+              }
+            ],
+            "edges": [],
+            "panels": [],
+            "steps": [
+              {
+                "at": "four",
+                "note": "read() + write(): four copies"
+              },
+              {
+                "at": "disk",
+                "add": [
+                  {
+                    "from": "disk",
+                    "to": "pc",
+                    "w": "DMA"
+                  }
+                ],
+                "edges": {
+                  "disk-pc": "relax"
+                },
+                "note": "1 · disk → page cache (DMA)"
+              },
+              {
+                "at": "CPU",
+                "add": [
+                  {
+                    "from": "pc",
+                    "to": "user",
+                    "w": "CPU copy"
+                  }
+                ],
+                "nodes": {
+                  "user": "active"
+                },
+                "edges": {
+                  "disk-pc": "base",
+                  "pc-user": "relax"
+                },
+                "note": "2 · page cache → your buffer (CPU)"
+              },
+              {
+                "at": "again",
+                "add": [
+                  {
+                    "from": "user",
+                    "to": "sock",
+                    "w": "CPU copy"
+                  }
+                ],
+                "nodes": {
+                  "user": "base",
+                  "sock": "active"
+                },
+                "edges": {
+                  "pc-user": "base",
+                  "user-sock": "relax"
+                },
+                "note": "3 · your buffer → socket buffer (CPU)"
+              },
+              {
+                "at": "out",
+                "add": [
+                  {
+                    "from": "sock",
+                    "to": "nic",
+                    "w": "DMA"
+                  }
+                ],
+                "nodes": {
+                  "sock": "base"
+                },
+                "edges": {
+                  "user-sock": "base",
+                  "sock-nic": "relax"
+                },
+                "note": "4 · socket buffer → NIC (DMA)"
+              },
+              {
+                "at": "pure",
+                "nodes": {
+                  "user": "queued"
+                },
+                "edges": {
+                  "sock-nic": "base",
+                  "pc-user": "relax",
+                  "user-sock": "relax"
+                },
+                "note": "2 CPU copies, 2 syscalls per chunk"
+              },
+              {
+                "at": "transfer",
+                "remove": [
+                  "pc-user",
+                  "user-sock"
+                ],
+                "add": [
+                  {
+                    "from": "pc",
+                    "to": "sock",
+                    "w": "in-kernel copy"
+                  }
+                ],
+                "nodes": {
+                  "user": "dim"
+                },
+                "edges": {
+                  "pc-sock": "relax"
+                },
+                "note": "sendfile: one call, data stays in the kernel"
+              },
+              {
+                "at": "gather",
+                "remove": [
+                  "pc-sock"
+                ],
+                "add": [
+                  {
+                    "from": "pc",
+                    "to": "nic",
+                    "w": "gather DMA"
+                  }
+                ],
+                "nodes": {
+                  "sock": "dim",
+                  "nic": "active"
+                },
+                "edges": {
+                  "pc-nic": "relax"
+                },
+                "note": "Scatter-gather NIC: DMA from the cache"
+              },
+              {
+                "at": "all",
+                "nodes": {
+                  "nic": "done",
+                  "pc": "done"
+                },
+                "edges": {
+                  "pc-nic": "tree",
+                  "disk-pc": "tree"
+                },
+                "note": "Zero CPU copies"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "Nginx serves static files this way, once you turn sendfile on: it's off by default. Kafka hands log segments to consumers with it. Splice generalizes the idea to any two descriptors, through a pipe, which suits proxies. The limit: since the CPU never sees the data, it can't transform it. Encryption used to rule it out, but kernel TLS now encrypts inside the kernel, so even HTTPS can use sendfile.",
+          "props": {
+            "title": "Where it's <em>used</em>",
+            "items": [
+              {
+                "at": "static",
+                "label": "Nginx",
+                "title": "Static files",
+                "body": "Turn it on: sendfile is off by default.",
+                "code": "sendfile on;"
+              },
+              {
+                "at": "Kafka",
+                "label": "Kafka",
+                "title": "Log segments to consumers",
+                "body": "Java transferTo → sendfile.",
+                "code": "consumer fetch"
+              },
+              {
+                "at": "Splice",
+                "label": "splice",
+                "title": "Any two fds, via a pipe",
+                "body": "Socket → pipe → socket, for proxies.",
+                "code": "splice(2)"
+              },
+              {
+                "at": "transform",
+                "label": "Limit",
+                "title": "No transforming",
+                "body": "TLS only via kernel TLS (kTLS).",
+                "code": "SSL_sendfile"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Read goes through the page cache, and waits for the device only on a miss. Write returns once the bytes are cached: f sync makes them durable. Epoll returns only ready descriptors, and io uring batches operations through shared rings. And sendfile keeps the data inside the kernel.",
+          "props": {
+            "title": "I/O, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "miss",
+                "text": "read: page cache; the device only on a miss.",
+                "code": "read-ahead"
+              },
+              {
+                "at": "durable",
+                "text": "write returns when cached; fsync for durability.",
+                "code": "dirty writeback"
+              },
+              {
+                "at": "batches",
+                "text": "epoll: ready fds. io_uring: batched, shared rings.",
+                "code": "readiness vs completion"
+              },
+              {
+                "at": "inside",
+                "text": "sendfile keeps data in the kernel.",
+                "code": "zero-copy"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,580 @@
+{
+  "slug": "os-system-calls",
+  "series": "os",
+  "title": "System calls and interrupts",
+  "kicker": "OS · System calls",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/system/os/direct-execution.md",
+  "summary": "Limited direct execution: user and kernel mode, how a system call traps into the kernel, timer interrupts, and what a context switch costs.",
+  "captionFixes": [
+    {
+      "match": [
+        "programme"
+      ],
+      "display": "program"
+    },
+    {
+      "match": [
+        "disc"
+      ],
+      "display": "disk"
+    },
+    {
+      "match": [
+        "libk"
+      ],
+      "display": "libc"
+    },
+    {
+      "match": [
+        "getPID"
+      ],
+      "display": "getpid"
+    },
+    {
+      "match": [
+        "two",
+        "hundred",
+        "and",
+        "eighty"
+      ],
+      "display": "280"
+    },
+    {
+      "match": [
+        "VDSO"
+      ],
+      "display": "vDSO"
+    },
+    {
+      "match": [
+        "readV"
+      ],
+      "display": "readv"
+    },
+    {
+      "match": [
+        "EO",
+        "urine"
+      ],
+      "display": "io_uring"
+    },
+    {
+      "match": [
+        "pre-emptive"
+      ],
+      "display": "preemptive"
+    },
+    {
+      "match": [
+        "running",
+        "processes",
+        "registers"
+      ],
+      "display": "running process's registers"
+    },
+    {
+      "match": [
+        "new",
+        "route"
+      ],
+      "display": "new root"
+    },
+    {
+      "match": [
+        "x86,",
+        "without"
+      ],
+      "display": "x86. Without"
+    },
+    {
+      "match": [
+        "With",
+        "PCID",
+        "Linux"
+      ],
+      "display": "With PCID, Linux"
+    },
+    {
+      "match": [
+        "P",
+        "I",
+        "D"
+      ],
+      "display": "PID"
+    },
+    {
+      "match": [
+        "get",
+        "P",
+        "I",
+        "D"
+      ],
+      "display": "getpid"
+    },
+    {
+      "match": [
+        "get",
+        "PID"
+      ],
+      "display": "getpid"
+    },
+    {
+      "match": [
+        "v",
+        "D",
+        "S",
+        "O"
+      ],
+      "display": "vDSO"
+    },
+    {
+      "match": [
+        "Clock",
+        "get",
+        "time"
+      ],
+      "display": "clock_gettime"
+    },
+    {
+      "match": [
+        "read",
+        "v"
+      ],
+      "display": "readv"
+    },
+    {
+      "match": [
+        "io",
+        "uring"
+      ],
+      "display": "io_uring"
+    },
+    {
+      "match": [
+        "I/O",
+        "uring"
+      ],
+      "display": "io_uring"
+    },
+    {
+      "match": [
+        "C",
+        "R",
+        "three"
+      ],
+      "display": "CR3"
+    },
+    {
+      "match": [
+        "C",
+        "R",
+        "3"
+      ],
+      "display": "CR3"
+    },
+    {
+      "match": [
+        "P",
+        "C",
+        "I",
+        "D"
+      ],
+      "display": "PCID"
+    },
+    {
+      "match": [
+        "sys",
+        "call"
+      ],
+      "display": "syscall"
+    },
+    {
+      "match": [
+        "floating",
+        "point"
+      ],
+      "display": "floating-point"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Crossing into the kernel",
+      "question": "A user program can't touch the disk. So how does read() get your bytes?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "System calls, question one. Your program isn't allowed to touch the disk. So how does a call to read get your bytes? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "You can't touch the disk. So how does <em>read()</em> work?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "The CPU runs your code in user mode, where device access and privileged instructions are forbidden. To do I/O, you ask the kernel. Read in libc is a thin wrapper. It puts the system call number in one register, and the arguments in others, then executes the special syscall instruction. That traps: the CPU switches to kernel mode, onto the kernel stack, and jumps to the entry point the kernel registered at boot. The kernel trusts nothing: it checks the file descriptor, and that the buffer really is your memory, then does the work. Return from trap drops back to user mode, with the result in a register.",
+          "props": {
+            "title": "A <em>system call</em>",
+            "nodes": [
+              {
+                "id": "app",
+                "label": "your code\nread(fd, buf, n)",
+                "x": 330,
+                "y": 300,
+                "w": 320,
+                "h": 96
+              },
+              {
+                "id": "libc",
+                "label": "libc wrapper\nrax = SYS_read",
+                "x": 330,
+                "y": 600,
+                "w": 320,
+                "h": 96
+              },
+              {
+                "id": "entry",
+                "label": "CPU: user → kernel mode\nkernel stack",
+                "x": 960,
+                "y": 600,
+                "w": 380,
+                "h": 96
+              },
+              {
+                "id": "handler",
+                "label": "sys_read()\nchecks fd, buf",
+                "x": 1580,
+                "y": 600,
+                "w": 300,
+                "h": 96,
+                "hidden": true
+              },
+              {
+                "id": "ret",
+                "label": "return from trap\nresult in rax",
+                "x": 1260,
+                "y": 300,
+                "w": 340,
+                "h": 96,
+                "hidden": true
+              }
+            ],
+            "edges": [
+              {
+                "from": "app",
+                "to": "libc"
+              },
+              {
+                "from": "libc",
+                "to": "entry",
+                "w": "syscall"
+              }
+            ],
+            "panels": [],
+            "steps": [
+              {
+                "at": "user",
+                "nodes": {
+                  "app": "active"
+                },
+                "note": "User mode: no devices, no privileged instructions"
+              },
+              {
+                "at": "wrapper",
+                "nodes": {
+                  "app": "base",
+                  "libc": "active"
+                },
+                "edges": {
+                  "app-libc": "relax"
+                },
+                "note": "libc: syscall number + arguments in registers"
+              },
+              {
+                "at": "traps",
+                "nodes": {
+                  "libc": "base",
+                  "entry": "active"
+                },
+                "edges": {
+                  "app-libc": "base",
+                  "libc-entry": "relax"
+                },
+                "note": "Trap: switch to kernel mode and stack"
+              },
+              {
+                "at": "boot",
+                "show": [
+                  "handler"
+                ],
+                "add": [
+                  {
+                    "from": "entry",
+                    "to": "handler",
+                    "w": "trap table"
+                  }
+                ],
+                "nodes": {
+                  "entry": "base",
+                  "handler": "active"
+                },
+                "edges": {
+                  "libc-entry": "base",
+                  "entry-handler": "relax"
+                },
+                "note": "Jump to the handler registered at boot"
+              },
+              {
+                "at": "checks",
+                "note": "Validate the fd and the user buffer"
+              },
+              {
+                "at": "work",
+                "nodes": {
+                  "handler": "done"
+                },
+                "edges": {
+                  "entry-handler": "base"
+                },
+                "note": "Copy the data into your buffer"
+              },
+              {
+                "at": "drops",
+                "show": [
+                  "ret"
+                ],
+                "add": [
+                  {
+                    "from": "handler",
+                    "to": "ret"
+                  },
+                  {
+                    "from": "ret",
+                    "to": "app"
+                  }
+                ],
+                "nodes": {
+                  "ret": "active",
+                  "app": "done"
+                },
+                "edges": {
+                  "handler-ret": "relax",
+                  "ret-app": "relax"
+                },
+                "note": "Back to user mode, result in rax"
+              }
+            ]
+          }
+        },
+        {
+          "type": "compare",
+          "say": "A round trip is cheap, but not free. A trivial system call costs around a hundred to a few hundred nanoseconds: in a Linux VM, get P I D took about 280. Some calls skip the kernel entirely. Clock get time reads the time from a page the kernel maps into every process, the v D S O, in about 20 nanoseconds. And hot paths batch: one call for many operations, with read v, or io uring.",
+          "props": {
+            "title": "What a crossing <em>costs</em>",
+            "left": {
+              "at": "trivial",
+              "label": "System call",
+              "title": "~100–300 ns round trip",
+              "body": "Mode switch, validation, cache and TLB effects. getpid: ~280 ns in a Linux VM."
+            },
+            "right": {
+              "at": "skip",
+              "label": "vDSO",
+              "title": "No crossing at all",
+              "tone": "good",
+              "body": "clock_gettime reads a kernel-mapped page: ~20 ns."
+            },
+            "verdict": {
+              "at": "batch",
+              "text": "On hot paths, batch: fewer crossings, more work each.",
+              "code": "readv · io_uring"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Getting the CPU back",
+      "question": "A process loops forever and never makes a system call. How does the OS get the CPU back?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. A process spins in a loop forever, and never makes a system call. How does the operating system ever get the CPU back? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "A process spins <em>forever</em>. How does the OS get the CPU back?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Early systems were cooperative. The OS got control back only when a process made a system call, or yielded. One infinite loop, and the only fix was a reboot. Modern kernels are preemptive. At boot, they program a hardware timer to interrupt every few milliseconds. The interrupt forces the CPU into kernel mode, saves the running process's registers, and runs the kernel's handler. Now the scheduler decides: keep running this process, or switch to another.",
+          "props": {
+            "title": "Wait politely, or <em>take it back</em>",
+            "left": {
+              "at": "cooperative",
+              "label": "Cooperative",
+              "title": "Wait for a syscall or yield",
+              "body": "One infinite loop, and only a reboot helps."
+            },
+            "right": {
+              "at": "Modern",
+              "label": "Preemptive",
+              "title": "A hardware timer interrupt",
+              "tone": "good",
+              "body": "Fires every few ms; the kernel always gets the CPU back."
+            },
+            "verdict": {
+              "at": "decides",
+              "text": "Then the scheduler decides: keep running, or switch.",
+              "code": "timer → kernel → schedule()"
+            }
+          }
+        },
+        {
+          "type": "points",
+          "say": "So there are three ways into the kernel. A system call, when the program asks. An exception, when an instruction faults, like a page fault, or a divide by zero. And an interrupt, from a device or the timer, which can arrive between any two instructions. Everything else runs directly on the CPU, at full speed. That's limited direct execution.",
+          "props": {
+            "title": "Three ways <em>in</em>",
+            "items": [
+              {
+                "at": "asks",
+                "label": "System call",
+                "title": "The program asks",
+                "body": "A deliberate trap for a service.",
+                "code": "syscall"
+              },
+              {
+                "at": "faults",
+                "label": "Exception",
+                "title": "An instruction faults",
+                "body": "Page fault, divide by zero, bad opcode.",
+                "code": "#PF · #DE · #UD"
+              },
+              {
+                "at": "device",
+                "label": "Interrupt",
+                "title": "From outside",
+                "body": "Timer, disk, network card; between any two instructions.",
+                "code": "IRQ"
+              },
+              {
+                "at": "directly",
+                "label": "The rest",
+                "title": "Runs directly on the CPU",
+                "body": "Full speed, until one of the three.",
+                "code": "limited direct execution"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "The context switch",
+      "question": "What happens in a context switch, and why is a process switch dearer than a thread switch?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. What actually happens in a context switch? And why does switching processes cost more than switching threads? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What happens in a <em>context switch</em>?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "A context switch happens inside the kernel: after a timer interrupt, or when a thread blocks. The kernel saves the current thread's registers: program counter, stack pointer, general registers, and floating point state. The scheduler picks the next thread. Then the kernel restores that thread's registers and kernel stack, and returns to user mode as the new thread.",
+          "props": {
+            "title": "Four <em>steps</em>",
+            "items": [
+              {
+                "at": "inside",
+                "label": "1 · Enter",
+                "title": "Already in the kernel",
+                "body": "Timer interrupt, or the thread blocked.",
+                "code": "IRQ · syscall"
+              },
+              {
+                "at": "saves",
+                "label": "2 · Save",
+                "title": "Current thread's registers",
+                "body": "PC, SP, general and FP/SIMD state.",
+                "code": "into its task struct"
+              },
+              {
+                "at": "picks",
+                "label": "3 · Pick",
+                "title": "The scheduler chooses",
+                "body": "The next runnable thread.",
+                "code": "schedule()"
+              },
+              {
+                "at": "restores",
+                "label": "4 · Restore",
+                "title": "Next thread's registers",
+                "body": "And its kernel stack; return to user mode.",
+                "code": "sysret · iret"
+              }
+            ]
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Between threads of one process, that's it: the address space doesn't change. Between processes, the kernel also switches page tables, by loading a new root into C R three on x86. Without tagged TLB entries, that flushes every cached translation. With P C I D, Linux keeps them, tagged per address space. Either way, the bigger cost is indirect: the new thread starts with cold caches and TLB, which can cost more than the switch itself.",
+          "props": {
+            "title": "Thread or <em>process</em>",
+            "left": {
+              "at": "threads",
+              "label": "Thread switch",
+              "title": "Same address space",
+              "tone": "good",
+              "body": "Registers and stacks change; page tables don't."
+            },
+            "right": {
+              "at": "Between#2",
+              "label": "Process switch",
+              "title": "New page tables too",
+              "body": "Load CR3. Without PCID, every TLB entry is flushed."
+            },
+            "verdict": {
+              "at": "indirect",
+              "text": "The real cost is indirect: cold caches and TLB.",
+              "code": "a few µs, plus misses"
+            }
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. User code runs directly on the CPU, but in user mode. A system call traps into the kernel, and back. The timer interrupt guarantees the kernel gets control back. And a context switch saves one thread's registers, and restores another's, plus page tables, between processes.",
+          "props": {
+            "title": "Into the kernel, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "directly",
+                "text": "User code runs directly, in user mode.",
+                "code": "limited direct execution"
+              },
+              {
+                "at": "traps",
+                "text": "A system call traps in, and returns out.",
+                "code": "~100s of ns"
+              },
+              {
+                "at": "guarantees",
+                "text": "The timer interrupt guarantees control returns.",
+                "code": "preemption"
+              },
+              {
+                "at": "saves",
+                "text": "Switch = save, pick, restore (+ page tables).",
+                "code": "CR3 · PCID"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

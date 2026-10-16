@@ -1,0 +1,707 @@
+{
+  "slug": "os-processes",
+  "series": "os",
+  "title": "Processes",
+  "kicker": "OS · Processes",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/system/os/process-basics.md",
+  "summary": "fork, exec and wait; process states, zombies and orphans; and why copy-on-write makes fork cheap.",
+  "captionFixes": [
+    {
+      "match": [
+        "processes",
+        "question"
+      ],
+      "display": "Processes, question"
+    },
+    {
+      "match": [
+        "Negative",
+        "1"
+      ],
+      "display": "Negative one"
+    },
+    {
+      "match": [
+        "id"
+      ],
+      "display": "ID"
+    },
+    {
+      "match": [
+        "waitPID"
+      ],
+      "display": "waitpid"
+    },
+    {
+      "match": [
+        "in",
+        "PS"
+      ],
+      "display": "in ps"
+    },
+    {
+      "match": [
+        "it's",
+        "PID"
+      ],
+      "display": "its PID"
+    },
+    {
+      "match": [
+        "sigchildren",
+        "reap"
+      ],
+      "display": "SIGCHLD and reap"
+    },
+    {
+      "match": [
+        "sigchild"
+      ],
+      "display": "SIGCHLD"
+    },
+    {
+      "match": [
+        "In",
+        "it",
+        "process",
+        "1"
+      ],
+      "display": "init, process 1,"
+    },
+    {
+      "match": [
+        "nobody",
+        "writes",
+        "is"
+      ],
+      "display": "A page nobody writes is"
+    },
+    {
+      "match": [
+        "makes",
+        "Fork"
+      ],
+      "display": "makes fork"
+    },
+    {
+      "match": [
+        "to",
+        "recap"
+      ],
+      "display": "To recap",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "frames.",
+        "Marked"
+      ],
+      "display": "frames, marked"
+    },
+    {
+      "match": [
+        "P",
+        "I",
+        "D"
+      ],
+      "display": "PID"
+    },
+    {
+      "match": [
+        "P",
+        "I",
+        "Ds"
+      ],
+      "display": "PIDs"
+    },
+    {
+      "match": [
+        "I",
+        "D"
+      ],
+      "display": "ID"
+    },
+    {
+      "match": [
+        "wait",
+        "pid"
+      ],
+      "display": "waitpid"
+    },
+    {
+      "match": [
+        "Wait",
+        "pid"
+      ],
+      "display": "waitpid"
+    },
+    {
+      "match": [
+        "sig",
+        "child"
+      ],
+      "display": "SIGCHLD"
+    },
+    {
+      "match": [
+        "SIG",
+        "CHLD"
+      ],
+      "display": "SIGCHLD"
+    },
+    {
+      "match": [
+        "read",
+        "only"
+      ],
+      "display": "read-only"
+    },
+    {
+      "match": [
+        "copy",
+        "on",
+        "write"
+      ],
+      "display": "copy-on-write"
+    },
+    {
+      "match": [
+        "Copy",
+        "on",
+        "write"
+      ],
+      "display": "Copy-on-write"
+    },
+    {
+      "match": [
+        "posix",
+        "spawn"
+      ],
+      "display": "posix_spawn"
+    },
+    {
+      "match": [
+        "process",
+        "one"
+      ],
+      "display": "process 1"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "fork, exec, wait",
+      "question": "What does fork return, and why does a shell fork and then exec?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Processes, question one. What does fork return? And why does a shell call fork, and then exec, instead of one call that starts a program? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What does <em>fork</em> return, and why <em>fork</em> then <em>exec</em>?"
+          }
+        },
+        {
+          "type": "code",
+          "say": "Fork creates a near copy of the calling process, and both copies return from it. The return value tells them apart: zero in the child, and the child's process I D in the parent. Negative one means it failed. Before running anything, the child can rearrange its own state. Here it points standard output at a file: that's how a shell does redirection. Then exec replaces the running program with a new one: same process, same I D, new code. It only returns if it fails. Meanwhile, the parent calls wait pid, which blocks until the child exits, and collects its status.",
+          "props": {
+            "title": "A tiny <em>shell</em>",
+            "file": "shell.c",
+            "tag": "process API",
+            "lang": "cpp",
+            "size": 20,
+            "width": 1210,
+            "code": "while (read_command(line, &argv, &outfile)) {\n    pid_t pid = fork();                    // one process becomes two\n    if (pid < 0) { perror(\"fork\"); continue; }\n    if (pid == 0) {                        // child: fork returned 0\n        if (outfile) {                     // \"cmd > out.txt\"\n            int fd = open(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);\n            dup2(fd, STDOUT_FILENO);       // stdout now writes to the file\n            close(fd);\n        }\n        execvp(argv[0], argv);             // replace the program; no return\n        perror(\"execvp\");                  // ...unless it failed\n        _exit(127);\n    }\n    int status;                            // parent: fork returned the child's PID\n    waitpid(pid, &status, 0);              // wait for it, and reap it\n}",
+            "highlights": [
+              {
+                "at": "copy",
+                "lines": "2",
+                "note": "One process becomes two"
+              },
+              {
+                "at": "zero",
+                "lines": "4",
+                "note": "Child: fork returned 0"
+              },
+              {
+                "at": "standard",
+                "lines": "5-8",
+                "note": "Set up the child first: redirect stdout"
+              },
+              {
+                "at": "replaces",
+                "lines": "10",
+                "note": "Same PID, new program"
+              },
+              {
+                "at": "fails",
+                "lines": "11-12",
+                "note": "Only returns on error"
+              },
+              {
+                "at": "blocks",
+                "lines": "14-15",
+                "note": "Parent: wait for the child, and reap it"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "States and zombies",
+      "question": "What is a zombie process, and how do you get rid of one?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. What is a zombie process? And how do you get rid of one? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What is a <em>zombie</em>, and how do you get rid of one?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "A process is running on a CPU, ready and waiting for one, or blocked on some event. The scheduler moves a ready process onto a CPU. A timer interrupt can preempt it, back to ready. If it starts disk or network I/O, it blocks, and when the I/O completes, it's ready again. When it exits, the kernel frees its memory and closes its files. But its entry in the process table stays, holding the exit status, until the parent collects it. Until then it's a zombie, shown as Z in ps. Once the parent calls wait, the entry is gone.",
+          "props": {
+            "title": "Process <em>states</em>",
+            "nodes": [
+              {
+                "id": "ready",
+                "label": "Ready",
+                "x": 380,
+                "y": 300,
+                "w": 240,
+                "h": 64
+              },
+              {
+                "id": "running",
+                "label": "Running",
+                "x": 1000,
+                "y": 300,
+                "w": 240,
+                "h": 64
+              },
+              {
+                "id": "blocked",
+                "label": "Blocked",
+                "x": 690,
+                "y": 580,
+                "w": 240,
+                "h": 64
+              },
+              {
+                "id": "zombie",
+                "label": "Zombie (Z)",
+                "x": 1560,
+                "y": 300,
+                "w": 260,
+                "h": 64
+              },
+              {
+                "id": "gone",
+                "label": "reaped",
+                "x": 1560,
+                "y": 580,
+                "w": 260,
+                "h": 64,
+                "hidden": true
+              }
+            ],
+            "edges": [
+              {
+                "from": "ready",
+                "to": "running",
+                "w": "scheduled"
+              },
+              {
+                "from": "running",
+                "to": "ready",
+                "w": "preempted"
+              },
+              {
+                "from": "running",
+                "to": "blocked",
+                "w": "I/O"
+              },
+              {
+                "from": "blocked",
+                "to": "ready",
+                "w": "I/O done"
+              },
+              {
+                "from": "running",
+                "to": "zombie",
+                "w": "exit"
+              }
+            ],
+            "panels": [],
+            "steps": [
+              {
+                "at": "running",
+                "nodes": {
+                  "running": "active"
+                },
+                "note": "Running: on a CPU"
+              },
+              {
+                "at": "waiting",
+                "nodes": {
+                  "running": "base",
+                  "ready": "queued"
+                },
+                "note": "Ready: runnable, waiting for a CPU"
+              },
+              {
+                "at": "blocked",
+                "nodes": {
+                  "ready": "base",
+                  "blocked": "queued"
+                },
+                "note": "Blocked: waiting for an event"
+              },
+              {
+                "at": "scheduler",
+                "nodes": {
+                  "blocked": "base",
+                  "ready": "base",
+                  "running": "active"
+                },
+                "edges": {
+                  "ready-running": "relax"
+                },
+                "note": "Scheduled: ready → running"
+              },
+              {
+                "at": "preempt",
+                "nodes": {
+                  "running": "base",
+                  "ready": "active"
+                },
+                "edges": {
+                  "ready-running": "base",
+                  "running-ready": "relax"
+                },
+                "note": "Timer interrupt: running → ready"
+              },
+              {
+                "at": "blocks",
+                "nodes": {
+                  "ready": "base",
+                  "blocked": "active"
+                },
+                "edges": {
+                  "running-ready": "base",
+                  "running-blocked": "relax"
+                },
+                "note": "Starts I/O: running → blocked"
+              },
+              {
+                "at": "completes",
+                "nodes": {
+                  "blocked": "base",
+                  "ready": "active"
+                },
+                "edges": {
+                  "running-blocked": "base",
+                  "blocked-ready": "relax"
+                },
+                "note": "I/O done: blocked → ready"
+              },
+              {
+                "at": "exits",
+                "nodes": {
+                  "ready": "base",
+                  "zombie": "active"
+                },
+                "edges": {
+                  "blocked-ready": "base",
+                  "running-zombie": "relax"
+                },
+                "note": "Exit: memory freed, files closed"
+              },
+              {
+                "at": "stays",
+                "note": "…but the process-table entry stays"
+              },
+              {
+                "at": "zombie",
+                "nodes": {
+                  "zombie": "queued"
+                },
+                "note": "A zombie: exit status waiting to be collected"
+              },
+              {
+                "at": "calls",
+                "show": [
+                  "gone"
+                ],
+                "add": [
+                  {
+                    "from": "zombie",
+                    "to": "gone",
+                    "w": "parent's wait()"
+                  }
+                ],
+                "nodes": {
+                  "zombie": "dim",
+                  "gone": "done"
+                },
+                "edges": {
+                  "running-zombie": "base"
+                },
+                "note": "Parent's wait() reaps it"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "A zombie holds no memory and no CPU, just a process table slot, and its P I D. You can't kill it: it's already dead. The danger is a parent that forks, and never waits: zombies pile up until P I Ds run out. Fix the parent: call wait pid, or handle SIGCHLD and reap in a loop, or ignore SIGCHLD, so the kernel reaps automatically. If the parent dies first, its children are orphans: init, process one, adopts and reaps them.",
+          "props": {
+            "title": "Getting rid of <em>zombies</em>",
+            "items": [
+              {
+                "at": "slot",
+                "label": "What's left",
+                "title": "A PID and an exit status",
+                "body": "No memory, no CPU. kill can't remove it.",
+                "code": "ps: STAT Z"
+              },
+              {
+                "at": "never",
+                "label": "The danger",
+                "title": "A parent that never waits",
+                "body": "Zombies pile up until PIDs run out.",
+                "code": "pid_max"
+              },
+              {
+                "at": "Fix",
+                "label": "The fix",
+                "title": "Reap in the parent",
+                "body": "waitpid; reap in a SIGCHLD handler; or ignore SIGCHLD.",
+                "code": "waitpid(-1, &s, WNOHANG)"
+              },
+              {
+                "at": "orphans",
+                "label": "Orphans",
+                "title": "Parent died first",
+                "body": "init (PID 1) adopts and reaps them.",
+                "code": "or a subreaper"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Copy-on-write fork",
+      "question": "fork copies the whole address space. So why is it fast?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. Fork gives the child a copy of the parent's whole address space, maybe gigabytes. So why is fork fast? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "fork copies the whole address space. Why is it <em>fast</em>?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Copying gigabytes on every fork would be slow, and wasteful, because most children call exec right away. So fork copies only the page tables, and points both processes at the same physical frames, marked read only. Reads are shared freely. When either process writes, the CPU raises a page fault. The kernel sees a copy on write page, copies just that page into a new frame, maps it writable for the writer, and retries the write. A page nobody writes is never copied.",
+          "props": {
+            "title": "Copy on <em>write</em>",
+            "nodes": [
+              {
+                "id": "ppt",
+                "label": "parent\npage table",
+                "x": 420,
+                "y": 300,
+                "w": 280,
+                "h": 96
+              },
+              {
+                "id": "cpt",
+                "label": "child\npage table",
+                "x": 420,
+                "y": 600,
+                "w": 280,
+                "h": 96,
+                "hidden": true
+              },
+              {
+                "id": "f42",
+                "label": "frame 42",
+                "x": 1300,
+                "y": 300,
+                "w": 280,
+                "h": 96
+              },
+              {
+                "id": "f99",
+                "label": "frame 99\n(copy)",
+                "x": 1300,
+                "y": 600,
+                "w": 280,
+                "h": 96,
+                "hidden": true
+              }
+            ],
+            "edges": [
+              {
+                "from": "ppt",
+                "to": "f42"
+              }
+            ],
+            "panels": [],
+            "steps": [
+              {
+                "at": "tables",
+                "show": [
+                  "cpt"
+                ],
+                "add": [
+                  {
+                    "from": "cpt",
+                    "to": "f42"
+                  }
+                ],
+                "nodes": {
+                  "ppt": "active",
+                  "cpt": "active"
+                },
+                "note": "fork(): copy the page tables, not the pages"
+              },
+              {
+                "at": "marked",
+                "nodes": {
+                  "ppt": "base",
+                  "cpt": "base",
+                  "f42": "queued"
+                },
+                "note": "Both map frame 42, now read-only"
+              },
+              {
+                "at": "Reads",
+                "edges": {
+                  "ppt-f42": "relax",
+                  "cpt-f42": "relax"
+                },
+                "note": "Reads: shared, no fault"
+              },
+              {
+                "at": "writes",
+                "nodes": {
+                  "cpt": "active"
+                },
+                "edges": {
+                  "ppt-f42": "base",
+                  "cpt-f42": "base"
+                },
+                "note": "Child writes → page fault"
+              },
+              {
+                "at": "copies#2",
+                "show": [
+                  "f99"
+                ],
+                "nodes": {
+                  "f99": "active"
+                },
+                "note": "Kernel copies that one page"
+              },
+              {
+                "at": "writable",
+                "remove": [
+                  "cpt-f42"
+                ],
+                "add": [
+                  {
+                    "from": "cpt",
+                    "to": "f99"
+                  }
+                ],
+                "nodes": {
+                  "f99": "done",
+                  "cpt": "base",
+                  "f42": "base"
+                },
+                "edges": {
+                  "cpt-f99": "tree"
+                },
+                "note": "Child maps frame 99, read-write"
+              },
+              {
+                "at": "retries",
+                "note": "…and the write is retried"
+              },
+              {
+                "at": "never",
+                "nodes": {
+                  "f42": "done"
+                },
+                "note": "Never written → never copied"
+              }
+            ]
+          }
+        },
+        {
+          "type": "compare",
+          "say": "So fork, then exec, is nearly free: exec throws the copied page tables away. But a big process that keeps writing pays per page. Redis's background save forks a child to write a snapshot. Every page the parent writes during the save gets copied, so memory can nearly double. And fork still copies page tables, about two megabytes per gigabyte, so spawning helpers from a huge process is better done with posix spawn.",
+          "props": {
+            "title": "Cheap, <em>not free</em>",
+            "left": {
+              "at": "exec",
+              "label": "fork + exec",
+              "title": "Nearly free",
+              "tone": "good",
+              "body": "Only page tables are copied, and exec discards them."
+            },
+            "right": {
+              "at": "snapshot",
+              "label": "fork of a busy heap",
+              "title": "One copy per written page",
+              "body": "Redis BGSAVE: pages the parent writes get copied; memory can nearly double."
+            },
+            "verdict": {
+              "at": "megabytes",
+              "text": "fork still copies page tables: ~2 MB per GB of memory.",
+              "code": "posix_spawn"
+            }
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Fork returns zero in the child, and the child's P I D in the parent. Exec replaces the program, keeping the process. A zombie is an exited child nobody has waited for. And copy on write makes fork cheap, until someone writes.",
+          "props": {
+            "title": "Processes, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "returns",
+                "text": "fork: 0 in the child, the child's PID in the parent.",
+                "code": "pid_t pid = fork()"
+              },
+              {
+                "at": "Exec",
+                "text": "exec replaces the program, keeps the process.",
+                "code": "execvp"
+              },
+              {
+                "at": "zombie",
+                "text": "Zombie: exited, not yet waited for.",
+                "code": "waitpid"
+              },
+              {
+                "at": "cheap",
+                "text": "Copy-on-write: pages are copied on first write.",
+                "code": "fork is cheap, until writes"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

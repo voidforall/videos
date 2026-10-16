@@ -1,0 +1,697 @@
+{
+  "slug": "os-concurrency-bugs",
+  "series": "os",
+  "title": "Concurrency bugs",
+  "kicker": "OS · Concurrency bugs",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/system/os/concurrency-bugs.md",
+  "summary": "Atomicity and order violations, the four conditions for deadlock and how to break them, and priority inversion.",
+  "captionFixes": [
+    {
+      "match": [
+        "high",
+        "priority"
+      ],
+      "display": "high-priority"
+    },
+    {
+      "match": [
+        "medium",
+        "priority"
+      ],
+      "display": "medium-priority"
+    },
+    {
+      "match": [
+        "Two",
+        "standard",
+        "fixes",
+        "are,",
+        "priority"
+      ],
+      "display": "Two standard fixes. Priority"
+    },
+    {
+      "match": [
+        "The",
+        "fixes",
+        "one",
+        "lock"
+      ],
+      "display": "The fix is one lock"
+    },
+    {
+      "match": [
+        "other",
+        "threads",
+        "right"
+      ],
+      "display": "other thread's write"
+    },
+    {
+      "match": [
+        "a",
+        "before",
+        "B"
+      ],
+      "display": "A before B"
+    },
+    {
+      "match": [
+        "live",
+        "lock"
+      ],
+      "display": "livelock"
+    },
+    {
+      "match": [
+        "awaits",
+        "for",
+        "graph"
+      ],
+      "display": "a waits-for graph"
+    },
+    {
+      "match": [
+        "fixes",
+        "are,"
+      ],
+      "display": "fixes."
+    },
+    {
+      "match": [
+        "low"
+      ],
+      "display": "Low"
+    },
+    {
+      "match": [
+        "high"
+      ],
+      "display": "High"
+    },
+    {
+      "match": [
+        "medium"
+      ],
+      "display": "Medium"
+    },
+    {
+      "match": [
+        "high's"
+      ],
+      "display": "High's"
+    },
+    {
+      "match": [
+        "try",
+        "lock"
+      ],
+      "display": "trylock"
+    },
+    {
+      "match": [
+        "Lock",
+        "free"
+      ],
+      "display": "Lock-free"
+    },
+    {
+      "match": [
+        "lock",
+        "step"
+      ],
+      "display": "lockstep"
+    },
+    {
+      "match": [
+        "waits",
+        "for",
+        "graph"
+      ],
+      "display": "waits-for graph"
+    },
+    {
+      "match": [
+        "high",
+        "priority"
+      ],
+      "display": "high-priority"
+    },
+    {
+      "match": [
+        "medium",
+        "priority"
+      ],
+      "display": "medium-priority"
+    },
+    {
+      "match": [
+        "lower",
+        "priority"
+      ],
+      "display": "lower-priority"
+    },
+    {
+      "match": [
+        "higher",
+        "priority"
+      ],
+      "display": "higher-priority"
+    },
+    {
+      "match": [
+        "Open",
+        "Office"
+      ],
+      "display": "OpenOffice"
+    },
+    {
+      "match": [
+        "My",
+        "SQL"
+      ],
+      "display": "MySQL"
+    },
+    {
+      "match": [
+        "standard",
+        "mutex"
+      ],
+      "display": "std::mutex"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Not just deadlock",
+      "question": "Most real-world concurrency bugs aren't deadlocks. What are they?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Concurrency bugs, question one. Most concurrency bugs found in real software aren't deadlocks. So what are they? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Most concurrency bugs aren't deadlocks. <em>What are they?</em>"
+          }
+        },
+        {
+          "type": "code",
+          "say": "A study of real bugs in MySQL, Apache, Mozilla and OpenOffice found 105 concurrency bugs, and 74 of them were not deadlocks. Almost all of those were one of two kinds. An atomicity violation: the code assumes two steps happen together, but they don't. Here one thread checks a pointer, another thread nulls it, and the first thread uses it anyway. The fix is one lock, held around the check and the use, and around the other thread's write. And an order violation: the code assumes one thing happens before another. Here the new thread may read the thread pointer before its creator has stored it. The fix is to enforce the order: wait on a condition variable, until initialization is done.",
+          "props": {
+            "title": "Atomicity and <em>order</em>",
+            "file": "bugs.c",
+            "tag": "non-deadlock",
+            "lang": "cpp",
+            "size": 20,
+            "width": 1210,
+            "code": "// Atomicity violation (MySQL): check, then use, not atomically\nif (thd->proc_info)                       // T1: not NULL...\n    fputs(thd->proc_info, out);           // ...T2 nulls it in between: crash\n// Fix: one lock around the check and the use, and around T2's write\n\n// Order violation (Mozilla): assumes mThread is already set\nvoid init(void)  { mThread = PR_CreateThread(mMain, ...); }\nvoid mMain(void) { mState = mThread->State; }   // may run first: NULL\n// Fix: make the order explicit\npthread_mutex_lock(&m);\nwhile (!mtInit) pthread_cond_wait(&c, &m);      // init sets mtInit, signals\npthread_mutex_unlock(&m);",
+            "highlights": [
+              {
+                "at": "together",
+                "lines": "2-3",
+                "note": "Check and use, not atomic"
+              },
+              {
+                "at": "lock",
+                "lines": "4",
+                "note": "Fix: one lock around both sides"
+              },
+              {
+                "at": "before",
+                "lines": "7-8",
+                "note": "Assumes init already ran"
+              },
+              {
+                "at": "condition",
+                "lines": "10-12",
+                "note": "Fix: wait for the order"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Deadlock",
+      "question": "What four conditions must all hold for deadlock, and which is easiest to break?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. What four conditions must all hold for a deadlock? And which one is easiest to break? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Four conditions for <em>deadlock</em>. Which do you break?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Thread one takes lock A, then wants lock B. Thread two takes lock B, then wants lock A. Each holds what the other needs, so both wait forever. Four conditions must all hold. Mutual exclusion: a lock has one owner. Hold and wait: threads hold locks while waiting for more. No preemption: nobody can take a lock away. And circular wait: a cycle, each thread waiting on the next. Break any one, and deadlock can't happen. The practical one is the cycle. Always acquire locks in one global order, A before B, and no cycle can form.",
+          "props": {
+            "title": "A <em>cycle</em> of waits",
+            "nodes": [
+              {
+                "id": "t1",
+                "label": "thread 1",
+                "x": 420,
+                "y": 320,
+                "w": 220,
+                "h": 80
+              },
+              {
+                "id": "t2",
+                "label": "thread 2",
+                "x": 1150,
+                "y": 600,
+                "w": 220,
+                "h": 80
+              },
+              {
+                "id": "l1",
+                "label": "lock A",
+                "x": 1150,
+                "y": 320,
+                "w": 220,
+                "h": 80
+              },
+              {
+                "id": "l2",
+                "label": "lock B",
+                "x": 420,
+                "y": 600,
+                "w": 220,
+                "h": 80
+              }
+            ],
+            "edges": [],
+            "panels": [],
+            "steps": [
+              {
+                "at": "takes",
+                "add": [
+                  {
+                    "from": "l1",
+                    "to": "t1",
+                    "w": "held by"
+                  }
+                ],
+                "nodes": {
+                  "t1": "active",
+                  "l1": "active"
+                },
+                "note": "Thread 1 holds A"
+              },
+              {
+                "at": "wants",
+                "add": [
+                  {
+                    "from": "t1",
+                    "to": "l2",
+                    "w": "wants"
+                  }
+                ],
+                "nodes": {
+                  "l1": "base"
+                },
+                "edges": {
+                  "t1-l2": "relax"
+                },
+                "note": "…and wants B"
+              },
+              {
+                "at": "takes#2",
+                "add": [
+                  {
+                    "from": "l2",
+                    "to": "t2",
+                    "w": "held by"
+                  }
+                ],
+                "nodes": {
+                  "t1": "base",
+                  "t2": "active",
+                  "l2": "active"
+                },
+                "edges": {
+                  "t1-l2": "base"
+                },
+                "note": "Thread 2 holds B"
+              },
+              {
+                "at": "wants#2",
+                "add": [
+                  {
+                    "from": "t2",
+                    "to": "l1",
+                    "w": "wants"
+                  }
+                ],
+                "nodes": {
+                  "l2": "base"
+                },
+                "edges": {
+                  "t2-l1": "relax"
+                },
+                "note": "…and wants A"
+              },
+              {
+                "at": "forever",
+                "nodes": {
+                  "t1": "queued",
+                  "t2": "queued"
+                },
+                "edges": {
+                  "t2-l1": "relax",
+                  "t1-l2": "relax"
+                },
+                "note": "Both wait forever"
+              },
+              {
+                "at": "Mutual",
+                "edges": {
+                  "t2-l1": "base",
+                  "t1-l2": "base"
+                },
+                "nodes": {
+                  "t1": "base",
+                  "t2": "base"
+                },
+                "note": "1 · Mutual exclusion: one owner"
+              },
+              {
+                "at": "Hold#2",
+                "note": "2 · Hold and wait"
+              },
+              {
+                "at": "preemption",
+                "note": "3 · No preemption"
+              },
+              {
+                "at": "circular",
+                "edges": {
+                  "l1-t1": "relax",
+                  "t1-l2": "relax",
+                  "l2-t2": "relax",
+                  "t2-l1": "relax"
+                },
+                "note": "4 · Circular wait"
+              },
+              {
+                "at": "Break",
+                "edges": {
+                  "l1-t1": "base",
+                  "t1-l2": "base",
+                  "l2-t2": "base",
+                  "t2-l1": "base"
+                },
+                "note": "Break any one → no deadlock"
+              },
+              {
+                "at": "global",
+                "remove": [
+                  "l2-t2"
+                ],
+                "nodes": {
+                  "t1": "done",
+                  "t2": "queued"
+                },
+                "note": "Global order: thread 2 also asks for A first"
+              },
+              {
+                "at": "form",
+                "note": "No cycle. In C++: std::scoped_lock(a, b)"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "The other three can be broken too, at a cost. Take all your locks at once, under one big lock, and hold and wait is gone, but so is concurrency. Use try lock, and if the next lock is busy, release what you hold, and retry, with a random delay, or two threads can retry in lockstep forever: that's livelock. Lock free structures remove mutual exclusion itself. And databases detect cycles in a waits for graph, and abort one victim transaction.",
+          "props": {
+            "title": "Breaking the <em>others</em>",
+            "items": [
+              {
+                "at": "once",
+                "label": "Hold and wait",
+                "title": "All locks at once",
+                "body": "Under one global lock: concurrency suffers.",
+                "code": "coarse locking"
+              },
+              {
+                "at": "release",
+                "label": "No preemption",
+                "title": "trylock, back off",
+                "body": "Add random delays to avoid livelock.",
+                "code": "pthread_mutex_trylock"
+              },
+              {
+                "at": "remove",
+                "label": "Mutual exclusion",
+                "title": "Go lock-free",
+                "body": "No locks to deadlock on; harder code.",
+                "code": "CAS"
+              },
+              {
+                "at": "detect",
+                "label": "Detect, recover",
+                "title": "Find the cycle",
+                "body": "Databases abort a victim transaction.",
+                "code": "waits-for graph"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Priority inversion",
+      "question": "A high-priority thread waits on a lock while a medium-priority thread runs. What went wrong?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. A high priority thread is stuck waiting for a lock, and a medium priority thread is running. What went wrong? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "High waits, <em>Medium</em> runs. What went wrong?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Low takes a lock. High wakes up, and needs the same lock, so it blocks, waiting for Low. Fine so far: Low should finish soon. But then Medium wakes up. It doesn't need the lock at all, but it outranks Low, so it preempts Low, and runs for as long as it likes. Now High is waiting on Medium, a lower priority thread. That's priority inversion. It famously kept resetting the Mars Pathfinder lander, in 1997. The fix is priority inheritance: while Low holds a lock that High wants, Low runs at High's priority, so Medium can't preempt it. Low finishes, releases the lock, and High runs.",
+          "props": {
+            "title": "Priority <em>inversion</em>",
+            "nodes": [
+              {
+                "id": "H",
+                "label": "High",
+                "x": 330,
+                "y": 290,
+                "w": 220,
+                "h": 80
+              },
+              {
+                "id": "M",
+                "label": "Medium",
+                "x": 330,
+                "y": 450,
+                "w": 220,
+                "h": 80
+              },
+              {
+                "id": "L",
+                "label": "Low",
+                "x": 330,
+                "y": 610,
+                "w": 220,
+                "h": 80
+              },
+              {
+                "id": "lock",
+                "label": "lock",
+                "x": 1100,
+                "y": 610,
+                "w": 220,
+                "h": 80
+              }
+            ],
+            "edges": [],
+            "panels": [],
+            "steps": [
+              {
+                "at": "takes",
+                "add": [
+                  {
+                    "from": "lock",
+                    "to": "L",
+                    "w": "held by"
+                  }
+                ],
+                "nodes": {
+                  "L": "active"
+                },
+                "edges": {
+                  "lock-L": "relax"
+                },
+                "note": "Low holds the lock"
+              },
+              {
+                "at": "blocks",
+                "add": [
+                  {
+                    "from": "H",
+                    "to": "lock",
+                    "w": "wants"
+                  }
+                ],
+                "nodes": {
+                  "H": "queued"
+                },
+                "edges": {
+                  "lock-L": "base",
+                  "H-lock": "relax"
+                },
+                "note": "High needs it: blocks, waiting for Low"
+              },
+              {
+                "at": "Fine",
+                "edges": {
+                  "H-lock": "base"
+                },
+                "note": "Fine: Low will be quick"
+              },
+              {
+                "at": "outranks",
+                "nodes": {
+                  "M": "active"
+                },
+                "note": "Medium wakes: outranks Low"
+              },
+              {
+                "at": "preempts",
+                "nodes": {
+                  "L": "dim"
+                },
+                "note": "Medium preempts Low"
+              },
+              {
+                "at": "likes",
+                "note": "…and runs as long as it likes"
+              },
+              {
+                "at": "Now",
+                "nodes": {
+                  "H": "queued"
+                },
+                "edges": {
+                  "H-lock": "relax",
+                  "lock-L": "relax"
+                },
+                "note": "High is effectively waiting on Medium"
+              },
+              {
+                "at": "inversion",
+                "edges": {
+                  "H-lock": "base",
+                  "lock-L": "base"
+                },
+                "note": "Priority inversion"
+              },
+              {
+                "at": "Pathfinder",
+                "note": "Mars Pathfinder, 1997: repeated resets"
+              },
+              {
+                "at": "inheritance",
+                "nodes": {
+                  "L": "active",
+                  "M": "base"
+                },
+                "note": "Inheritance: Low runs at High's priority"
+              },
+              {
+                "at": "releases",
+                "remove": [
+                  "lock-L"
+                ],
+                "nodes": {
+                  "L": "done"
+                },
+                "note": "Low finishes, releases the lock"
+              },
+              {
+                "at": "runs#3",
+                "remove": [
+                  "H-lock"
+                ],
+                "add": [
+                  {
+                    "from": "lock",
+                    "to": "H",
+                    "w": "held by"
+                  }
+                ],
+                "nodes": {
+                  "H": "done"
+                },
+                "edges": {
+                  "lock-H": "tree"
+                },
+                "note": "High gets the lock and runs"
+              }
+            ]
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Two standard fixes. Priority inheritance boosts the holder only while a higher priority thread is waiting. POSIX mutexes offer it as an attribute, and Linux implements it, but a plain standard mutex doesn't use it. A priority ceiling runs any holder of the lock at the highest priority of any thread that uses it, which also prevents some deadlocks. Or design it away: don't share locks across priority levels.",
+          "props": {
+            "title": "Inherit, or <em>ceiling</em>",
+            "left": {
+              "at": "boosts",
+              "label": "Inheritance",
+              "title": "Boost while someone waits",
+              "tone": "good",
+              "body": "The holder borrows the highest waiter's priority."
+            },
+            "right": {
+              "at": "ceiling",
+              "label": "Ceiling",
+              "title": "Always run at the ceiling",
+              "body": "Any holder runs at the lock's ceiling priority."
+            },
+            "verdict": {
+              "at": "plain",
+              "text": "std::mutex does neither: set a pthread mutex protocol.",
+              "code": "PTHREAD_PRIO_INHERIT"
+            }
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Most concurrency bugs are atomicity or order violations: fix them with locks, and condition variables. Deadlock needs four conditions, and a global lock order breaks the cycle. And priority inversion is fixed by letting a lock holder inherit its waiter's priority.",
+          "props": {
+            "title": "Concurrency bugs, <em>in three lines</em>",
+            "items": [
+              {
+                "at": "violations",
+                "text": "Atomicity and order violations: locks, condition variables.",
+                "code": "most real bugs"
+              },
+              {
+                "at": "cycle",
+                "text": "Deadlock: break the cycle with a global lock order.",
+                "code": "std::scoped_lock"
+              },
+              {
+                "at": "inherit",
+                "text": "Priority inversion: the holder inherits priority.",
+                "code": "PTHREAD_PRIO_INHERIT"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

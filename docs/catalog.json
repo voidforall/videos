@@ -22,6 +22,11 @@
       "blurb": "Interview designs drawn as live diagrams: request paths, hash rings, and the failure cases that decide each trade-off."
     },
     {
+      "id": "os",
+      "title": "Operating systems",
+      "blurb": "How one machine is shared: processes and system calls, scheduling, virtual memory and the TLB, page faults, I/O from epoll to io_uring, and the concurrency bugs that bite."
+    },
+    {
       "id": "build",
       "title": "Build it",
       "blurb": "Concrete implementation problems, interview style: the spec, the data structure, the core operation animated, a pause to write it yourself, then the code."
@@ -1764,6 +1769,302 @@
           "duration": 68,
           "video": "media/cpp-memory-layout-03.mp4",
           "poster": "media/cpp-memory-layout-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "os-processes",
+      "series": "os",
+      "title": "Processes",
+      "kicker": "OS · Processes",
+      "summary": "fork, exec and wait; process states, zombies and orphans; and why copy-on-write makes fork cheap.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/system/os/process-basics.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "fork, exec, wait",
+          "question": "What does fork return, and why does a shell fork and then exec?",
+          "duration": 49,
+          "video": "media/os-processes-01.mp4",
+          "poster": "media/os-processes-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "States and zombies",
+          "question": "What is a zombie process, and how do you get rid of one?",
+          "duration": 70,
+          "video": "media/os-processes-02.mp4",
+          "poster": "media/os-processes-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Copy-on-write fork",
+          "question": "fork copies the whole address space. So why is it fast?",
+          "duration": 84,
+          "video": "media/os-processes-03.mp4",
+          "poster": "media/os-processes-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "os-system-calls",
+      "series": "os",
+      "title": "System calls and interrupts",
+      "kicker": "OS · System calls",
+      "summary": "Limited direct execution: user and kernel mode, how a system call traps into the kernel, timer interrupts, and what a context switch costs.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/system/os/direct-execution.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Crossing into the kernel",
+          "question": "A user program can't touch the disk. So how does read() get your bytes?",
+          "duration": 75,
+          "video": "media/os-system-calls-01.mp4",
+          "poster": "media/os-system-calls-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Getting the CPU back",
+          "question": "A process loops forever and never makes a system call. How does the OS get the CPU back?",
+          "duration": 63,
+          "video": "media/os-system-calls-02.mp4",
+          "poster": "media/os-system-calls-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "The context switch",
+          "question": "What happens in a context switch, and why is a process switch dearer than a thread switch?",
+          "duration": 81,
+          "video": "media/os-system-calls-03.mp4",
+          "poster": "media/os-system-calls-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "os-scheduling",
+      "series": "os",
+      "title": "CPU scheduling",
+      "kicker": "OS · CPU scheduling",
+      "summary": "Turnaround versus response time, FIFO, SJF, STCF and round robin, the multi-level feedback queue, Linux's CFS and EEVDF, and multiprocessor run queues.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/system/os/cpu-scheduling.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Turnaround and response",
+          "question": "A 100-second job arrives just before two 10-second jobs. What's the average turnaround under FIFO, and under SJF?",
+          "duration": 82,
+          "video": "media/os-scheduling-01.mp4",
+          "poster": "media/os-scheduling-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "The multi-level feedback queue",
+          "question": "How can a scheduler favour short jobs without knowing how long any job will run?",
+          "duration": 80,
+          "video": "media/os-scheduling-02.mp4",
+          "poster": "media/os-scheduling-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Linux: CFS and EEVDF",
+          "question": "How does Linux decide which task runs next?",
+          "duration": 80,
+          "video": "media/os-scheduling-03.mp4",
+          "poster": "media/os-scheduling-03.jpg"
+        },
+        {
+          "id": "04",
+          "title": "Many CPUs",
+          "question": "With many CPUs, should there be one shared run queue, or one per CPU?",
+          "duration": 81,
+          "video": "media/os-scheduling-04.mp4",
+          "poster": "media/os-scheduling-04.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "os-virtual-memory",
+      "series": "os",
+      "title": "Virtual memory",
+      "kicker": "OS · Virtual memory",
+      "summary": "Why processes get virtual addresses, from base and bounds to paging, how an address is translated, and how malloc manages the heap.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/system/os/virtual-memory.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Why virtual addresses?",
+          "question": "Why not let each process use physical addresses directly?",
+          "duration": 67,
+          "video": "media/os-virtual-memory-01.mp4",
+          "poster": "media/os-virtual-memory-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Translating an address",
+          "question": "How does the hardware turn a virtual address into a physical one?",
+          "duration": 65,
+          "video": "media/os-virtual-memory-02.mp4",
+          "poster": "media/os-virtual-memory-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Inside malloc",
+          "question": "free() takes only a pointer. How does the allocator know how many bytes to free?",
+          "duration": 88,
+          "video": "media/os-virtual-memory-03.mp4",
+          "poster": "media/os-virtual-memory-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "os-tlb",
+      "series": "os",
+      "title": "TLBs and page tables",
+      "kicker": "OS · TLBs and page tables",
+      "summary": "How the TLB makes paging fast, what happens to it on a context switch, multi-level page tables, and when huge pages help.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/system/os/tlb.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "The TLB",
+          "question": "Paging adds a memory lookup to every access. Why isn't everything twice as slow?",
+          "duration": 77,
+          "video": "media/os-tlb-01.mp4",
+          "poster": "media/os-tlb-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "TLBs and context switches",
+          "question": "After a context switch, the TLB still holds the old process's translations. What can the OS do?",
+          "duration": 71,
+          "video": "media/os-tlb-02.mp4",
+          "poster": "media/os-tlb-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Multi-level page tables",
+          "question": "A flat page table is 4 MB per process. How do real systems make it smaller?",
+          "duration": 58,
+          "video": "media/os-tlb-03.mp4",
+          "poster": "media/os-tlb-03.jpg"
+        },
+        {
+          "id": "04",
+          "title": "Huge pages",
+          "question": "When do huge pages help, and why do some databases say to turn them off?",
+          "duration": 89,
+          "video": "media/os-tlb-04.mp4",
+          "poster": "media/os-tlb-04.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "os-swapping",
+      "series": "os",
+      "title": "Page faults and swapping",
+      "kicker": "OS · Page faults and swapping",
+      "summary": "What happens on a page fault, minor versus major faults, page replacement from FIFO to the clock algorithm, dirty pages, and thrashing.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/system/os/swapping.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "The page fault",
+          "question": "What happens when a program touches a page that isn't in memory?",
+          "duration": 77,
+          "video": "media/os-swapping-01.mp4",
+          "poster": "media/os-swapping-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Which page to evict?",
+          "question": "Memory is full and a page must go. Which one should the OS evict?",
+          "duration": 67,
+          "video": "media/os-swapping-02.mp4",
+          "poster": "media/os-swapping-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Dirty pages and thrashing",
+          "question": "Why does a machine that runs out of memory grind to a halt instead of slowing down a little?",
+          "duration": 74,
+          "video": "media/os-swapping-03.mp4",
+          "poster": "media/os-swapping-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "os-io",
+      "series": "os",
+      "title": "I/O",
+      "kicker": "OS · I/O",
+      "summary": "What read() and write() really do, the page cache and writeback, select and poll versus epoll, io_uring, and zero-copy with sendfile.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/interview/os-io.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "A read(), end to end",
+          "question": "What happens between calling read() on a file and getting the bytes back?",
+          "duration": 72,
+          "video": "media/os-io-01.mp4",
+          "poster": "media/os-io-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "select, poll, epoll",
+          "question": "Ten thousand connections, ten of them active. Why does epoll scale when poll doesn't?",
+          "duration": 73,
+          "video": "media/os-io-02.mp4",
+          "poster": "media/os-io-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "io_uring",
+          "question": "How does io_uring do I/O without a system call per operation?",
+          "duration": 72,
+          "video": "media/os-io-03.mp4",
+          "poster": "media/os-io-03.jpg"
+        },
+        {
+          "id": "04",
+          "title": "Zero-copy",
+          "question": "Serving a file over a socket with read and write: how many copies, and how does sendfile cut them?",
+          "duration": 94,
+          "video": "media/os-io-04.mp4",
+          "poster": "media/os-io-04.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "os-concurrency-bugs",
+      "series": "os",
+      "title": "Concurrency bugs",
+      "kicker": "OS · Concurrency bugs",
+      "summary": "Atomicity and order violations, the four conditions for deadlock and how to break them, and priority inversion.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/system/os/concurrency-bugs.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Not just deadlock",
+          "question": "Most real-world concurrency bugs aren't deadlocks. What are they?",
+          "duration": 55,
+          "video": "media/os-concurrency-bugs-01.mp4",
+          "poster": "media/os-concurrency-bugs-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Deadlock",
+          "question": "What four conditions must all hold for deadlock, and which is easiest to break?",
+          "duration": 72,
+          "video": "media/os-concurrency-bugs-02.mp4",
+          "poster": "media/os-concurrency-bugs-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Priority inversion",
+          "question": "A high-priority thread waits on a lock while a medium-priority thread runs. What went wrong?",
+          "duration": 95,
+          "video": "media/os-concurrency-bugs-03.mp4",
+          "poster": "media/os-concurrency-bugs-03.jpg"
         }
       ]
     }

@@ -1,0 +1,519 @@
+{
+  "slug": "os-virtual-memory",
+  "series": "os",
+  "title": "Virtual memory",
+  "kicker": "OS · Virtual memory",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/system/os/virtual-memory.md",
+  "summary": "Why processes get virtual addresses, from base and bounds to paging, how an address is translated, and how malloc manages the heap.",
+  "captionFixes": [
+    {
+      "match": [
+        "memory,",
+        "addresses"
+      ],
+      "display": "memory addresses"
+    },
+    {
+      "match": [
+        "user",
+        "accessed",
+        "and",
+        "dirty"
+      ],
+      "display": "user, accessed, and dirty"
+    },
+    {
+      "match": [
+        "2",
+        "to",
+        "the",
+        "20"
+      ],
+      "display": "2²⁰"
+    },
+    {
+      "match": [
+        "Glibc"
+      ],
+      "display": "glibc",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "that",
+        "fits",
+        "fast"
+      ],
+      "display": "that fits: fast"
+    },
+    {
+      "match": [
+        "m",
+        "map"
+      ],
+      "display": "mmap"
+    },
+    {
+      "match": [
+        "M",
+        "map"
+      ],
+      "display": "mmap"
+    },
+    {
+      "match": [
+        "multi",
+        "level"
+      ],
+      "display": "multi-level"
+    },
+    {
+      "match": [
+        "Multi",
+        "level"
+      ],
+      "display": "Multi-level"
+    },
+    {
+      "match": [
+        "variable",
+        "sized"
+      ],
+      "display": "variable-sized"
+    },
+    {
+      "match": [
+        "fixed",
+        "size"
+      ],
+      "display": "fixed-size"
+    },
+    {
+      "match": [
+        "two",
+        "to",
+        "the",
+        "twenty"
+      ],
+      "display": "2^20"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Why virtual addresses?",
+      "question": "Why not let each process use physical addresses directly?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Virtual memory, question one. Why not let each process use physical memory addresses directly? What does the extra layer buy? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Why not use <em>physical</em> addresses directly?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Three goals. Transparency: each process sees its own private address space, as if it had the machine to itself. Protection: a process can't even name another process's memory, let alone corrupt it. And efficiency: translation happens in hardware, on every access, so it has to be fast. The first hardware did it with base and bounds: add a base register to every address, and fault if it's past the bound.",
+          "props": {
+            "title": "What the layer <em>buys</em>",
+            "items": [
+              {
+                "at": "Transparency",
+                "label": "Transparency",
+                "title": "A private address space",
+                "body": "Every process: the same layout, its own memory.",
+                "code": "code · heap · stack"
+              },
+              {
+                "at": "Protection",
+                "label": "Protection",
+                "title": "Isolation",
+                "body": "Another process's memory can't even be named.",
+                "code": "no shared addresses"
+              },
+              {
+                "at": "efficiency",
+                "label": "Efficiency",
+                "title": "In hardware",
+                "body": "Translated on every load and store.",
+                "code": "MMU"
+              },
+              {
+                "at": "base",
+                "label": "Base and bounds",
+                "title": "The first design",
+                "body": "physical = virtual + base; fault past bound.",
+                "code": "one pair per process"
+              }
+            ]
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Base and bounds keeps the whole address space contiguous, including the empty gap between heap and stack. Segmentation gives each segment, code, heap and stack, its own base and bounds, so the gap costs nothing. But variable sized segments fragment physical memory, into holes too small to use. Paging cuts everything into fixed size pages. Any free frame fits any page, so external fragmentation disappears. That's what every modern system uses.",
+          "props": {
+            "title": "Segments or <em>pages</em>",
+            "left": {
+              "at": "Segmentation",
+              "label": "Segmentation",
+              "title": "Variable-sized pieces",
+              "body": "Base + bounds per segment. Physical memory fragments into unusable holes."
+            },
+            "right": {
+              "at": "Paging",
+              "label": "Paging",
+              "title": "Fixed-size pages",
+              "tone": "good",
+              "body": "Any free frame fits any page: no external fragmentation."
+            },
+            "verdict": {
+              "at": "modern",
+              "text": "Every modern OS pages (usually 4 KB).",
+              "code": "getconf PAGESIZE"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Translating an address",
+      "question": "How does the hardware turn a virtual address into a physical one?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. A load from a virtual address. How does the hardware turn it into a physical address? Pause and walk through it out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Virtual address → <em>physical</em> address: how?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Take a 32 bit address, with four kilobyte pages. The low twelve bits are the offset within the page. The top twenty bits are the virtual page number. The hardware uses the page number as an index into this process's page table, whose location sits in a register. The entry holds a physical frame number, plus control bits: present, writable, user, accessed, and dirty. The frame number replaces the page number, the offset is copied unchanged, and that's the physical address. If the entry isn't present, or the access breaks its permissions, the CPU raises a page fault instead.",
+          "props": {
+            "title": "Page number, <em>offset</em>",
+            "nodes": [
+              {
+                "id": "va",
+                "label": "virtual address\n0x00403008",
+                "x": 380,
+                "y": 290,
+                "w": 360,
+                "h": 96
+              },
+              {
+                "id": "vpn",
+                "label": "page number\n0x00403 (top 20 bits)",
+                "x": 380,
+                "y": 570,
+                "w": 360,
+                "h": 96,
+                "hidden": true
+              },
+              {
+                "id": "off",
+                "label": "offset\n0x008 (low 12 bits)",
+                "x": 960,
+                "y": 290,
+                "w": 340,
+                "h": 96,
+                "hidden": true
+              },
+              {
+                "id": "pte",
+                "label": "page table[0x00403]\nframe 0x001FF · P W U A D",
+                "x": 960,
+                "y": 570,
+                "w": 420,
+                "h": 96,
+                "hidden": true
+              },
+              {
+                "id": "pa",
+                "label": "physical address\n0x001FF008",
+                "x": 1540,
+                "y": 290,
+                "w": 360,
+                "h": 96,
+                "hidden": true
+              }
+            ],
+            "edges": [],
+            "panels": [],
+            "steps": [
+              {
+                "at": "address",
+                "nodes": {
+                  "va": "active"
+                },
+                "note": "32-bit address, 4 KB pages"
+              },
+              {
+                "at": "offset",
+                "show": [
+                  "off"
+                ],
+                "add": [
+                  {
+                    "from": "va",
+                    "to": "off"
+                  }
+                ],
+                "nodes": {
+                  "va": "base",
+                  "off": "active"
+                },
+                "note": "Low 12 bits: offset within the page"
+              },
+              {
+                "at": "number",
+                "show": [
+                  "vpn"
+                ],
+                "add": [
+                  {
+                    "from": "va",
+                    "to": "vpn"
+                  }
+                ],
+                "nodes": {
+                  "off": "base",
+                  "vpn": "active"
+                },
+                "note": "Top 20 bits: virtual page number"
+              },
+              {
+                "at": "index",
+                "show": [
+                  "pte"
+                ],
+                "add": [
+                  {
+                    "from": "vpn",
+                    "to": "pte",
+                    "w": "index"
+                  }
+                ],
+                "nodes": {
+                  "vpn": "base",
+                  "pte": "active"
+                },
+                "edges": {
+                  "vpn-pte": "relax"
+                },
+                "note": "Index this process's page table"
+              },
+              {
+                "at": "register",
+                "note": "Table location: a register (CR3 on x86)"
+              },
+              {
+                "at": "control",
+                "note": "Present · Writable · User · Accessed · Dirty"
+              },
+              {
+                "at": "replaces",
+                "show": [
+                  "pa"
+                ],
+                "add": [
+                  {
+                    "from": "pte",
+                    "to": "pa",
+                    "w": "frame"
+                  }
+                ],
+                "nodes": {
+                  "pte": "base",
+                  "pa": "active"
+                },
+                "edges": {
+                  "vpn-pte": "base",
+                  "pte-pa": "relax"
+                },
+                "note": "Frame number replaces page number"
+              },
+              {
+                "at": "unchanged",
+                "add": [
+                  {
+                    "from": "off",
+                    "to": "pa",
+                    "w": "offset"
+                  }
+                ],
+                "nodes": {
+                  "pa": "done"
+                },
+                "edges": {
+                  "pte-pa": "tree",
+                  "off-pa": "tree"
+                },
+                "note": "Offset copied unchanged: 0x001FF008"
+              },
+              {
+                "at": "permissions",
+                "nodes": {
+                  "pte": "queued"
+                },
+                "note": "Not present, or not allowed → page fault"
+              }
+            ]
+          }
+        },
+        {
+          "type": "compare",
+          "say": "This flat table has two problems. Space: two to the twenty entries, four bytes each, is four megabytes per process, mostly empty. And time: every load and store now needs an extra memory access, to read the entry first. Multi level tables fix the space, and the TLB fixes the time.",
+          "props": {
+            "title": "Two <em>costs</em>",
+            "left": {
+              "at": "Space",
+              "label": "Space",
+              "title": "4 MB per process",
+              "body": "2²⁰ entries × 4 bytes, mostly describing nothing."
+            },
+            "right": {
+              "at": "time",
+              "label": "Time",
+              "title": "An extra access",
+              "body": "Read the entry before every load and store."
+            },
+            "verdict": {
+              "at": "fix",
+              "text": "Multi-level tables fix space; the TLB fixes time.",
+              "code": "next: TLBs and page tables"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Inside malloc",
+      "question": "free() takes only a pointer. How does the allocator know how many bytes to free?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. Free takes only a pointer, no size. So how does the allocator know how many bytes it's getting back? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "free() gets no size. How does it <em>know</em>?"
+          }
+        },
+        {
+          "type": "code",
+          "say": "The allocator hides a small header just before every block it hands out. Malloc takes a chunk from its free list, splitting a bigger one if needed, writes the size into the header, and returns the address just past it. Free steps back one header, and reads the size. A magic number catches pointers malloc never returned. The chunk goes back on the free list, and merges with free neighbours, so the heap doesn't crumble into small pieces.",
+          "props": {
+            "title": "A <em>header</em> before every block",
+            "file": "alloc.c",
+            "tag": "malloc",
+            "lang": "cpp",
+            "size": 21,
+            "width": 1190,
+            "code": "typedef struct { size_t size; uint32_t magic; } header_t;\n\nvoid* my_malloc(size_t n) {\n    header_t* h = take_chunk(n + sizeof(header_t));  // split a bigger free chunk\n    h->size = n;\n    h->magic = MAGIC;\n    return h + 1;                     // user memory starts after the header\n}\n\nvoid my_free(void* p) {\n    header_t* h = (header_t*)p - 1;   // step back to the header\n    assert(h->magic == MAGIC);        // catch bad pointers and double frees\n    give_back(h, h->size + sizeof(header_t));\n    coalesce(h);                      // merge with free neighbours\n}",
+            "highlights": [
+              {
+                "at": "hides",
+                "lines": "1",
+                "note": "Size lives in a hidden header"
+              },
+              {
+                "at": "splitting",
+                "lines": "4",
+                "note": "Take a chunk, splitting if needed"
+              },
+              {
+                "at": "past",
+                "lines": "7",
+                "note": "Return the address after the header"
+              },
+              {
+                "at": "steps",
+                "lines": "11",
+                "note": "free: step back one header"
+              },
+              {
+                "at": "magic",
+                "lines": "12",
+                "note": "Catch bad and double frees"
+              },
+              {
+                "at": "merges",
+                "lines": "13-14",
+                "note": "Coalesce with free neighbours"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "Which free chunk should it take? Best fit searches for the smallest that fits: little waste, but a slow search. First fit takes the first that fits: fast. Real allocators keep separate lists per size class, like the kernel's slab allocator for common objects. And the buddy allocator splits memory in powers of two, so a freed block merges with its buddy cheaply, at the cost of rounding sizes up. Big blocks skip all this: glibc maps them directly with m map, from 128 kilobytes by default.",
+          "props": {
+            "title": "Choosing a <em>chunk</em>",
+            "items": [
+              {
+                "at": "Best",
+                "label": "Best fit",
+                "title": "Smallest that fits",
+                "body": "Little waste; searches the whole list.",
+                "code": "slow"
+              },
+              {
+                "at": "First",
+                "label": "First fit",
+                "title": "First that fits",
+                "body": "Fast; small fragments pile up at the front.",
+                "code": "next fit spreads them"
+              },
+              {
+                "at": "class",
+                "label": "Size classes",
+                "title": "A list per size",
+                "body": "Kernel slab caches; tcmalloc, jemalloc.",
+                "code": "no search at all"
+              },
+              {
+                "at": "buddy",
+                "label": "Buddy",
+                "title": "Powers of two",
+                "body": "Cheap merging; sizes rounded up.",
+                "code": "Linux page allocator"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Virtual memory gives every process a private, protected address space. Paging uses fixed size pages, so any frame fits any page. A virtual address is a page number and an offset, and the page table maps the number to a frame. And malloc keeps each block's size in a header, just before the pointer.",
+          "props": {
+            "title": "Virtual memory, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "private",
+                "text": "Private, protected address spaces.",
+                "code": "transparency · isolation"
+              },
+              {
+                "at": "Paging",
+                "text": "Paging: fixed-size pages, any frame fits.",
+                "code": "no external fragmentation"
+              },
+              {
+                "at": "maps",
+                "text": "Page number → frame; the offset is kept.",
+                "code": "PTE: P W U A D"
+              },
+              {
+                "at": "header",
+                "text": "malloc keeps the size in a header.",
+                "code": "free(p): look at p − 1"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1003 @@
+{
+  "slug": "os-scheduling",
+  "series": "os",
+  "title": "CPU scheduling",
+  "kicker": "OS · CPU scheduling",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/system/os/cpu-scheduling.md",
+  "summary": "Turnaround versus response time, FIFO, SJF, STCF and round robin, the multi-level feedback queue, Linux's CFS and EEVDF, and multiprocessor run queues.",
+  "captionFixes": [
+    {
+      "match": [
+        "S.J.F.",
+        "and",
+        "S.D.C.F.",
+        "optimize"
+      ],
+      "display": "SJF and STCF optimize"
+    },
+    {
+      "match": [
+        "is",
+        "in",
+        "balance"
+      ],
+      "display": "is imbalance"
+    },
+    {
+      "match": [
+        "S.J.F.",
+        "and",
+        "S.D.C.F."
+      ],
+      "display": "SJF and STCF"
+    },
+    {
+      "match": [
+        "M.L.F.Q.",
+        "learns"
+      ],
+      "display": "MLFQ learns"
+    },
+    {
+      "match": [
+        "E.E.V.D.F.",
+        "and"
+      ],
+      "display": "EEVDF, and"
+    },
+    {
+      "match": [
+        "100",
+        "second",
+        "job",
+        "(a)",
+        "arrives"
+      ],
+      "display": "100-second job, A, arrives"
+    },
+    {
+      "match": [
+        "two",
+        "10",
+        "second",
+        "jobs",
+        "(b",
+        "and",
+        "c)"
+      ],
+      "display": "two 10-second jobs, B and C."
+    },
+    {
+      "match": [
+        "first",
+        "in,",
+        "first",
+        "out",
+        "runs",
+        "a",
+        "first"
+      ],
+      "display": "First in, first out runs A first"
+    },
+    {
+      "match": [
+        "20,",
+        "and",
+        "at",
+        "120"
+      ],
+      "display": "20, and A at 120"
+    },
+    {
+      "match": [
+        "if",
+        "a",
+        "starts"
+      ],
+      "display": "if A starts"
+    },
+    {
+      "match": [
+        "JobR"
+      ],
+      "display": "Job A"
+    },
+    {
+      "match": [
+        "syncs"
+      ],
+      "display": "sinks"
+    },
+    {
+      "match": [
+        "sync"
+      ],
+      "display": "sink"
+    },
+    {
+      "match": [
+        "But",
+        "jobs",
+        "finish"
+      ],
+      "display": "Short jobs finish"
+    },
+    {
+      "match": [
+        "2",
+        "loop",
+        "holes",
+        "are"
+      ],
+      "display": "Two loopholes."
+    },
+    {
+      "match": [
+        "starve",
+        "at",
+        "the",
+        "bottom"
+      ],
+      "display": "starve A at the bottom"
+    },
+    {
+      "match": [
+        "S.D.C.F."
+      ],
+      "display": "STCF"
+    },
+    {
+      "match": [
+        "S.J.F."
+      ],
+      "display": "SJF"
+    },
+    {
+      "match": [
+        "M.L.F.Q."
+      ],
+      "display": "MLFQ"
+    },
+    {
+      "match": [
+        "E.E.V.D.F."
+      ],
+      "display": "EEVDF"
+    },
+    {
+      "match": [
+        "Round",
+        "Robin"
+      ],
+      "display": "round robin",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "1",
+        "Q",
+        "each"
+      ],
+      "display": "one queue each"
+    },
+    {
+      "match": [
+        "threads",
+        "affinity"
+      ],
+      "display": "thread's affinity"
+    },
+    {
+      "match": [
+        "S",
+        "J",
+        "F"
+      ],
+      "display": "SJF"
+    },
+    {
+      "match": [
+        "M",
+        "L",
+        "F",
+        "Q"
+      ],
+      "display": "MLFQ"
+    },
+    {
+      "match": [
+        "E",
+        "E",
+        "V",
+        "D",
+        "F"
+      ],
+      "display": "EEVDF"
+    },
+    {
+      "match": [
+        "first",
+        "in,",
+        "first",
+        "out"
+      ],
+      "display": "first in, first out"
+    },
+    {
+      "match": [
+        "multi",
+        "level"
+      ],
+      "display": "multi-level"
+    },
+    {
+      "match": [
+        "CPU",
+        "bound"
+      ],
+      "display": "CPU-bound"
+    },
+    {
+      "match": [
+        "red",
+        "black"
+      ],
+      "display": "red-black"
+    },
+    {
+      "match": [
+        "six",
+        "point",
+        "six"
+      ],
+      "display": "6.6"
+    },
+    {
+      "match": [
+        "one",
+        "point",
+        "two",
+        "five"
+      ],
+      "display": "1.25"
+    },
+    {
+      "match": [
+        "per",
+        "CPU"
+      ],
+      "display": "per-CPU"
+    },
+    {
+      "match": [
+        "time",
+        "to",
+        "completion"
+      ],
+      "display": "time-to-completion"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Turnaround and response",
+      "question": "A 100-second job arrives just before two 10-second jobs. What's the average turnaround under FIFO, and under SJF?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "CPU scheduling, question one. A 100 second job, A, arrives just before two 10 second jobs, B and C. What's the average turnaround time under first in, first out? And under shortest job first? Pause and work it out.",
+          "pauseAfter": 4,
+          "props": {
+            "question": "A 100 s job, then two 10 s jobs. Average <em>turnaround</em>: FIFO vs SJF?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Turnaround time is when a job finishes, minus when it arrived. First in, first out runs A first. B waits behind it, and finishes at 110 seconds, C at 120. The average turnaround is 110 seconds. That's the convoy effect: short jobs stuck behind a long one. Shortest job first runs B and C first. They finish at 10 and 20, and A at 120, so the average is 50 seconds. When all jobs arrive together, that's optimal.",
+          "props": {
+            "title": "The <em>convoy</em> effect",
+            "nodes": [
+              {
+                "id": "fifo",
+                "label": "FIFO",
+                "x": 190,
+                "y": 330,
+                "w": 170,
+                "h": 72,
+                "hidden": true
+              },
+              {
+                "id": "sjf",
+                "label": "SJF",
+                "x": 190,
+                "y": 560,
+                "w": 170,
+                "h": 72,
+                "hidden": true
+              },
+              {
+                "id": "fA",
+                "label": "A · 100 s",
+                "x": 880.0,
+                "y": 330,
+                "w": 1100,
+                "h": 72,
+                "hidden": true
+              },
+              {
+                "id": "fB",
+                "label": "B",
+                "x": 1485.0,
+                "y": 330,
+                "w": 110,
+                "h": 72,
+                "hidden": true
+              },
+              {
+                "id": "fC",
+                "label": "C",
+                "x": 1595.0,
+                "y": 330,
+                "w": 110,
+                "h": 72,
+                "hidden": true
+              },
+              {
+                "id": "sB",
+                "label": "B",
+                "x": 385.0,
+                "y": 560,
+                "w": 110,
+                "h": 72,
+                "hidden": true
+              },
+              {
+                "id": "sC",
+                "label": "C",
+                "x": 495.0,
+                "y": 560,
+                "w": 110,
+                "h": 72,
+                "hidden": true
+              },
+              {
+                "id": "sA",
+                "label": "A · 100 s",
+                "x": 1100.0,
+                "y": 560,
+                "w": 1100,
+                "h": 72,
+                "hidden": true
+              }
+            ],
+            "edges": [],
+            "panels": [],
+            "steps": [
+              {
+                "at": "out",
+                "show": [
+                  "fifo",
+                  "fA"
+                ],
+                "nodes": {
+                  "fifo": "base",
+                  "fA": "active"
+                },
+                "note": "FIFO: A runs first, for 100 s"
+              },
+              {
+                "at": "waits",
+                "show": [
+                  "fB"
+                ],
+                "nodes": {
+                  "fA": "done",
+                  "fB": "active"
+                },
+                "note": "B finishes at 110 s"
+              },
+              {
+                "at": "120",
+                "show": [
+                  "fC"
+                ],
+                "nodes": {
+                  "fB": "done",
+                  "fC": "done"
+                },
+                "note": "C finishes at 120 s"
+              },
+              {
+                "at": "average",
+                "note": "(100 + 110 + 120) / 3 = 110 s"
+              },
+              {
+                "at": "convoy",
+                "nodes": {
+                  "fB": "queued",
+                  "fC": "queued"
+                },
+                "note": "Convoy: short jobs stuck behind a long one"
+              },
+              {
+                "at": "Shortest",
+                "show": [
+                  "sjf",
+                  "sB",
+                  "sC"
+                ],
+                "nodes": {
+                  "sB": "done",
+                  "sC": "done"
+                },
+                "note": "SJF: B and C first, done at 10 s and 20 s"
+              },
+              {
+                "at": "120#2",
+                "show": [
+                  "sA"
+                ],
+                "nodes": {
+                  "sA": "done"
+                },
+                "note": "A finishes at 120 s"
+              },
+              {
+                "at": "50",
+                "note": "(10 + 20 + 120) / 3 = 50 s"
+              },
+              {
+                "at": "optimal",
+                "note": "Optimal, when all jobs arrive together"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "But if A starts first, and B and C arrive ten seconds later, S J F is stuck again. Shortest time to completion first preempts: whenever a job arrives, it runs whichever job has the least time left. But turnaround isn't everything. Response time is the wait from arrival to first run, and it's what an interactive user feels. Round robin runs each job for a short time slice, in turn. Its response time is excellent, but its turnaround is close to the worst possible. And the slice length is a trade-off: shorter means snappier, but more context switches.",
+          "props": {
+            "title": "Turnaround or <em>response</em>?",
+            "items": [
+              {
+                "at": "preempts",
+                "label": "STCF",
+                "title": "Preemptive SJF",
+                "body": "On each arrival, run the least time left.",
+                "code": "optimal turnaround"
+              },
+              {
+                "at": "Response",
+                "label": "Response time",
+                "title": "Arrival → first run",
+                "body": "What an interactive user feels.",
+                "code": "T_first_run − T_arrival"
+              },
+              {
+                "at": "Round",
+                "label": "Round robin",
+                "title": "Take turns, one slice each",
+                "body": "Great response, near-worst turnaround.",
+                "code": "3 × 5 s jobs, 1 s slices: 1 s vs 14 s"
+              },
+              {
+                "at": "length",
+                "label": "Time slice",
+                "title": "A trade-off",
+                "body": "Shorter: snappier, but more switches.",
+                "code": "amortize the switch"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "The multi-level feedback queue",
+      "question": "How can a scheduler favour short jobs without knowing how long any job will run?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. Shortest job first needs to know how long each job will run, and the OS never knows. So how can a scheduler still favour short, interactive jobs? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Favour short jobs, <em>without knowing</em> job lengths?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "A multi level feedback queue keeps several queues, by priority. A higher queue always runs first, and jobs in the same queue take turns. Every new job starts at the top, as if it were short. Job A is CPU bound. It uses up its time allotment at the top, so it's demoted, and demoted again, until it sinks to the bottom. Job B is interactive. It runs briefly, then waits for input, so it stays at the top, and responds quickly. Short jobs finish before they sink, so this approximates shortest job first, without knowing any lengths.",
+          "props": {
+            "title": "Learn from <em>behaviour</em>",
+            "nodes": [
+              {
+                "id": "q2",
+                "label": "Q2 · high",
+                "x": 260,
+                "y": 300,
+                "w": 260,
+                "h": 80
+              },
+              {
+                "id": "q1",
+                "label": "Q1",
+                "x": 260,
+                "y": 450,
+                "w": 260,
+                "h": 80
+              },
+              {
+                "id": "q0",
+                "label": "Q0 · low",
+                "x": 260,
+                "y": 600,
+                "w": 260,
+                "h": 80
+              },
+              {
+                "id": "A",
+                "label": "A",
+                "x": 760,
+                "y": 300,
+                "hidden": true
+              },
+              {
+                "id": "B",
+                "label": "B",
+                "x": 1060,
+                "y": 300,
+                "hidden": true
+              }
+            ],
+            "edges": [],
+            "panels": [],
+            "steps": [
+              {
+                "at": "priority",
+                "nodes": {
+                  "q2": "active",
+                  "q1": "base",
+                  "q0": "base"
+                },
+                "note": "Queues, by priority"
+              },
+              {
+                "at": "first",
+                "note": "Rule 1: a higher queue always runs first"
+              },
+              {
+                "at": "turns",
+                "note": "Rule 2: same queue → round robin"
+              },
+              {
+                "at": "top",
+                "show": [
+                  "A"
+                ],
+                "nodes": {
+                  "A": "queued"
+                },
+                "note": "Rule 3: new jobs start at the top"
+              },
+              {
+                "at": "allotment",
+                "nodes": {
+                  "A": "active"
+                },
+                "note": "A uses up its allotment at this level…"
+              },
+              {
+                "at": "demoted",
+                "move": {
+                  "A": [
+                    760,
+                    450
+                  ]
+                },
+                "nodes": {
+                  "q2": "base",
+                  "q1": "active"
+                },
+                "note": "Rule 4: …so it's demoted"
+              },
+              {
+                "at": "demoted#2",
+                "move": {
+                  "A": [
+                    760,
+                    600
+                  ]
+                },
+                "nodes": {
+                  "q1": "base",
+                  "q0": "active"
+                },
+                "note": "…and again"
+              },
+              {
+                "at": "bottom",
+                "nodes": {
+                  "A": "dim",
+                  "q0": "base"
+                },
+                "note": "CPU-bound jobs sink to the bottom"
+              },
+              {
+                "at": "interactive",
+                "show": [
+                  "B"
+                ],
+                "nodes": {
+                  "B": "active",
+                  "q2": "active"
+                },
+                "note": "B: a short burst, then waits for input"
+              },
+              {
+                "at": "responds",
+                "nodes": {
+                  "B": "done"
+                },
+                "note": "B stays on top: fast response"
+              },
+              {
+                "at": "lengths",
+                "nodes": {
+                  "A": "base",
+                  "q2": "base"
+                },
+                "note": "≈ SJF, with no job lengths"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "Two loopholes. Interactive jobs can starve A at the bottom forever, and a job that turns interactive never climbs back. So every so often, a priority boost moves every job to the top. And a job could game the scheduler, giving up the CPU just before its slice ends, to stay on top. So the allotment counts all the CPU time used at a level, however often the job gives the CPU up. The number of queues, the slices, and the boost period all need tuning. BSD, Solaris and Windows all use variants of this design.",
+          "props": {
+            "title": "Closing the <em>loopholes</em>",
+            "items": [
+              {
+                "at": "starve",
+                "label": "Starvation",
+                "title": "Priority boost",
+                "body": "Every period S, move all jobs to the top.",
+                "code": "Rule 5"
+              },
+              {
+                "at": "game",
+                "label": "Gaming",
+                "title": "Count all CPU time",
+                "body": "The allotment covers all time used at a level.",
+                "code": "Rule 4, revised"
+              },
+              {
+                "at": "tuning",
+                "label": "Tuning",
+                "title": "Voodoo constants",
+                "body": "Queues, slice per level, boost period.",
+                "code": "short slices up top"
+              },
+              {
+                "at": "variants",
+                "label": "In practice",
+                "title": "Widely used",
+                "body": "BSD, Solaris and Windows use variants.",
+                "code": "MLFQ"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Linux: CFS and EEVDF",
+      "question": "How does Linux decide which task runs next?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. Linux has no priority queues for normal tasks. So how does it decide which task runs next? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How does <em>Linux</em> pick the next task?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Linux tracks a virtual runtime for every task: the CPU time it has used, scaled by its weight. Runnable tasks sit in a red black tree, ordered by virtual runtime, and the scheduler picks the leftmost: the task that has had the least. Task D runs, and its virtual runtime grows from 20 to 60. It's no longer the smallest, so it goes back into the tree, further right. Now B is the leftmost, and runs next. Over time, every task gets its fair share.",
+          "props": {
+            "title": "Least runtime <em>runs next</em>",
+            "nodes": [
+              {
+                "id": "A",
+                "label": "A",
+                "x": 640,
+                "y": 290
+              },
+              {
+                "id": "B",
+                "label": "B",
+                "x": 420,
+                "y": 440
+              },
+              {
+                "id": "C",
+                "label": "C",
+                "x": 860,
+                "y": 440
+              },
+              {
+                "id": "D",
+                "label": "D",
+                "x": 300,
+                "y": 590
+              },
+              {
+                "id": "E",
+                "label": "E",
+                "x": 540,
+                "y": 590
+              }
+            ],
+            "edges": [
+              {
+                "from": "A",
+                "to": "B"
+              },
+              {
+                "from": "A",
+                "to": "C"
+              },
+              {
+                "from": "B",
+                "to": "D"
+              },
+              {
+                "from": "B",
+                "to": "E"
+              }
+            ],
+            "panels": [
+              {
+                "key": "vr",
+                "label": "vruntime",
+                "type": "table",
+                "initial": {}
+              }
+            ],
+            "steps": [
+              {
+                "at": "virtual",
+                "panels": {
+                  "vr": {
+                    "A": "50",
+                    "B": "30",
+                    "C": "70",
+                    "D": "20",
+                    "E": "40"
+                  }
+                },
+                "note": "vruntime: CPU time used ÷ weight"
+              },
+              {
+                "at": "tree",
+                "note": "A red-black tree, ordered by vruntime"
+              },
+              {
+                "at": "leftmost",
+                "nodes": {
+                  "D": "active"
+                },
+                "edges": {
+                  "A-B": "relax",
+                  "B-D": "relax"
+                },
+                "note": "Pick the leftmost: least vruntime"
+              },
+              {
+                "at": "grows",
+                "panels": {
+                  "vr": {
+                    "D": "60"
+                  }
+                },
+                "edges": {
+                  "A-B": "base",
+                  "B-D": "base"
+                },
+                "note": "D runs: 20 → 60"
+              },
+              {
+                "at": "further",
+                "remove": [
+                  "B-D"
+                ],
+                "add": [
+                  {
+                    "from": "C",
+                    "to": "D"
+                  }
+                ],
+                "move": {
+                  "D": [
+                    760,
+                    590
+                  ]
+                },
+                "nodes": {
+                  "D": "base"
+                },
+                "note": "Re-inserted further right"
+              },
+              {
+                "at": "Now",
+                "nodes": {
+                  "B": "active"
+                },
+                "edges": {
+                  "A-B": "relax"
+                },
+                "note": "Now B is leftmost"
+              },
+              {
+                "at": "share",
+                "nodes": {
+                  "B": "base"
+                },
+                "edges": {
+                  "A-B": "base"
+                },
+                "note": "Over time: a fair share for everyone"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "Weights come from nice values. Each nice step is worth about ten percent of CPU, a factor of one point two five in weight, and a heavier task's virtual runtime grows more slowly. A task that slept, waiting for input, has fallen behind, so it runs soon after it wakes. That was the completely fair scheduler. Since Linux six point six, the default is E E V D F. Each task has a lag: the CPU time it's owed. Only tasks with lag at least zero are eligible, and among those, the earliest virtual deadline runs first. A task asking for shorter slices gets earlier deadlines, so it runs sooner, without getting more CPU overall.",
+          "props": {
+            "title": "Weights, and <em>EEVDF</em>",
+            "items": [
+              {
+                "at": "nice",
+                "label": "Weights",
+                "title": "From nice values",
+                "body": "Each step ≈ 10% CPU (×1.25 weight).",
+                "code": "nice 0 → 1024"
+              },
+              {
+                "at": "slept",
+                "label": "Sleepers",
+                "title": "Woken tasks run soon",
+                "body": "Their vruntime fell behind.",
+                "code": "interactive feels fast"
+              },
+              {
+                "at": "lag",
+                "label": "EEVDF · Linux 6.6+",
+                "title": "Lag: CPU time owed",
+                "body": "Eligible only when lag ≥ 0.",
+                "code": "replaced CFS"
+              },
+              {
+                "at": "deadline",
+                "label": "Virtual deadline",
+                "title": "Earliest runs first",
+                "body": "Shorter slice → earlier deadline: sooner, not more.",
+                "code": "sched_setattr"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "04",
+      "title": "Many CPUs",
+      "question": "With many CPUs, should there be one shared run queue, or one per CPU?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question four. On a machine with many CPUs, should runnable tasks wait in one shared queue, or in one queue per CPU? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "One run queue, or <em>one per CPU</em>?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "One shared queue is simple, and balances load perfectly. But every CPU takes the same lock to pick a task, and that lock becomes the bottleneck. And tasks hop between CPUs, losing their warm caches. One queue per CPU scales: each CPU mostly touches its own queue, and tasks keep their cache affinity. The cost is imbalance: one CPU can sit idle while another has a backlog.",
+          "props": {
+            "title": "Shared or <em>per-CPU</em>",
+            "left": {
+              "at": "shared",
+              "label": "Single queue",
+              "title": "Simple, balanced",
+              "body": "One lock for all CPUs; tasks bounce and lose warm caches."
+            },
+            "right": {
+              "at": "scales",
+              "label": "Per-CPU queues",
+              "title": "Scales, keeps affinity",
+              "tone": "good",
+              "body": "Each CPU uses its own queue; caches stay warm."
+            },
+            "verdict": {
+              "at": "cost",
+              "text": "The catch: load imbalance.",
+              "code": "idle CPU, busy neighbour"
+            }
+          }
+        },
+        {
+          "type": "points",
+          "say": "So per CPU queues need balancing. An idle CPU steals work from a busy one, and Linux also rebalances periodically, preferring nearby CPUs that share a cache, before crossing sockets. Migrating a task costs its warm cache, so the balancer is deliberately lazy. And when latency matters most, you pin: set the thread's affinity to one core, and keep other work off that core.",
+          "props": {
+            "title": "Keeping CPUs <em>busy</em>",
+            "items": [
+              {
+                "at": "steals",
+                "label": "Work stealing",
+                "title": "Idle pulls from busy",
+                "body": "Balance when a queue runs dry.",
+                "code": "newidle balance"
+              },
+              {
+                "at": "nearby",
+                "label": "Topology",
+                "title": "Near first",
+                "body": "Same core, then cache, then socket.",
+                "code": "sched domains"
+              },
+              {
+                "at": "lazy",
+                "label": "Migration costs",
+                "title": "Deliberately lazy",
+                "body": "Moving a task loses its warm cache.",
+                "code": "cache affinity"
+              },
+              {
+                "at": "pin",
+                "label": "Pinning",
+                "title": "One thread, one core",
+                "body": "Affinity, plus keep other work off it.",
+                "code": "taskset · isolcpus"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. S J F and STCF optimize turnaround, and round robin optimizes response. M L F Q learns which jobs are short from how they behave. Linux runs the task with the least weighted runtime, now with deadlines from E E V D F. And multiple CPUs get one queue each, kept in balance.",
+          "props": {
+            "title": "Scheduling, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "turnaround",
+                "text": "SJF / STCF: turnaround. Round robin: response.",
+                "code": "convoy effect"
+              },
+              {
+                "at": "learns",
+                "text": "MLFQ learns job length from behaviour.",
+                "code": "demote · boost"
+              },
+              {
+                "at": "Linux",
+                "text": "Linux: least weighted runtime; EEVDF deadlines.",
+                "code": "vruntime · lag"
+              },
+              {
+                "at": "balance",
+                "text": "Per-CPU queues, balanced lazily.",
+                "code": "affinity"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,680 @@
+{
+  "slug": "os-swapping",
+  "series": "os",
+  "title": "Page faults and swapping",
+  "kicker": "OS · Page faults and swapping",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/system/os/swapping.md",
+  "summary": "What happens on a page fault, minor versus major faults, page replacement from FIFO to the clock algorithm, dirty pages, and thrashing.",
+  "captionFixes": [
+    {
+      "match": [
+        "disc"
+      ],
+      "display": "disk"
+    },
+    {
+      "match": [
+        "a",
+        "a"
+      ],
+      "display": "a"
+    },
+    {
+      "match": [
+        "FIFA"
+      ],
+      "display": "FIFO"
+    },
+    {
+      "match": [
+        "A",
+        "processor's"
+      ],
+      "display": "A process's"
+    },
+    {
+      "match": [
+        "non-computing"
+      ],
+      "display": "none computing"
+    },
+    {
+      "match": [
+        "fixes",
+        "run",
+        "fewer",
+        "things",
+        "add",
+        "memory"
+      ],
+      "display": "fixes: run fewer things, add memory,"
+    },
+    {
+      "match": [
+        "i/o"
+      ],
+      "display": "I/O"
+    },
+    {
+      "match": [
+        "runs",
+        "out-of-memory"
+      ],
+      "display": "runs out of memory"
+    },
+    {
+      "match": [
+        "the",
+        "out",
+        "of",
+        "memory",
+        "killer"
+      ],
+      "display": "the out-of-memory killer"
+    },
+    {
+      "match": [
+        "Belady's"
+      ],
+      "display": "Belady's"
+    },
+    {
+      "match": [
+        "Beladys"
+      ],
+      "display": "Belady's"
+    },
+    {
+      "match": [
+        "L",
+        "R",
+        "U"
+      ],
+      "display": "LRU"
+    },
+    {
+      "match": [
+        "F",
+        "I",
+        "F",
+        "O"
+      ],
+      "display": "FIFO"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "The page fault",
+      "question": "What happens when a program touches a page that isn't in memory?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Page faults, question one. A program touches a page that isn't in memory right now. What happens, step by step? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Touch a page that isn't <em>in memory</em>. Then what?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Every load or store is translated. If the page table entry says not present, the CPU raises a page fault, and the kernel takes over. First: is the address inside any mapping the process owns? If not, it's a bug, and the process gets a segmentation fault. If it is, the kernel finds a free frame, evicting another page if memory is full. If the data lives on disk, in swap or in a mapped file, the kernel starts the read, and the process blocks, so another one runs. When the data arrives, the kernel marks the entry present, and retries the faulting instruction. It succeeds, as if nothing happened.",
+          "props": {
+            "title": "The <em>fault</em> path",
+            "nodes": [
+              {
+                "id": "acc",
+                "label": "load / store",
+                "x": 230,
+                "y": 290,
+                "w": 260,
+                "h": 80
+              },
+              {
+                "id": "pte",
+                "label": "PTE: present = 0",
+                "x": 590,
+                "y": 290,
+                "w": 300,
+                "h": 80
+              },
+              {
+                "id": "trap",
+                "label": "page fault\n→ kernel",
+                "x": 950,
+                "y": 290,
+                "w": 260,
+                "h": 96,
+                "hidden": true
+              },
+              {
+                "id": "segv",
+                "label": "not in any mapping\n→ SIGSEGV",
+                "x": 950,
+                "y": 480,
+                "w": 320,
+                "h": 96,
+                "hidden": true
+              },
+              {
+                "id": "frame",
+                "label": "get a free frame\n(evict if none)",
+                "x": 1340,
+                "y": 290,
+                "w": 320,
+                "h": 96,
+                "hidden": true
+              },
+              {
+                "id": "disk",
+                "label": "read from disk\nprocess blocks",
+                "x": 1340,
+                "y": 650,
+                "w": 320,
+                "h": 96,
+                "hidden": true
+              },
+              {
+                "id": "upd",
+                "label": "present = 1\nretry the access",
+                "x": 230,
+                "y": 650,
+                "w": 320,
+                "h": 96,
+                "hidden": true
+              }
+            ],
+            "edges": [
+              {
+                "from": "acc",
+                "to": "pte"
+              }
+            ],
+            "panels": [],
+            "steps": [
+              {
+                "at": "translated",
+                "nodes": {
+                  "acc": "active"
+                },
+                "edges": {
+                  "acc-pte": "relax"
+                },
+                "note": "Every access is translated"
+              },
+              {
+                "at": "present",
+                "nodes": {
+                  "acc": "base",
+                  "pte": "active"
+                },
+                "edges": {
+                  "acc-pte": "base"
+                },
+                "note": "PTE: not present"
+              },
+              {
+                "at": "takes",
+                "show": [
+                  "trap"
+                ],
+                "add": [
+                  {
+                    "from": "pte",
+                    "to": "trap"
+                  }
+                ],
+                "nodes": {
+                  "pte": "base",
+                  "trap": "active"
+                },
+                "edges": {
+                  "pte-trap": "relax"
+                },
+                "note": "Page fault: trap into the kernel"
+              },
+              {
+                "at": "mapping",
+                "note": "Is the address in one of its mappings?"
+              },
+              {
+                "at": "bug",
+                "show": [
+                  "segv"
+                ],
+                "add": [
+                  {
+                    "from": "trap",
+                    "to": "segv",
+                    "w": "no"
+                  }
+                ],
+                "nodes": {
+                  "segv": "dim"
+                },
+                "edges": {
+                  "pte-trap": "base",
+                  "trap-segv": "dim"
+                },
+                "note": "No: a bug → SIGSEGV"
+              },
+              {
+                "at": "frame",
+                "show": [
+                  "frame"
+                ],
+                "add": [
+                  {
+                    "from": "trap",
+                    "to": "frame",
+                    "w": "yes"
+                  }
+                ],
+                "nodes": {
+                  "trap": "base",
+                  "frame": "active"
+                },
+                "edges": {
+                  "trap-frame": "relax"
+                },
+                "note": "Yes: get a frame, evicting if full"
+              },
+              {
+                "at": "blocks",
+                "show": [
+                  "disk"
+                ],
+                "add": [
+                  {
+                    "from": "frame",
+                    "to": "disk"
+                  }
+                ],
+                "nodes": {
+                  "frame": "base",
+                  "disk": "queued"
+                },
+                "edges": {
+                  "trap-frame": "base",
+                  "frame-disk": "relax"
+                },
+                "note": "Read from swap or the file; the process blocks"
+              },
+              {
+                "at": "arrives",
+                "show": [
+                  "upd"
+                ],
+                "add": [
+                  {
+                    "from": "disk",
+                    "to": "upd"
+                  }
+                ],
+                "nodes": {
+                  "disk": "base",
+                  "upd": "active"
+                },
+                "edges": {
+                  "frame-disk": "base",
+                  "disk-upd": "relax"
+                },
+                "note": "Mark present; set the frame"
+              },
+              {
+                "at": "retries",
+                "add": [
+                  {
+                    "from": "upd",
+                    "to": "acc"
+                  }
+                ],
+                "nodes": {
+                  "upd": "done",
+                  "acc": "done"
+                },
+                "edges": {
+                  "disk-upd": "base",
+                  "upd-acc": "tree"
+                },
+                "note": "Retry the instruction"
+              },
+              {
+                "at": "succeeds",
+                "note": "It succeeds, as if nothing happened"
+              }
+            ]
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Most faults never touch the disk. The first touch of fresh memory just maps a zeroed frame. A page already in the page cache, like a shared library another process loaded, just gets mapped. These minor faults cost around a microsecond or a few: a Linux VM measured three and a half per first touch, including zeroing the page. A major fault waits for storage: around a hundred microseconds on an SSD, and ten milliseconds on a spinning disk.",
+          "props": {
+            "title": "Minor or <em>major</em>",
+            "left": {
+              "at": "minor",
+              "label": "Minor fault",
+              "title": "No I/O",
+              "tone": "good",
+              "body": "First touch (zero-fill) or a page already cached. ~1–4 µs."
+            },
+            "right": {
+              "at": "major",
+              "label": "Major fault",
+              "title": "Waits for storage",
+              "body": "Swap-in or an uncached file page. ~100 µs SSD, ~10 ms HDD."
+            },
+            "verdict": {
+              "at": "spinning",
+              "text": "Major faults are what make a machine feel frozen.",
+              "code": "/usr/bin/time -v · perf stat -e major-faults"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Which page to evict?",
+      "question": "Memory is full and a page must go. Which one should the OS evict?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. Memory is full, and a page has to go. Which one should the OS evict? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Memory is full. Which page <em>goes</em>?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "The optimal choice evicts the page that will be used furthest in the future. That's impossible, since nobody knows the future, but it's the yardstick. FIFO evicts the oldest page, even if it's the hottest, and suffers Belady's anomaly: for some access patterns, more memory means more faults. Least recently used bets that the past predicts the future, and usually wins. But exact LRU means updating a list on every memory access: far too slow.",
+          "props": {
+            "title": "Replacement <em>policies</em>",
+            "items": [
+              {
+                "at": "optimal",
+                "label": "Optimal (MIN)",
+                "title": "Furthest next use",
+                "body": "Needs the future; the yardstick.",
+                "code": "Belady, 1966"
+              },
+              {
+                "at": "oldest",
+                "label": "FIFO",
+                "title": "Oldest page",
+                "body": "Ignores use. More frames can mean more faults.",
+                "code": "3 frames: 9 faults · 4 frames: 10"
+              },
+              {
+                "at": "bets",
+                "label": "LRU",
+                "title": "Least recently used",
+                "body": "The past predicts the future.",
+                "code": "temporal locality"
+              },
+              {
+                "at": "slow",
+                "label": "Exact LRU",
+                "title": "Too expensive",
+                "body": "Updating a list on every access.",
+                "code": "so: approximate it"
+              }
+            ]
+          }
+        },
+        {
+          "type": "graph",
+          "say": "So real systems approximate it with the clock algorithm. The hardware sets a use bit whenever a page is accessed. Pages sit in a circle, with a hand. To evict, check the page under the hand. If its use bit is set, it was used recently: clear the bit, giving it a second chance, and move on. Page one's bit is clear, so it's the one evicted. Pages that keep getting used keep setting their bits, and survive. Linux refines this with active and inactive lists, driven by the same bits.",
+          "props": {
+            "title": "The <em>clock</em> algorithm",
+            "nodes": [
+              {
+                "id": "p0",
+                "label": "page 0",
+                "x": 700,
+                "y": 290,
+                "w": 190,
+                "h": 72
+              },
+              {
+                "id": "p1",
+                "label": "page 1",
+                "x": 1000,
+                "y": 460,
+                "w": 190,
+                "h": 72
+              },
+              {
+                "id": "p2",
+                "label": "page 2",
+                "x": 700,
+                "y": 640,
+                "w": 190,
+                "h": 72
+              },
+              {
+                "id": "p3",
+                "label": "page 3",
+                "x": 400,
+                "y": 460,
+                "w": 190,
+                "h": 72
+              }
+            ],
+            "edges": [
+              {
+                "from": "p0",
+                "to": "p1"
+              },
+              {
+                "from": "p1",
+                "to": "p2"
+              },
+              {
+                "from": "p2",
+                "to": "p3"
+              },
+              {
+                "from": "p3",
+                "to": "p0"
+              }
+            ],
+            "panels": [
+              {
+                "key": "use",
+                "label": "use bit",
+                "type": "table",
+                "initial": {}
+              }
+            ],
+            "steps": [
+              {
+                "at": "accessed",
+                "panels": {
+                  "use": {
+                    "p0": "1",
+                    "p1": "0",
+                    "p2": "1",
+                    "p3": "0"
+                  }
+                },
+                "note": "Hardware sets the use bit on each access"
+              },
+              {
+                "at": "circle",
+                "note": "Pages in a circle"
+              },
+              {
+                "at": "hand",
+                "nodes": {
+                  "p0": "queued"
+                },
+                "note": "The hand points at page 0"
+              },
+              {
+                "at": "recently",
+                "nodes": {
+                  "p0": "active"
+                },
+                "note": "page 0: use = 1, recently used"
+              },
+              {
+                "at": "chance",
+                "panels": {
+                  "use": {
+                    "p0": "0"
+                  }
+                },
+                "nodes": {
+                  "p0": "base"
+                },
+                "note": "Clear it: a second chance"
+              },
+              {
+                "at": "move",
+                "nodes": {
+                  "p1": "queued"
+                },
+                "edges": {
+                  "p0-p1": "relax"
+                },
+                "note": "Advance the hand"
+              },
+              {
+                "at": "evicted",
+                "nodes": {
+                  "p1": "dim"
+                },
+                "edges": {
+                  "p0-p1": "base"
+                },
+                "note": "page 1: use = 0 → evict"
+              },
+              {
+                "at": "survive",
+                "nodes": {
+                  "p2": "done"
+                },
+                "note": "Busy pages keep setting their bits"
+              },
+              {
+                "at": "Linux",
+                "nodes": {
+                  "p2": "base"
+                },
+                "note": "Linux: active / inactive lists, same bits"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Dirty pages and thrashing",
+      "question": "Why does a machine that runs out of memory grind to a halt instead of slowing down a little?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. When a machine runs out of memory, why does it grind to a halt, instead of just slowing down a little? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Out of memory: why a <em>halt</em>, not a slowdown?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Evicting a clean page is free: an identical copy is already on disk, so the frame is simply reused. A dirty page has been written, so it must be written out first: a second disk I/O, on the fault path. So the kernel prefers clean pages, and writes dirty ones back in the background, before it's under pressure.",
+          "props": {
+            "title": "Clean or <em>dirty</em>",
+            "left": {
+              "at": "clean",
+              "label": "Clean page",
+              "title": "Free to evict",
+              "tone": "good",
+              "body": "Identical on disk already: just reuse the frame."
+            },
+            "right": {
+              "at": "dirty",
+              "label": "Dirty page",
+              "title": "Write it out first",
+              "body": "A second I/O on the fault path. The PTE's dirty bit says which."
+            },
+            "verdict": {
+              "at": "background",
+              "text": "Write dirty pages back early, in the background.",
+              "code": "kswapd · writeback"
+            }
+          }
+        },
+        {
+          "type": "points",
+          "say": "A process's working set is the pages it actively uses. When the working sets of everything running add up to more than RAM, every eviction throws out a page that's needed again soon. The system spends its time paging, and almost none computing. That's thrashing, and adding work makes it worse. The fixes: run fewer things, add memory, or let the out of memory killer end one process, so the rest can run.",
+          "props": {
+            "title": "<em>Thrashing</em>",
+            "items": [
+              {
+                "at": "working",
+                "label": "Working set",
+                "title": "Pages in active use",
+                "body": "What must stay resident to make progress.",
+                "code": "RSS ≠ working set"
+              },
+              {
+                "at": "needed",
+                "label": "Over-commit",
+                "title": "Sum > RAM",
+                "body": "Every eviction is needed again soon.",
+                "code": "major faults climb"
+              },
+              {
+                "at": "thrashing",
+                "label": "Thrashing",
+                "title": "All paging, no work",
+                "body": "More work makes it worse.",
+                "code": "vmstat: si / so"
+              },
+              {
+                "at": "fixes",
+                "label": "Fixes",
+                "title": "Do less, or add RAM",
+                "body": "Or the OOM killer ends one process.",
+                "code": "oom_score_adj"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. A page fault traps into the kernel, which maps a frame, fetching data if needed, and retries. Minor faults need no I/O, and major faults wait for storage. The clock algorithm approximates LRU with use bits. And when working sets outgrow RAM, the machine thrashes.",
+          "props": {
+            "title": "Page faults, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "retries",
+                "text": "Fault → map a frame (fetch if needed) → retry.",
+                "code": "or SIGSEGV"
+              },
+              {
+                "at": "Minor",
+                "text": "Minor: no I/O. Major: wait for storage.",
+                "code": "µs vs ms"
+              },
+              {
+                "at": "approximates",
+                "text": "Clock approximates LRU with use bits.",
+                "code": "second chance"
+              },
+              {
+                "at": "outgrow",
+                "text": "Working sets > RAM → thrashing.",
+                "code": "OOM killer"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
