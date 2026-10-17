@@ -1,0 +1,1098 @@
+{
+  "slug": "algorithm-segment-tree",
+  "series": "algorithm",
+  "title": "Segment tree",
+  "kicker": "Algorithm · Segment tree",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/segment-tree.md",
+  "summary": "Range queries and updates in O(log N): how the tree splits ranges, why a query touches few nodes, and lazy propagation for range updates.",
+  "captionFixes": [
+    {
+      "match": [
+        "Segment",
+        "3",
+        "question",
+        "1"
+      ],
+      "display": "Segment tree, question 1."
+    },
+    {
+      "match": [
+        "queries",
+        "2n's"
+      ],
+      "display": "query's two ends"
+    },
+    {
+      "match": [
+        "O(n)"
+      ],
+      "display": "O(N)"
+    },
+    {
+      "match": [
+        "Right",
+        "10",
+        "there"
+      ],
+      "display": "Write 10 there"
+    },
+    {
+      "match": [
+        "One",
+        "pass"
+      ],
+      "display": "One path"
+    },
+    {
+      "match": [
+        "still",
+        "O(2)"
+      ],
+      "display": "still owe 2"
+    },
+    {
+      "match": [
+        "there",
+        "too"
+      ],
+      "display": "their two"
+    },
+    {
+      "match": [
+        "Encode"
+      ],
+      "display": "In code,"
+    },
+    {
+      "match": [
+        "nodes",
+        "some"
+      ],
+      "display": "node's sum"
+    },
+    {
+      "match": [
+        "route",
+        "to",
+        "leaf",
+        "pass"
+      ],
+      "display": "root-to-leaf path"
+    },
+    {
+      "match": [
+        "to",
+        "recap"
+      ],
+      "display": "To recap",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "log",
+        "n"
+      ],
+      "display": "O(log N)"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "n",
+        "log",
+        "n"
+      ],
+      "display": "O(N log N)"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "n"
+      ],
+      "display": "O(N)"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "one"
+      ],
+      "display": "O(1)"
+    },
+    {
+      "match": [
+        "push",
+        "down"
+      ],
+      "display": "push down"
+    },
+    {
+      "match": [
+        "pushdown"
+      ],
+      "display": "push down"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Splitting the range",
+      "question": "What does each node of a segment tree store, and why is a range query O(log N)?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Segment tree, question one. What does each node store? And why is a range query only O of log n? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What does each node store, and why is a range query <em>O(log N)</em>?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Take the array one, three, five, seven, nine, eleven. The root covers the whole range, zero to five, and stores its sum, thirty-six. Each node splits its range in half, down to single elements at the leaves. Now ask for the sum from index one to four. The root only partly overlaps, so recurse into both halves. Zero to two is partial too, and so is zero to one, as well. Zero alone is outside: it returns nothing. Index one is inside: take three. Index two: take five. On the right, three to four is fully inside: take sixteen, without going any deeper. The last leaf is outside. Three, plus five, plus sixteen: twenty-four.",
+          "props": {
+            "title": "Sum of <em>a[1..4]</em>",
+            "nodes": [
+              {
+                "id": "1",
+                "label": "[0,5]\n36",
+                "x": 681,
+                "y": 280,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "2",
+                "label": "[0,2]\n9",
+                "x": 402,
+                "y": 410,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "3",
+                "label": "[3,5]\n27",
+                "x": 960,
+                "y": 410,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "4",
+                "label": "[0,1]\n4",
+                "x": 263,
+                "y": 540,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "5",
+                "label": "[2]\n5",
+                "x": 542,
+                "y": 540,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "6",
+                "label": "[3,4]\n16",
+                "x": 821,
+                "y": 540,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "7",
+                "label": "[5]\n11",
+                "x": 1100,
+                "y": 540,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "8",
+                "label": "[0]\n1",
+                "x": 170,
+                "y": 670,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "9",
+                "label": "[1]\n3",
+                "x": 356,
+                "y": 670,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "12",
+                "label": "[3]\n7",
+                "x": 728,
+                "y": 670,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "13",
+                "label": "[4]\n9",
+                "x": 914,
+                "y": 670,
+                "w": 160,
+                "h": 84
+              }
+            ],
+            "edges": [
+              {
+                "from": "1",
+                "to": "2"
+              },
+              {
+                "from": "1",
+                "to": "3"
+              },
+              {
+                "from": "2",
+                "to": "4"
+              },
+              {
+                "from": "2",
+                "to": "5"
+              },
+              {
+                "from": "3",
+                "to": "6"
+              },
+              {
+                "from": "3",
+                "to": "7"
+              },
+              {
+                "from": "4",
+                "to": "8"
+              },
+              {
+                "from": "4",
+                "to": "9"
+              },
+              {
+                "from": "6",
+                "to": "12"
+              },
+              {
+                "from": "6",
+                "to": "13"
+              }
+            ],
+            "panels": [
+              {
+                "key": "sum",
+                "label": "query(1, 4)",
+                "type": "list",
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "root",
+                "nodes": {
+                  "1": "active"
+                },
+                "note": "Root: the whole range [0,5], sum 36"
+              },
+              {
+                "at": "splits",
+                "nodes": {
+                  "1": "base",
+                  "2": "active",
+                  "3": "active"
+                },
+                "note": "Each node splits its range in half"
+              },
+              {
+                "at": "leaves",
+                "nodes": {
+                  "2": "base",
+                  "3": "base",
+                  "8": "active",
+                  "9": "active",
+                  "5": "active",
+                  "12": "active",
+                  "13": "active",
+                  "7": "active"
+                },
+                "note": "Leaves: single elements"
+              },
+              {
+                "at": "ask",
+                "nodes": {
+                  "8": "base",
+                  "9": "base",
+                  "5": "base",
+                  "12": "base",
+                  "13": "base",
+                  "7": "base"
+                },
+                "note": "query(1, 4)"
+              },
+              {
+                "at": "partly",
+                "nodes": {
+                  "1": "queued"
+                },
+                "note": "[0,5] partly overlaps: recurse"
+              },
+              {
+                "at": "partial",
+                "nodes": {
+                  "2": "queued"
+                },
+                "note": "[0,2] partial"
+              },
+              {
+                "at": "well",
+                "nodes": {
+                  "4": "queued"
+                },
+                "note": "[0,1] partial"
+              },
+              {
+                "at": "outside",
+                "nodes": {
+                  "8": "dim"
+                },
+                "note": "[0] outside: return 0"
+              },
+              {
+                "at": "take#2",
+                "nodes": {
+                  "9": "done"
+                },
+                "panels": {
+                  "sum": [
+                    "3"
+                  ]
+                },
+                "note": "[1] inside: take 3"
+              },
+              {
+                "at": "take#3",
+                "nodes": {
+                  "5": "done"
+                },
+                "panels": {
+                  "sum": [
+                    "3",
+                    "5"
+                  ]
+                },
+                "note": "[2] inside: take 5"
+              },
+              {
+                "at": "fully",
+                "nodes": {
+                  "3": "queued",
+                  "6": "done"
+                },
+                "panels": {
+                  "sum": [
+                    "3",
+                    "5",
+                    "16"
+                  ]
+                },
+                "note": "[3,4] fully inside: take 16, stop"
+              },
+              {
+                "at": "last",
+                "nodes": {
+                  "7": "dim",
+                  "12": "dim",
+                  "13": "dim"
+                },
+                "note": "[5] outside; [3] and [4] never visited"
+              },
+              {
+                "at": "24",
+                "panels": {
+                  "sum": [
+                    "3",
+                    "5",
+                    "16",
+                    "= 24"
+                  ]
+                },
+                "note": "3 + 5 + 16 = 24"
+              }
+            ],
+            "directed": false
+          }
+        },
+        {
+          "type": "points",
+          "say": "Why so few nodes? At each level, only the nodes holding the query's two ends can be partial. Everything between them is fully inside, and returns at once, or fully outside. So a query visits at most about four nodes per level, over log n levels. Building is O of n: each node is computed once, from its two children. And no pointers: node i has children two i, and two i plus one. Allocate four n slots to be safe.",
+          "props": {
+            "title": "Why <em>O(log N)</em>",
+            "items": [
+              {
+                "at": "ends",
+                "label": "Per level",
+                "title": "At most 2 partial nodes",
+                "body": "Only the two ends of the query split; the middle returns at once.",
+                "code": "≤ 4 nodes per level"
+              },
+              {
+                "at": "Building",
+                "label": "Build",
+                "title": "O(N), bottom-up",
+                "body": "Each node is the merge of its two children.",
+                "code": "t[i] = t[2i] + t[2i+1]"
+              },
+              {
+                "at": "pointers",
+                "label": "Layout",
+                "title": "A plain array",
+                "body": "Root at 1; children of i at 2i and 2i+1.",
+                "code": "vector<long long> t(4 * n)"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Point update",
+      "question": "How does a segment tree update one element, and what does it cost?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. How do you update one element, and what does it cost? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How do you <em>update</em> one element, and what does it cost?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Set index two to ten. Walk down from the root, always into the half that contains index two: left, then right, and we reach the leaf. Write ten there. Then, on the way back up, recompute each node from its two children. Zero to two becomes four plus ten, fourteen. The root becomes fourteen plus twenty-seven, forty-one. One path from the root to a leaf: O of log n.",
+          "props": {
+            "title": "a[2] = <em>10</em>",
+            "nodes": [
+              {
+                "id": "1",
+                "label": "[0,5]\n36",
+                "x": 1029,
+                "y": 280,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "2",
+                "label": "[0,2]\n9",
+                "x": 610,
+                "y": 410,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "3",
+                "label": "[3,5]\n27",
+                "x": 1448,
+                "y": 410,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "4",
+                "label": "[0,1]\n4",
+                "x": 402,
+                "y": 540,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "5",
+                "label": "[2]\n5",
+                "x": 820,
+                "y": 540,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "6",
+                "label": "[3,4]\n16",
+                "x": 1239,
+                "y": 540,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "7",
+                "label": "[5]\n11",
+                "x": 1658,
+                "y": 540,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "8",
+                "label": "[0]\n1",
+                "x": 262,
+                "y": 670,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "9",
+                "label": "[1]\n3",
+                "x": 542,
+                "y": 670,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "12",
+                "label": "[3]\n7",
+                "x": 1100,
+                "y": 670,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "13",
+                "label": "[4]\n9",
+                "x": 1378,
+                "y": 670,
+                "w": 160,
+                "h": 84
+              }
+            ],
+            "edges": [
+              {
+                "from": "1",
+                "to": "2"
+              },
+              {
+                "from": "1",
+                "to": "3"
+              },
+              {
+                "from": "2",
+                "to": "4"
+              },
+              {
+                "from": "2",
+                "to": "5"
+              },
+              {
+                "from": "3",
+                "to": "6"
+              },
+              {
+                "from": "3",
+                "to": "7"
+              },
+              {
+                "from": "4",
+                "to": "8"
+              },
+              {
+                "from": "4",
+                "to": "9"
+              },
+              {
+                "from": "6",
+                "to": "12"
+              },
+              {
+                "from": "6",
+                "to": "13"
+              }
+            ],
+            "panels": [],
+            "steps": [
+              {
+                "at": "Set",
+                "note": "update(2, 10)"
+              },
+              {
+                "at": "Walk",
+                "nodes": {
+                  "1": "active"
+                },
+                "note": "2 is in [0,5]"
+              },
+              {
+                "at": "left",
+                "nodes": {
+                  "2": "active"
+                },
+                "edges": {
+                  "1-2": "relax"
+                },
+                "note": "2 ≤ mid 2: go left to [0,2]"
+              },
+              {
+                "at": "right",
+                "nodes": {
+                  "5": "active"
+                },
+                "edges": {
+                  "2-5": "relax"
+                },
+                "note": "2 > mid 1: go right to [2]"
+              },
+              {
+                "at": "Write",
+                "labels": {
+                  "5": "[2]\n10"
+                },
+                "nodes": {
+                  "5": "done"
+                },
+                "note": "Leaf: t = 10"
+              },
+              {
+                "at": "recompute",
+                "note": "Back up: merge the two children"
+              },
+              {
+                "at": "fourteen",
+                "labels": {
+                  "2": "[0,2]\n14"
+                },
+                "nodes": {
+                  "2": "done"
+                },
+                "note": "[0,2] = 4 + 10 = 14"
+              },
+              {
+                "at": "root#2",
+                "labels": {
+                  "1": "[0,5]\n41"
+                },
+                "nodes": {
+                  "1": "done"
+                },
+                "note": "[0,5] = 14 + 27 = 41"
+              },
+              {
+                "at": "path",
+                "note": "One root-to-leaf path: O(log N)"
+              }
+            ],
+            "directed": false
+          }
+        },
+        {
+          "type": "code",
+          "say": "Here's the whole structure. Build fills each node from its children. Query has three cases: outside returns zero, the identity for sum, inside returns the node, and partial splits at mid. Update walks to the leaf, and re-merges on the way back. To get min or max instead of sum, change the merge, and the identity.",
+          "props": {
+            "title": "The <em>code</em>",
+            "file": "segtree.cpp",
+            "tag": "C++",
+            "lang": "cpp",
+            "size": 19,
+            "width": 1250,
+            "code": "struct SegTree {\n    int n;\n    vector<long long> t;                     // node i: children 2i, 2i+1\n    SegTree(const vector<int>& a) : n(a.size()), t(4 * a.size()) {\n        build(a, 1, 0, n - 1);\n    }\n    void build(const vector<int>& a, int node, int lo, int hi) {\n        if (lo == hi) { t[node] = a[lo]; return; }\n        int mid = lo + (hi - lo) / 2;\n        build(a, 2 * node, lo, mid);\n        build(a, 2 * node + 1, mid + 1, hi);\n        t[node] = t[2 * node] + t[2 * node + 1];\n    }\n    long long query(int node, int lo, int hi, int l, int r) {\n        if (r < lo || hi < l) return 0;            // outside: identity\n        if (l <= lo && hi <= r) return t[node];    // inside: whole node\n        int mid = lo + (hi - lo) / 2;              // partial: split\n        return query(2 * node, lo, mid, l, r)\n             + query(2 * node + 1, mid + 1, hi, l, r);\n    }\n    void update(int node, int lo, int hi, int idx, long long val) {\n        if (lo == hi) { t[node] = val; return; }\n        int mid = lo + (hi - lo) / 2;\n        if (idx <= mid) update(2 * node, lo, mid, idx, val);\n        else            update(2 * node + 1, mid + 1, hi, idx, val);\n        t[node] = t[2 * node] + t[2 * node + 1];   // recompute on the way up\n    }\n};",
+            "highlights": [
+              {
+                "at": "Build",
+                "lines": "7-11",
+                "note": "build: leaves, then merge children"
+              },
+              {
+                "at": "outside",
+                "lines": "15",
+                "note": "Outside: return the identity"
+              },
+              {
+                "at": "inside",
+                "lines": "16",
+                "note": "Inside: the whole node answers"
+              },
+              {
+                "at": "partial",
+                "lines": "17-19",
+                "note": "Partial: split at mid"
+              },
+              {
+                "at": "Update",
+                "lines": "21-26",
+                "note": "update: down to the leaf, merge on the way back"
+              },
+              {
+                "at": "merge",
+                "lines": "26",
+                "note": "min / max: change the merge and the identity"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Lazy propagation",
+      "question": "How can a segment tree add a value to a whole range in O(log N)?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. How can a segment tree add a value to a whole range, in O of log n? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How do you add to a whole <em>range</em> in O(log N)?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Add two to every element from one to four. Touching every leaf would be O of n. Instead, walk the tree as a query does. At a node fully inside the range, stop there: fix its sum, two for each element it covers, and leave a lazy tag that says its children still owe two. Index one becomes five. Index two becomes seven. Three to four covers two elements: sixteen plus four is twenty, and it keeps a tag, plus two. Its children are now stale, and that's fine. On the way back, the parents are recomputed: thirteen, and then thirty-one, and the root, forty-four. Later, a query reaches index three, below the tag. Before descending, push the tag down: both children get their two, and the tag clears. Index three is nine.",
+          "props": {
+            "title": "Add 2 to <em>a[1..4]</em>",
+            "nodes": [
+              {
+                "id": "1",
+                "label": "[0,5]\n36",
+                "x": 1029,
+                "y": 280,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "2",
+                "label": "[0,2]\n9",
+                "x": 610,
+                "y": 410,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "3",
+                "label": "[3,5]\n27",
+                "x": 1448,
+                "y": 410,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "4",
+                "label": "[0,1]\n4",
+                "x": 402,
+                "y": 540,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "5",
+                "label": "[2]\n5",
+                "x": 820,
+                "y": 540,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "6",
+                "label": "[3,4]\n16",
+                "x": 1239,
+                "y": 540,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "7",
+                "label": "[5]\n11",
+                "x": 1658,
+                "y": 540,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "8",
+                "label": "[0]\n1",
+                "x": 262,
+                "y": 670,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "9",
+                "label": "[1]\n3",
+                "x": 542,
+                "y": 670,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "12",
+                "label": "[3]\n7",
+                "x": 1100,
+                "y": 670,
+                "w": 160,
+                "h": 84
+              },
+              {
+                "id": "13",
+                "label": "[4]\n9",
+                "x": 1378,
+                "y": 670,
+                "w": 160,
+                "h": 84
+              }
+            ],
+            "edges": [
+              {
+                "from": "1",
+                "to": "2"
+              },
+              {
+                "from": "1",
+                "to": "3"
+              },
+              {
+                "from": "2",
+                "to": "4"
+              },
+              {
+                "from": "2",
+                "to": "5"
+              },
+              {
+                "from": "3",
+                "to": "6"
+              },
+              {
+                "from": "3",
+                "to": "7"
+              },
+              {
+                "from": "4",
+                "to": "8"
+              },
+              {
+                "from": "4",
+                "to": "9"
+              },
+              {
+                "from": "6",
+                "to": "12"
+              },
+              {
+                "from": "6",
+                "to": "13"
+              }
+            ],
+            "panels": [],
+            "steps": [
+              {
+                "at": "Add",
+                "note": "rangeAdd(1, 4, +2)"
+              },
+              {
+                "at": "Touching",
+                "nodes": {
+                  "9": "queued",
+                  "5": "queued",
+                  "12": "queued",
+                  "13": "queued"
+                },
+                "note": "Eagerly: every leaf in range, O(N)"
+              },
+              {
+                "at": "Instead",
+                "nodes": {
+                  "9": "base",
+                  "5": "base",
+                  "12": "base",
+                  "13": "base"
+                },
+                "note": "Lazily: stop at fully covered nodes"
+              },
+              {
+                "at": "tag",
+                "note": "Fix the sum now; tag the children's debt"
+              },
+              {
+                "at": "five",
+                "labels": {
+                  "9": "[1]\n5"
+                },
+                "nodes": {
+                  "9": "done"
+                },
+                "note": "[1]: 3 + 2 = 5"
+              },
+              {
+                "at": "seven",
+                "labels": {
+                  "5": "[2]\n7"
+                },
+                "nodes": {
+                  "5": "done"
+                },
+                "note": "[2]: 5 + 2 = 7"
+              },
+              {
+                "at": "twenty",
+                "labels": {
+                  "6": "[3,4]\n20 +2"
+                },
+                "nodes": {
+                  "6": "queued"
+                },
+                "note": "[3,4]: 16 + 2×2 = 20, lazy +2"
+              },
+              {
+                "at": "stale",
+                "nodes": {
+                  "12": "dim",
+                  "13": "dim"
+                },
+                "note": "Children not touched: still 7 and 9"
+              },
+              {
+                "at": "thirteen",
+                "labels": {
+                  "4": "[0,1]\n6",
+                  "2": "[0,2]\n13"
+                },
+                "nodes": {
+                  "4": "done",
+                  "2": "done"
+                },
+                "note": "[0,1] = 6, [0,2] = 13"
+              },
+              {
+                "at": "then",
+                "labels": {
+                  "3": "[3,5]\n31"
+                },
+                "nodes": {
+                  "3": "done"
+                },
+                "note": "[3,5] = 20 + 11 = 31"
+              },
+              {
+                "at": "root",
+                "labels": {
+                  "1": "[0,5]\n44"
+                },
+                "nodes": {
+                  "1": "done"
+                },
+                "note": "Root = 13 + 31 = 44"
+              },
+              {
+                "at": "reaches",
+                "nodes": {
+                  "1": "base",
+                  "2": "base",
+                  "3": "base",
+                  "4": "base",
+                  "5": "base",
+                  "9": "base",
+                  "6": "active"
+                },
+                "note": "query(3, 3) must go below [3,4]"
+              },
+              {
+                "at": "push",
+                "labels": {
+                  "6": "[3,4]\n20",
+                  "12": "[3]\n9",
+                  "13": "[4]\n11"
+                },
+                "nodes": {
+                  "12": "done",
+                  "13": "done",
+                  "6": "base"
+                },
+                "note": "pushDown: children +2 each, tag cleared"
+              },
+              {
+                "at": "nine",
+                "nodes": {
+                  "13": "base"
+                },
+                "note": "a[3] = 9"
+              }
+            ],
+            "directed": false
+          }
+        },
+        {
+          "type": "code",
+          "say": "In code, apply does both jobs: it fixes the node's sum right away, and records the debt for its children. Push down hands the debt to both children, then clears it. Range add calls apply on fully covered nodes and stops. On a partial node, it pushes down first, so the children are current, then recurses, and re-merges. Query adds the same push down before splitting.",
+          "props": {
+            "title": "apply and <em>pushDown</em>",
+            "file": "lazy.cpp",
+            "tag": "C++",
+            "lang": "cpp",
+            "size": 20,
+            "width": 1250,
+            "code": "void apply(int node, int lo, int hi, long long d) {\n    t[node] += d * (hi - lo + 1);    // the sum is right now\n    lazy[node] += d;                 // the children owe d each\n}\nvoid pushDown(int node, int lo, int hi) {\n    if (lazy[node] == 0) return;\n    int mid = lo + (hi - lo) / 2;\n    apply(2 * node, lo, mid, lazy[node]);\n    apply(2 * node + 1, mid + 1, hi, lazy[node]);\n    lazy[node] = 0;\n}\nvoid rangeAdd(int node, int lo, int hi, int l, int r, long long d) {\n    if (r < lo || hi < l) return;\n    if (l <= lo && hi <= r) { apply(node, lo, hi, d); return; }\n    pushDown(node, lo, hi);          // before touching the children\n    int mid = lo + (hi - lo) / 2;\n    rangeAdd(2 * node, lo, mid, l, r, d);\n    rangeAdd(2 * node + 1, mid + 1, hi, l, r, d);\n    t[node] = t[2 * node] + t[2 * node + 1];\n}\n// query(): the same as before, plus pushDown() before it splits",
+            "highlights": [
+              {
+                "at": "fixes",
+                "lines": "2",
+                "note": "Sum is correct immediately"
+              },
+              {
+                "at": "records",
+                "lines": "3",
+                "note": "The children's debt"
+              },
+              {
+                "at": "hands",
+                "lines": "5-10",
+                "note": "Hand the debt to both children"
+              },
+              {
+                "at": "stops",
+                "lines": "14",
+                "note": "Fully covered: apply and stop"
+              },
+              {
+                "at": "pushes",
+                "lines": "15-19",
+                "note": "Partial: push down first, then recurse"
+              },
+              {
+                "at": "Query",
+                "lines": "21",
+                "note": "Queries push down too"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Each node stores the merge of a range, and a query splits only at its two ends, so it's O of log n. A point update rewrites one root-to-leaf path. And lazy tags make range updates O of log n, by pushing work down only when it's needed.",
+          "props": {
+            "title": "Segment tree, <em>in three lines</em>",
+            "items": [
+              {
+                "at": "splits",
+                "text": "Query: only the two ends split, O(log N).",
+                "code": "≤ 4 nodes per level"
+              },
+              {
+                "at": "rewrites",
+                "text": "Point update: one root-to-leaf path.",
+                "code": "re-merge on the way up"
+              },
+              {
+                "at": "lazy",
+                "text": "Range update: lazy tags, pushed down on demand.",
+                "code": "apply + pushDown"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

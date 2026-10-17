@@ -1,0 +1,985 @@
+{
+  "slug": "algorithm-graph-dfs",
+  "series": "algorithm",
+  "title": "Depth-first search",
+  "kicker": "Algorithm · DFS",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/graph-dfs.md",
+  "summary": "What DFS entry and exit times reveal about edges, cycle detection with three states, and memoized DFS on an implicit DAG.",
+  "captionFixes": [
+    {
+      "match": [
+        "it's",
+        "edge"
+      ],
+      "display": "its edge"
+    },
+    {
+      "match": [
+        "U"
+      ],
+      "display": "u",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "V"
+      ],
+      "display": "v",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "U's"
+      ],
+      "display": "u's",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "Vs"
+      ],
+      "display": "v's",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "a",
+        "kyclic"
+      ],
+      "display": "acyclic"
+    },
+    {
+      "match": [
+        "treat"
+      ],
+      "display": "Treat",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "D",
+        "F",
+        "S"
+      ],
+      "display": "DFS"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "m",
+        "times",
+        "n"
+      ],
+      "display": "O(m·n)"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "log",
+        "n"
+      ],
+      "display": "O(log N)"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "n",
+        "log",
+        "n"
+      ],
+      "display": "O(N log N)"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "n"
+      ],
+      "display": "O(N)"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "one"
+      ],
+      "display": "O(1)"
+    },
+    {
+      "match": [
+        "O(n)"
+      ],
+      "display": "O(N)"
+    },
+    {
+      "match": [
+        "to",
+        "recap"
+      ],
+      "display": "To recap",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "d",
+        "p"
+      ],
+      "display": "dp"
+    },
+    {
+      "match": [
+        "DP"
+      ],
+      "display": "dp",
+      "matchCase": true
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Entry and exit times",
+      "question": "What do DFS entry and exit times tell you about the edges of a directed graph?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Depth-first search, question one. What do entry and exit times tell you about the edges of a directed graph? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What do <em>entry and exit times</em> tell you?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Run DFS from zero, with a clock that ticks on every entry, and every exit. Enter zero at time zero, then one at time one, then two at time two. Two has an edge back to zero. Zero was entered, but hasn't exited: it's still on the current path. That's a back edge, and it means a cycle. Two has nothing else, so it exits at three, and one exits at four. Back at zero, its edge to two finds a node that's finished, and was entered after zero: a forward edge, a shortcut down the tree. Then enter three, at five. Its edge to two finds a finished node, entered before three: a cross edge, into a branch that's already done. Three exits at six, and zero at seven.",
+          "props": {
+            "title": "Classify edges by <em>time</em>",
+            "nodes": [
+              {
+                "id": "0",
+                "x": 280,
+                "y": 300
+              },
+              {
+                "id": "1",
+                "x": 860,
+                "y": 300
+              },
+              {
+                "id": "2",
+                "x": 860,
+                "y": 620
+              },
+              {
+                "id": "3",
+                "x": 280,
+                "y": 620
+              }
+            ],
+            "edges": [
+              {
+                "from": "0",
+                "to": "1"
+              },
+              {
+                "from": "1",
+                "to": "2"
+              },
+              {
+                "from": "2",
+                "to": "0"
+              },
+              {
+                "from": "0",
+                "to": "2"
+              },
+              {
+                "from": "0",
+                "to": "3"
+              },
+              {
+                "from": "3",
+                "to": "2"
+              }
+            ],
+            "panels": [
+              {
+                "key": "in",
+                "label": "enter",
+                "type": "table",
+                "initial": {}
+              },
+              {
+                "key": "out",
+                "label": "exit",
+                "type": "table",
+                "initial": {}
+              }
+            ],
+            "steps": [
+              {
+                "at": "clock",
+                "note": "Adjacency: 0 → 1, 2, 3 · 1 → 2 · 2 → 0 · 3 → 2"
+              },
+              {
+                "at": "Enter",
+                "nodes": {
+                  "0": "queued"
+                },
+                "panels": {
+                  "in": {
+                    "0": "0"
+                  }
+                },
+                "note": "enter 0"
+              },
+              {
+                "at": "then",
+                "nodes": {
+                  "1": "queued"
+                },
+                "edges": {
+                  "0-1": "tree"
+                },
+                "panels": {
+                  "in": {
+                    "1": "1"
+                  }
+                },
+                "note": "enter 1: tree edge"
+              },
+              {
+                "at": "then#2",
+                "nodes": {
+                  "2": "queued"
+                },
+                "edges": {
+                  "1-2": "tree"
+                },
+                "panels": {
+                  "in": {
+                    "2": "2"
+                  }
+                },
+                "note": "enter 2: tree edge"
+              },
+              {
+                "at": "back",
+                "edges": {
+                  "2-0": "relax"
+                },
+                "nodes": {
+                  "0": "active"
+                },
+                "note": "2 → 0: 0 entered, not exited"
+              },
+              {
+                "at": "cycle",
+                "nodes": {
+                  "0": "queued"
+                },
+                "note": "Back edge → a cycle"
+              },
+              {
+                "at": "nothing",
+                "nodes": {
+                  "2": "done"
+                },
+                "edges": {
+                  "2-0": "dim"
+                },
+                "panels": {
+                  "out": {
+                    "2": "3"
+                  }
+                },
+                "note": "exit 2"
+              },
+              {
+                "at": "four",
+                "nodes": {
+                  "1": "done"
+                },
+                "panels": {
+                  "out": {
+                    "1": "4"
+                  }
+                },
+                "note": "exit 1"
+              },
+              {
+                "at": "finished",
+                "edges": {
+                  "0-2": "relax"
+                },
+                "note": "0 → 2: finished, entered after 0"
+              },
+              {
+                "at": "shortcut",
+                "edges": {
+                  "0-2": "dim"
+                },
+                "note": "Forward edge: a shortcut to a descendant"
+              },
+              {
+                "at": "five",
+                "nodes": {
+                  "3": "queued"
+                },
+                "edges": {
+                  "0-3": "tree"
+                },
+                "panels": {
+                  "in": {
+                    "3": "5"
+                  }
+                },
+                "note": "enter 3: tree edge"
+              },
+              {
+                "at": "before",
+                "edges": {
+                  "3-2": "relax"
+                },
+                "note": "3 → 2: finished, entered before 3"
+              },
+              {
+                "at": "cross",
+                "edges": {
+                  "3-2": "dim"
+                },
+                "note": "Cross edge: into a finished branch"
+              },
+              {
+                "at": "six",
+                "nodes": {
+                  "3": "done"
+                },
+                "panels": {
+                  "out": {
+                    "3": "6"
+                  }
+                },
+                "note": "exit 3"
+              },
+              {
+                "at": "seven",
+                "nodes": {
+                  "0": "done"
+                },
+                "panels": {
+                  "out": {
+                    "0": "7"
+                  }
+                },
+                "note": "exit 0"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "So, for an edge from u to v: if v is entered but not exited, it's a back edge, and the graph has a cycle. If v is finished, and was entered after u, it's a forward edge. If v is finished, and was entered before u, it's a cross edge. Two more uses. u is an ancestor of v exactly when u's interval contains v's. And sorting by exit time, latest first, gives a topological order of a DAG.",
+          "props": {
+            "title": "Edge u → v, <em>by v's state</em>",
+            "items": [
+              {
+                "at": "cycle",
+                "label": "Back edge",
+                "title": "v entered, not exited",
+                "body": "v is on the current path: a cycle.",
+                "code": "in[v] set, out[v] not"
+              },
+              {
+                "at": "forward",
+                "label": "Forward edge",
+                "title": "v finished, entered after u",
+                "body": "A shortcut to a descendant.",
+                "code": "in[u] < in[v]"
+              },
+              {
+                "at": "cross",
+                "label": "Cross edge",
+                "title": "v finished, entered before u",
+                "body": "Into another, finished branch.",
+                "code": "in[v] < in[u]"
+              },
+              {
+                "at": "topological",
+                "label": "Uses",
+                "title": "Ancestors and topo order",
+                "body": "Nested intervals; reverse exit order.",
+                "code": "sort by out[] descending"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Finding a cycle",
+      "question": "Why isn't \"already visited\" enough to detect a cycle in a directed graph?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. In a directed graph, why isn't already visited enough to detect a cycle? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Why isn't <em>visited</em> enough to find a cycle?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Here's a diamond: zero points to one and two, and both point to three. DFS goes zero, one, three. Three finishes, then one. Now, from two, the edge to three hits a visited node. But there's no cycle: three is finished, so this path just joins a branch that's already done. That's why you need three states: unvisited, in progress, and done. Only reaching a node that's in progress, still on the current path, is a cycle. Add an edge from three back to zero, and run it again: zero, one, three, and now three's edge reaches zero while zero is in progress. That edge closes a cycle.",
+          "props": {
+            "title": "Visited is not <em>in progress</em>",
+            "nodes": [
+              {
+                "id": "0",
+                "x": 960,
+                "y": 280
+              },
+              {
+                "id": "1",
+                "x": 700,
+                "y": 450
+              },
+              {
+                "id": "2",
+                "x": 1220,
+                "y": 450
+              },
+              {
+                "id": "3",
+                "x": 960,
+                "y": 640
+              }
+            ],
+            "edges": [
+              {
+                "from": "0",
+                "to": "1"
+              },
+              {
+                "from": "0",
+                "to": "2"
+              },
+              {
+                "from": "1",
+                "to": "3"
+              },
+              {
+                "from": "2",
+                "to": "3"
+              }
+            ],
+            "panels": [],
+            "steps": [
+              {
+                "at": "diamond",
+                "note": "0 → 1, 0 → 2, 1 → 3, 2 → 3"
+              },
+              {
+                "at": "goes",
+                "nodes": {
+                  "0": "queued",
+                  "1": "queued",
+                  "3": "queued"
+                },
+                "edges": {
+                  "0-1": "tree",
+                  "1-3": "tree"
+                },
+                "note": "In progress: 0, 1, 3"
+              },
+              {
+                "at": "finishes",
+                "nodes": {
+                  "3": "done",
+                  "1": "done"
+                },
+                "note": "3 done, then 1 done"
+              },
+              {
+                "at": "hits",
+                "nodes": {
+                  "2": "queued"
+                },
+                "edges": {
+                  "0-2": "tree",
+                  "2-3": "relax"
+                },
+                "note": "2 → 3: visited…"
+              },
+              {
+                "at": "finished",
+                "edges": {
+                  "2-3": "dim"
+                },
+                "note": "…but done: no cycle"
+              },
+              {
+                "at": "states",
+                "note": "unvisited · in progress · done"
+              },
+              {
+                "at": "Only",
+                "note": "Reaching an in-progress node = a cycle"
+              },
+              {
+                "at": "Add",
+                "nodes": {
+                  "0": "base",
+                  "1": "base",
+                  "2": "base",
+                  "3": "base"
+                },
+                "edges": {
+                  "0-1": "base",
+                  "1-3": "base",
+                  "0-2": "base",
+                  "2-3": "base"
+                },
+                "add": [
+                  {
+                    "from": "3",
+                    "to": "0"
+                  }
+                ],
+                "note": "Add 3 → 0, run again"
+              },
+              {
+                "at": "again",
+                "nodes": {
+                  "0": "queued",
+                  "1": "queued",
+                  "3": "queued"
+                },
+                "edges": {
+                  "0-1": "tree",
+                  "1-3": "tree"
+                },
+                "note": "In progress: 0, 1, 3"
+              },
+              {
+                "at": "reaches",
+                "nodes": {
+                  "0": "active"
+                },
+                "edges": {
+                  "3-0": "relax"
+                },
+                "note": "3 → 0: 0 is in progress"
+              },
+              {
+                "at": "closes",
+                "note": "Cycle: 0 → 1 → 3 → 0"
+              }
+            ]
+          }
+        },
+        {
+          "type": "code",
+          "say": "In code, state one means in progress. Mark it on entry. Reaching a node in state one is a back edge: return true. Recurse only into unvisited nodes, and skip finished ones. Mark two on the way out. And start a search from every unvisited node, so disconnected parts are covered. In an undirected graph, the rule is simpler: a visited neighbor that isn't your parent closes a cycle.",
+          "props": {
+            "title": "Three <em>states</em>",
+            "file": "cycle.cpp",
+            "tag": "C++",
+            "lang": "cpp",
+            "size": 20,
+            "width": 1250,
+            "code": "// state: 0 = unvisited, 1 = in progress (on the path), 2 = done\nbool hasCycle(int u, const vector<vector<int>>& adj, vector<int>& state) {\n    state[u] = 1;\n    for (int v : adj[u]) {\n        if (state[v] == 1) return true;           // back edge: a cycle\n        if (state[v] == 0 && hasCycle(v, adj, state)) return true;\n    }                                             // state 2: finished, skip\n    state[u] = 2;\n    return false;\n}\nbool anyCycle(const vector<vector<int>>& adj) {\n    vector<int> state(adj.size(), 0);\n    for (int u = 0; u < (int)adj.size(); ++u)     // every component\n        if (state[u] == 0 && hasCycle(u, adj, state)) return true;\n    return false;\n}",
+            "highlights": [
+              {
+                "at": "entry",
+                "lines": "3",
+                "note": "In progress on entry"
+              },
+              {
+                "at": "true",
+                "lines": "5",
+                "note": "Back edge: a cycle"
+              },
+              {
+                "at": "Recurse",
+                "lines": "6",
+                "note": "Recurse into unvisited only"
+              },
+              {
+                "at": "out",
+                "lines": "8",
+                "note": "Done on exit"
+              },
+              {
+                "at": "every",
+                "lines": "13-14",
+                "note": "Every component"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Memoized DFS",
+      "question": "How do you find the longest increasing path in a matrix?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. How do you find the longest strictly increasing path in a matrix, moving up, down, left, or right? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Longest <em>increasing path</em> in a matrix?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Treat each cell as a node, with an edge to every neighbor holding a bigger value. Values strictly increase along each edge, so there are no cycles: it's a DAG, and DFS can't loop. The longest path from a cell is one, plus the longest path from its best bigger neighbor. That never changes, so cache it. The nines and the eight have no bigger neighbor: their paths have length one. The four, and both sixes, step to one of those: two. The bottom-left two steps up to a six: three. The middle one steps left, to the two: four. The last corner steps up to the eight: two. Each cell is computed once, so the whole search is O of m times n. The answer is four: one, two, six, nine.",
+          "props": {
+            "title": "Memo = <em>longest path from here</em>",
+            "nodes": [
+              {
+                "id": "hm",
+                "label": "matrix",
+                "x": 580,
+                "y": 290,
+                "w": 300,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "hmemo",
+                "label": "memo: longest path from here",
+                "x": 1340,
+                "y": 290,
+                "w": 520,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "m00",
+                "label": "9",
+                "x": 460,
+                "y": 400,
+                "w": 104,
+                "h": 96
+              },
+              {
+                "id": "m01",
+                "label": "9",
+                "x": 580,
+                "y": 400,
+                "w": 104,
+                "h": 96
+              },
+              {
+                "id": "m02",
+                "label": "4",
+                "x": 700,
+                "y": 400,
+                "w": 104,
+                "h": 96
+              },
+              {
+                "id": "m10",
+                "label": "6",
+                "x": 460,
+                "y": 520,
+                "w": 104,
+                "h": 96
+              },
+              {
+                "id": "m11",
+                "label": "6",
+                "x": 580,
+                "y": 520,
+                "w": 104,
+                "h": 96
+              },
+              {
+                "id": "m12",
+                "label": "8",
+                "x": 700,
+                "y": 520,
+                "w": 104,
+                "h": 96
+              },
+              {
+                "id": "m20",
+                "label": "2",
+                "x": 460,
+                "y": 640,
+                "w": 104,
+                "h": 96
+              },
+              {
+                "id": "m21",
+                "label": "1",
+                "x": 580,
+                "y": 640,
+                "w": 104,
+                "h": 96
+              },
+              {
+                "id": "m22",
+                "label": "1",
+                "x": 700,
+                "y": 640,
+                "w": 104,
+                "h": 96
+              },
+              {
+                "id": "p00",
+                "label": "",
+                "x": 1220,
+                "y": 400,
+                "w": 104,
+                "h": 96
+              },
+              {
+                "id": "p01",
+                "label": "",
+                "x": 1340,
+                "y": 400,
+                "w": 104,
+                "h": 96
+              },
+              {
+                "id": "p02",
+                "label": "",
+                "x": 1460,
+                "y": 400,
+                "w": 104,
+                "h": 96
+              },
+              {
+                "id": "p10",
+                "label": "",
+                "x": 1220,
+                "y": 520,
+                "w": 104,
+                "h": 96
+              },
+              {
+                "id": "p11",
+                "label": "",
+                "x": 1340,
+                "y": 520,
+                "w": 104,
+                "h": 96
+              },
+              {
+                "id": "p12",
+                "label": "",
+                "x": 1460,
+                "y": 520,
+                "w": 104,
+                "h": 96
+              },
+              {
+                "id": "p20",
+                "label": "",
+                "x": 1220,
+                "y": 640,
+                "w": 104,
+                "h": 96
+              },
+              {
+                "id": "p21",
+                "label": "",
+                "x": 1340,
+                "y": 640,
+                "w": 104,
+                "h": 96
+              },
+              {
+                "id": "p22",
+                "label": "",
+                "x": 1460,
+                "y": 640,
+                "w": 104,
+                "h": 96
+              }
+            ],
+            "edges": [],
+            "panels": [],
+            "steps": [
+              {
+                "at": "bigger",
+                "note": "Edge: to a neighbor with a bigger value"
+              },
+              {
+                "at": "cycles",
+                "note": "Strictly increasing → no cycles: a DAG"
+              },
+              {
+                "at": "plus",
+                "note": "len(cell) = 1 + max len(bigger neighbor)"
+              },
+              {
+                "at": "cache",
+                "nodes": {
+                  "hmemo": "active"
+                },
+                "note": "Cache each cell's answer"
+              },
+              {
+                "at": "nines",
+                "labels": {
+                  "p00": "1",
+                  "p01": "1",
+                  "p12": "1"
+                },
+                "nodes": {
+                  "m00": "queued",
+                  "m01": "queued",
+                  "m12": "queued",
+                  "hmemo": "base"
+                },
+                "note": "No bigger neighbor: 1"
+              },
+              {
+                "at": "sixes",
+                "labels": {
+                  "p02": "2",
+                  "p10": "2",
+                  "p11": "2"
+                },
+                "nodes": {
+                  "m00": "base",
+                  "m01": "base",
+                  "m12": "base",
+                  "m02": "queued",
+                  "m10": "queued",
+                  "m11": "queued"
+                },
+                "note": "One step to a 1: 2"
+              },
+              {
+                "at": "three",
+                "labels": {
+                  "p20": "3"
+                },
+                "nodes": {
+                  "m02": "base",
+                  "m10": "base",
+                  "m11": "base",
+                  "m20": "queued"
+                },
+                "note": "2 → 6: 1 + 2 = 3"
+              },
+              {
+                "at": "middle",
+                "labels": {
+                  "p21": "4"
+                },
+                "nodes": {
+                  "m20": "base",
+                  "m21": "queued"
+                },
+                "note": "1 → 2: 1 + 3 = 4"
+              },
+              {
+                "at": "corner",
+                "labels": {
+                  "p22": "2"
+                },
+                "nodes": {
+                  "m21": "base",
+                  "m22": "queued"
+                },
+                "note": "1 → 8: 1 + 1 = 2"
+              },
+              {
+                "at": "once",
+                "nodes": {
+                  "m22": "base"
+                },
+                "note": "Each cell once: O(m·n)"
+              },
+              {
+                "at": "answer",
+                "nodes": {
+                  "m21": "active",
+                  "m20": "active",
+                  "m10": "active",
+                  "m00": "active",
+                  "p21": "done"
+                },
+                "note": "1 → 2 → 6 → 9: length 4"
+              }
+            ]
+          }
+        },
+        {
+          "type": "code",
+          "say": "The code is a plain DFS with a cache. Zero means not computed yet, which is safe because every real answer is at least one. Only step to bigger neighbors: that's what makes the graph acyclic, so no visited set is needed. Store the result before returning. Then call it from every cell, and take the max.",
+          "props": {
+            "title": "DFS + <em>memo</em>",
+            "file": "longest_path.cpp",
+            "tag": "C++",
+            "lang": "cpp",
+            "size": 19,
+            "width": 1300,
+            "code": "int dfs(const vector<vector<int>>& g, vector<vector<int>>& memo, int r, int c) {\n    if (memo[r][c]) return memo[r][c];            // computed already\n    static const int dr[] = {1, -1, 0, 0}, dc[] = {0, 0, 1, -1};\n    int best = 1;\n    for (int k = 0; k < 4; ++k) {\n        int nr = r + dr[k], nc = c + dc[k];\n        if (nr >= 0 && nr < (int)g.size() && nc >= 0 && nc < (int)g[0].size()\n            && g[nr][nc] > g[r][c])               // edges only go uphill\n            best = max(best, 1 + dfs(g, memo, nr, nc));\n    }\n    return memo[r][c] = best;\n}",
+            "highlights": [
+              {
+                "at": "cache",
+                "lines": "2",
+                "note": "Return the cached answer"
+              },
+              {
+                "at": "Zero",
+                "lines": "4",
+                "note": "0 = not computed: real answers are ≥ 1"
+              },
+              {
+                "at": "bigger",
+                "lines": "8-9",
+                "note": "Uphill only: acyclic, no visited set"
+              },
+              {
+                "at": "Store",
+                "lines": "11",
+                "note": "Store, then return"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Entry and exit times classify every edge: back edges mean cycles. A directed cycle needs three states, because visited isn't the same as in progress. Reverse exit order is a topological order. And when edges only go uphill, DFS with a memo visits each node once.",
+          "props": {
+            "title": "DFS, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "classify",
+                "text": "Entry/exit times classify edges.",
+                "code": "back, forward, cross"
+              },
+              {
+                "at": "three",
+                "text": "Directed cycles: three states.",
+                "code": "in progress ≠ done"
+              },
+              {
+                "at": "Reverse",
+                "text": "Reverse exit order = topological order.",
+                "code": "DAGs"
+              },
+              {
+                "at": "memo",
+                "text": "Implicit DAG: DFS + memo, each node once.",
+                "code": "O(m·n)"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

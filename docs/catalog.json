@@ -4,7 +4,7 @@
     {
       "id": "algorithm",
       "title": "Algorithms",
-      "blurb": "Patterns that turn brute force into linear or logarithmic passes—each step animated on real arrays."
+      "blurb": "Interview patterns and data structures, each step animated: windows, binary search and monotonic stacks, graph search and spanning trees, segment and Fenwick trees, balanced BSTs, and dynamic programming from knapsack to bitmasks."
     },
     {
       "id": "cpp",
@@ -2065,6 +2065,268 @@
           "duration": 95,
           "video": "media/os-concurrency-bugs-03.mp4",
           "poster": "media/os-concurrency-bugs-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "algorithm-segment-tree",
+      "series": "algorithm",
+      "title": "Segment tree",
+      "kicker": "Algorithm · Segment tree",
+      "summary": "Range queries and updates in O(log N): how the tree splits ranges, why a query touches few nodes, and lazy propagation for range updates.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/segment-tree.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Splitting the range",
+          "question": "What does each node of a segment tree store, and why is a range query O(log N)?",
+          "duration": 79,
+          "video": "media/algorithm-segment-tree-01.mp4",
+          "poster": "media/algorithm-segment-tree-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Point update",
+          "question": "How does a segment tree update one element, and what does it cost?",
+          "duration": 53,
+          "video": "media/algorithm-segment-tree-02.mp4",
+          "poster": "media/algorithm-segment-tree-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Lazy propagation",
+          "question": "How can a segment tree add a value to a whole range in O(log N)?",
+          "duration": 93,
+          "video": "media/algorithm-segment-tree-03.mp4",
+          "poster": "media/algorithm-segment-tree-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "algorithm-fenwick-tree",
+      "series": "algorithm",
+      "title": "Fenwick tree",
+      "kicker": "Algorithm · Fenwick tree",
+      "summary": "The binary indexed tree: what each slot covers, prefix sums and updates by the lowest set bit, range updates with two trees, and when a segment tree is the better choice.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/binary-indexed-tree.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "The lowbit trick",
+          "question": "In a Fenwick tree, which elements does t[i] cover?",
+          "duration": 60,
+          "video": "media/algorithm-fenwick-tree-01.mp4",
+          "poster": "media/algorithm-fenwick-tree-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Query and update",
+          "question": "How does a Fenwick tree compute a prefix sum, and how does it update one element?",
+          "duration": 62,
+          "video": "media/algorithm-fenwick-tree-02.mp4",
+          "poster": "media/algorithm-fenwick-tree-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Range add, range sum",
+          "question": "How can a Fenwick tree add to a whole range and still answer range sums in O(log N)?",
+          "duration": 63,
+          "video": "media/algorithm-fenwick-tree-03.mp4",
+          "poster": "media/algorithm-fenwick-tree-03.jpg"
+        },
+        {
+          "id": "04",
+          "title": "Fenwick or segment tree?",
+          "question": "When can't you use a Fenwick tree, and what's the classic problem it solves?",
+          "duration": 79,
+          "video": "media/algorithm-fenwick-tree-04.mp4",
+          "poster": "media/algorithm-fenwick-tree-04.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "algorithm-balanced-bst",
+      "series": "algorithm",
+      "title": "AVL and red-black trees",
+      "kicker": "Algorithm · Balanced BSTs",
+      "summary": "Why plain BSTs degrade, how rotations fix them, the four AVL cases, the red-black rules and insert fix-up, and why std::map is a red-black tree.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/balanced-bst.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Rotations",
+          "question": "Why does a plain binary search tree degrade, and what does a rotation do?",
+          "duration": 78,
+          "video": "media/algorithm-balanced-bst-01.mp4",
+          "poster": "media/algorithm-balanced-bst-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "The four AVL cases",
+          "question": "When does an AVL tree rotate, and which rotation does it use?",
+          "duration": 90,
+          "video": "media/algorithm-balanced-bst-02.mp4",
+          "poster": "media/algorithm-balanced-bst-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Red-black rules",
+          "question": "What are the red-black rules, and how does an insert restore them?",
+          "duration": 73,
+          "video": "media/algorithm-balanced-bst-03.mp4",
+          "poster": "media/algorithm-balanced-bst-03.jpg"
+        },
+        {
+          "id": "04",
+          "title": "AVL or red-black?",
+          "question": "Why is std::map a red-black tree rather than an AVL tree?",
+          "duration": 61,
+          "video": "media/algorithm-balanced-bst-04.mp4",
+          "poster": "media/algorithm-balanced-bst-04.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "algorithm-dynamic-programming",
+      "series": "algorithm",
+      "title": "Dynamic programming",
+      "kicker": "Algorithm · Dynamic programming",
+      "summary": "Designing a DP from its state and transition, then three shapes interviews love: a 2D table (edit distance), intervals (burst balloons), and trees.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/dynamic-programming.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "State and transition",
+          "question": "How do you design a dynamic programming solution: what do you write down first?",
+          "duration": 94,
+          "video": "media/algorithm-dynamic-programming-01.mp4",
+          "poster": "media/algorithm-dynamic-programming-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Edit distance",
+          "question": "How do you compute the edit distance between two strings?",
+          "duration": 70,
+          "video": "media/algorithm-dynamic-programming-02.mp4",
+          "poster": "media/algorithm-dynamic-programming-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Interval DP",
+          "question": "In burst balloons, why do you choose the last balloon to burst, not the first?",
+          "duration": 66,
+          "video": "media/algorithm-dynamic-programming-03.mp4",
+          "poster": "media/algorithm-dynamic-programming-03.jpg"
+        },
+        {
+          "id": "04",
+          "title": "DP on trees",
+          "question": "How do you rob houses arranged as a binary tree, never taking a parent and its child?",
+          "duration": 70,
+          "video": "media/algorithm-dynamic-programming-04.mp4",
+          "poster": "media/algorithm-dynamic-programming-04.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "algorithm-knapsack",
+      "series": "algorithm",
+      "title": "Knapsack",
+      "kicker": "Algorithm · Knapsack",
+      "summary": "0/1 and unbounded knapsack on a one-dimensional array: why the loop direction decides how often an item is used, and why loop order decides combinations versus permutations.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/knapsack.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "0/1 knapsack",
+          "question": "In 0/1 knapsack with a one-dimensional array, why must the capacity loop run backwards?",
+          "duration": 79,
+          "video": "media/algorithm-knapsack-01.mp4",
+          "poster": "media/algorithm-knapsack-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Unbounded knapsack",
+          "question": "How does the code for unbounded knapsack differ from 0/1?",
+          "duration": 56,
+          "video": "media/algorithm-knapsack-02.mp4",
+          "poster": "media/algorithm-knapsack-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Combinations or permutations?",
+          "question": "In coin change II, why does the loop order decide whether you count combinations or permutations?",
+          "duration": 75,
+          "video": "media/algorithm-knapsack-03.mp4",
+          "poster": "media/algorithm-knapsack-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "algorithm-bitmask-dp",
+      "series": "algorithm",
+      "title": "Bitmask DP",
+      "kicker": "Algorithm · Bitmask DP",
+      "summary": "Sets as integers: subset enumeration, the visit-every-node DP over (mask, last), and why iterating submasks of every mask costs 3^n.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/bitmask-dp.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Sets as integers",
+          "question": "How do you store a set in an integer, and loop over all its subsets?",
+          "duration": 58,
+          "video": "media/algorithm-bitmask-dp-01.mp4",
+          "poster": "media/algorithm-bitmask-dp-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Visiting every node",
+          "question": "How do you find the cheapest path that visits every node exactly once?",
+          "duration": 71,
+          "video": "media/algorithm-bitmask-dp-02.mp4",
+          "poster": "media/algorithm-bitmask-dp-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Why O(3^n)?",
+          "question": "Looping over every submask of every mask: why is that 3^n and not 4^n?",
+          "duration": 75,
+          "video": "media/algorithm-bitmask-dp-03.mp4",
+          "poster": "media/algorithm-bitmask-dp-03.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "algorithm-graph-dfs",
+      "series": "algorithm",
+      "title": "Depth-first search",
+      "kicker": "Algorithm · DFS",
+      "summary": "What DFS entry and exit times reveal about edges, cycle detection with three states, and memoized DFS on an implicit DAG.",
+      "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/graph-dfs.md",
+      "clips": [
+        {
+          "id": "01",
+          "title": "Entry and exit times",
+          "question": "What do DFS entry and exit times tell you about the edges of a directed graph?",
+          "duration": 76,
+          "video": "media/algorithm-graph-dfs-01.mp4",
+          "poster": "media/algorithm-graph-dfs-01.jpg"
+        },
+        {
+          "id": "02",
+          "title": "Finding a cycle",
+          "question": "Why isn't \"already visited\" enough to detect a cycle in a directed graph?",
+          "duration": 70,
+          "video": "media/algorithm-graph-dfs-02.mp4",
+          "poster": "media/algorithm-graph-dfs-02.jpg"
+        },
+        {
+          "id": "03",
+          "title": "Memoized DFS",
+          "question": "How do you find the longest increasing path in a matrix?",
+          "duration": 91,
+          "video": "media/algorithm-graph-dfs-03.mp4",
+          "poster": "media/algorithm-graph-dfs-03.jpg"
         }
       ]
     }

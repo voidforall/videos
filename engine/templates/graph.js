@@ -4,14 +4,15 @@
 // lists (heap, queue, order). Steps change node/edge states, panels, and structure.
 // props: {
 //   title, directed?: true,
-//   nodes: [{ id, label?, x, y, w?, h?, hidden? }],     // centers, frame px; w/h make a box (memory layouts)
+//   nodes: [{ id, label?, x, y, w?, h?, hidden?, plain? }], // centers, frame px; w/h make a box; plain: bare text (table headers)
 //   edges: [{ from, to, w? }],                           // key "from-to"; u→v + v→u draw side by side
 //   panels: [{ key, label, type: "table" | "list", initial: {id: v} | [..] }],
 //   steps: [{ at, note?,
-//             nodes?: { id: "active" | "done" | "queued" | "dim" | "base" },
+//             nodes?: { id: "active" | "done" | "queued" | "dim" | "base" | "red" | "black" },
 //             edges?: { "u-v": "relax" | "tree" | "dim" | "base" },
 //             panels?: { key: { id: v } (table, merged) | [..] (list, replaced) },
-//             show?: [id], add?: [{ from, to, w? }], remove?: ["u-v"], move?: { id: [x, y] } }] }
+//             show?: [id], hide?: [id], labels?: { id: text }, add?: [{ from, to, w? }], remove?: ["u-v"], move?: { id: [x, y] } }] }
+// labels swap a node's text (segment-tree sums, DP cells); red/black colour red-black tree nodes.
 // List panels take rows? (default 1) for taller content; table panels take columns? (default: sorted ids).
 registerTemplate("graph", {
   render(props, { esc }) {
@@ -47,8 +48,12 @@ registerTemplate("graph", {
       ${labels}
       ${props.nodes.map((n) => {
         const [hw, hh] = graphHalf(n);
-        return `<div class="gr-node gr-base${n.w ? " gr-box" : ""}" data-id="${esc(n.id)}" style="left:${n.x - hw}px;top:${n.y - hh}px;width:${hw * 2}px;height:${hh * 2}px">${
-          esc(n.label ?? n.id).replace(/\n/g, "<br>")}</div>`;
+        const text = (t) => esc(t).replace(/\n/g, "<br>");
+        const changes = props.steps.map((s, i) => [i, s.labels?.[n.id]]).filter(([, t]) => t != null);
+        const body = changes.length
+          ? [[-1, n.label ?? n.id], ...changes].map(([i, t]) => `<span class="gr-lb" data-step="${i}">${text(t)}</span>`).join("")
+          : text(n.label ?? n.id);
+        return `<div class="${graphNodeClass(n, "base")}" data-id="${esc(n.id)}" style="left:${n.x - hw}px;top:${n.y - hh}px;width:${hw * 2}px;height:${hh * 2}px">${body}</div>`;
       }).join("")}
       <div class="gr-side">${panelHtml}</div>
       <div class="card gr-note"><p class="label">Step</p><div class="ar-slot gr-note-slot">${
@@ -142,6 +147,11 @@ registerTemplate("graph", {
 
     const hidden = new Set(props.nodes.filter((n) => n.hidden).map((n) => n.id));
     hidden.forEach((id) => gsap.set(nodeEl(id), { autoAlpha: 0 }));
+    const shownLabel = {};
+    q('.gr-lb').forEach((lb) => {
+      if (lb.dataset.step === "-1") shownLabel[lb.parentElement.dataset.id] = lb;
+      else gsap.set(lb, { autoAlpha: 0 });
+    });
     fx.in([...q(".gr-node")].filter((n) => !hidden.has(n.dataset.id)), 0.4, { y: 0, scale: 0.8, stagger: 0.06, dur: 0.45 })
       .in([...q(".gr-edge")].filter((g) => live.has(g.dataset.key)), 0.8, { y: 0, scale: 1, dur: 0.5 })
       .in([...q(".gr-w")].filter((w) => live.has(w.dataset.key)), 0.9, { y: 0, scale: 1, dur: 0.4 })
@@ -164,6 +174,13 @@ registerTemplate("graph", {
       for (const id of s.show ?? []) {
         if (!hidden.delete(id)) throw new Error(`graph: step "${s.at}" shows "${id}", which is not hidden`);
         tl.fromTo(nodeEl(id), { autoAlpha: 0, scale: 0.6 }, { autoAlpha: 1, scale: 1, duration: 0.4, ease: "back.out(1.6)", immediateRender: false }, at);
+      }
+      for (const id of s.hide ?? []) {
+        if (hidden.has(id)) throw new Error(`graph: step "${s.at}" hides "${id}", which is already hidden`);
+        const attached = [...live].filter((k) => k.split("-").includes(id));
+        if (attached.some((k) => !(s.remove ?? []).includes(k))) throw new Error(`graph: step "${s.at}" hides "${id}" but keeps its edges ${attached.join(", ")}`);
+        hidden.add(id);
+        tl.to(nodeEl(id), { autoAlpha: 0, scale: 0.6, duration: 0.35 }, at);
       }
       for (const key of s.remove ?? []) {
         if (!live.delete(key)) throw new Error(`graph: step "${s.at}" removes missing edge "${key}"`);
@@ -197,14 +214,21 @@ registerTemplate("graph", {
       }
 
       for (const [id, state] of Object.entries(s.nodes ?? {})) {
-        if (!["active", "done", "queued", "dim", "base"].includes(state)) throw new Error(`graph: unknown node state "${state}"`);
+        if (!GRAPH_STATES.includes(state)) throw new Error(`graph: unknown node state "${state}"`);
         const node = nodeEl(id);
-        tl.set(node, { className: `gr-node gr-${state}${spec[id].w ? " gr-box" : ""}` }, at);
+        tl.set(node, { className: graphNodeClass(spec[id], state) }, at);
         // opacity is tweened, not classed: entrance animations leave an inline opacity behind
         tl.to(node, { opacity: state === "dim" ? 0.35 : 1, duration: 0.3 }, at);
         tl.fromTo(node, { scale: 1.08 }, { scale: 1, duration: 0.35, ease: "power2.out", immediateRender: false }, at);
       }
       for (const [key, state] of Object.entries(s.edges ?? {})) styleEdge(key, state, at);
+
+      for (const id of Object.keys(s.labels ?? {})) {
+        const next = nodeEl(id).querySelector(`.gr-lb[data-step="${i}"]`);
+        tl.to(shownLabel[id], { autoAlpha: 0, duration: 0.15 }, at - 0.05);
+        tl.fromTo(next, { autoAlpha: 0, y: -10 }, { autoAlpha: 1, y: 0, duration: 0.3, ease: "power2.out", immediateRender: false }, at + 0.1);
+        shownLabel[id] = next;
+      }
 
       for (const [panel, update] of Object.entries(s.panels ?? {})) {
         const spec = props.panels.find((p) => p.key === panel);
@@ -237,4 +261,6 @@ registerTemplate("graph", {
 });
 
 const GRAPH_R = 44;
+const GRAPH_STATES = ["active", "done", "queued", "dim", "base", "red", "black"];
+const graphNodeClass = (n, state) => `gr-node gr-${state}${n.w ? " gr-box" : ""}${n.plain ? " gr-plain" : ""}`;
 const graphHalf = (n) => (n.w ? [n.w / 2, (n.h ?? 64) / 2] : [GRAPH_R, GRAPH_R]);

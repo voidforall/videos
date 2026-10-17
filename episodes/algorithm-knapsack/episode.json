@@ -1,0 +1,735 @@
+{
+  "slug": "algorithm-knapsack",
+  "series": "algorithm",
+  "title": "Knapsack",
+  "kicker": "Algorithm · Knapsack",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/knapsack.md",
+  "summary": "0/1 and unbounded knapsack on a one-dimensional array: why the loop direction decides how often an item is used, and why loop order decides combinations versus permutations.",
+  "captionFixes": [
+    {
+      "match": [
+        "dp",
+        "of",
+        "w",
+        "minus",
+        "1"
+      ],
+      "display": "dp[w−1]"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "n",
+        "times",
+        "W"
+      ],
+      "display": "O(N·W)"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "W"
+      ],
+      "display": "O(W)"
+    },
+    {
+      "match": [
+        "from",
+        "w",
+        "down"
+      ],
+      "display": "from W down"
+    },
+    {
+      "match": [
+        "one",
+        "thing",
+        "the",
+        "direction"
+      ],
+      "display": "One thing: the direction"
+    },
+    {
+      "match": [
+        "Zero",
+        "1"
+      ],
+      "display": "0/1"
+    },
+    {
+      "match": [
+        "dp",
+        "over"
+      ],
+      "display": "dp[a]"
+    },
+    {
+      "match": [
+        "make",
+        "A"
+      ],
+      "display": "make a"
+    },
+    {
+      "match": [
+        "coin",
+        "C"
+      ],
+      "display": "coin c"
+    },
+    {
+      "match": [
+        "every",
+        "sell"
+      ],
+      "display": "every cell"
+    },
+    {
+      "match": [
+        "1",
+        "1",
+        "1",
+        "and",
+        "1",
+        "2"
+      ],
+      "display": "1+1+1 and 1+2"
+    },
+    {
+      "match": [
+        "zero-one"
+      ],
+      "display": "0/1"
+    },
+    {
+      "match": [
+        "zero",
+        "one"
+      ],
+      "display": "0/1"
+    },
+    {
+      "match": [
+        "0-1"
+      ],
+      "display": "0/1"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "n",
+        "times",
+        "W"
+      ],
+      "display": "O(N·W)"
+    },
+    {
+      "match": [
+        "dp",
+        "of",
+        "w"
+      ],
+      "display": "dp[w]"
+    },
+    {
+      "match": [
+        "dp",
+        "of",
+        "a"
+      ],
+      "display": "dp[a]"
+    },
+    {
+      "match": [
+        "int",
+        "max"
+      ],
+      "display": "INT_MAX"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "log",
+        "n"
+      ],
+      "display": "O(log N)"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "n",
+        "log",
+        "n"
+      ],
+      "display": "O(N log N)"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "n"
+      ],
+      "display": "O(N)"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "one"
+      ],
+      "display": "O(1)"
+    },
+    {
+      "match": [
+        "O(n)"
+      ],
+      "display": "O(N)"
+    },
+    {
+      "match": [
+        "to",
+        "recap"
+      ],
+      "display": "To recap",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "d",
+        "p"
+      ],
+      "display": "dp"
+    },
+    {
+      "match": [
+        "DP"
+      ],
+      "display": "dp",
+      "matchCase": true
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "0/1 knapsack",
+      "question": "In 0/1 knapsack with a one-dimensional array, why must the capacity loop run backwards?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Knapsack, question one. With a one-dimensional array, why must the capacity loop for zero-one knapsack run backwards? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "0/1 knapsack: why loop capacity <em>backwards</em>?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Take one item: weight one, value fifteen, and capacities zero to four. Each cell does: d p of w is the max of itself, and d p of w minus one, plus fifteen. Run the loop forward. Capacity one reads capacity zero: fifteen. Capacity two reads capacity one, which already includes the item: thirty. Then forty-five, and then sixty. The single item was packed four times. Now run it backward. Capacity four reads capacity three, still zero from before this item: fifteen. Then three, then two, then one, each reading an old value. Fifteen everywhere: the item is used at most once. Backward means every read sees the row before this item.",
+          "props": {
+            "title": "One item: <em>w = 1, v = 15</em>",
+            "nodes": [
+              {
+                "id": "h0",
+                "label": "w=0",
+                "x": 700,
+                "y": 290,
+                "w": 120,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "h1",
+                "label": "w=1",
+                "x": 880,
+                "y": 290,
+                "w": 120,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "h2",
+                "label": "w=2",
+                "x": 1060,
+                "y": 290,
+                "w": 120,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "h3",
+                "label": "w=3",
+                "x": 1240,
+                "y": 290,
+                "w": 120,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "h4",
+                "label": "w=4",
+                "x": 1420,
+                "y": 290,
+                "w": 120,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "lf",
+                "label": "forward  w↑",
+                "x": 430,
+                "y": 400,
+                "w": 220,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "lb",
+                "label": "backward  w↓",
+                "x": 430,
+                "y": 600,
+                "w": 220,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "f0",
+                "label": "0",
+                "x": 700,
+                "y": 400,
+                "w": 120,
+                "h": 70
+              },
+              {
+                "id": "f1",
+                "label": "0",
+                "x": 880,
+                "y": 400,
+                "w": 120,
+                "h": 70
+              },
+              {
+                "id": "f2",
+                "label": "0",
+                "x": 1060,
+                "y": 400,
+                "w": 120,
+                "h": 70
+              },
+              {
+                "id": "f3",
+                "label": "0",
+                "x": 1240,
+                "y": 400,
+                "w": 120,
+                "h": 70
+              },
+              {
+                "id": "f4",
+                "label": "0",
+                "x": 1420,
+                "y": 400,
+                "w": 120,
+                "h": 70
+              },
+              {
+                "id": "b0",
+                "label": "0",
+                "x": 700,
+                "y": 600,
+                "w": 120,
+                "h": 70
+              },
+              {
+                "id": "b1",
+                "label": "0",
+                "x": 880,
+                "y": 600,
+                "w": 120,
+                "h": 70
+              },
+              {
+                "id": "b2",
+                "label": "0",
+                "x": 1060,
+                "y": 600,
+                "w": 120,
+                "h": 70
+              },
+              {
+                "id": "b3",
+                "label": "0",
+                "x": 1240,
+                "y": 600,
+                "w": 120,
+                "h": 70
+              },
+              {
+                "id": "b4",
+                "label": "0",
+                "x": 1420,
+                "y": 600,
+                "w": 120,
+                "h": 70
+              }
+            ],
+            "edges": [],
+            "panels": [],
+            "steps": [
+              {
+                "at": "Take",
+                "note": "Item: weight 1, value 15"
+              },
+              {
+                "at": "max",
+                "note": "dp[w] = max(dp[w], dp[w − 1] + 15)"
+              },
+              {
+                "at": "forward",
+                "nodes": {
+                  "lf": "active"
+                },
+                "note": "w = 1, 2, 3, 4"
+              },
+              {
+                "at": "reads",
+                "labels": {
+                  "f1": "15"
+                },
+                "nodes": {
+                  "f0": "queued",
+                  "f1": "done"
+                },
+                "note": "dp[1] = dp[0] + 15"
+              },
+              {
+                "at": "includes",
+                "labels": {
+                  "f2": "30"
+                },
+                "nodes": {
+                  "f0": "base",
+                  "f1": "queued",
+                  "f2": "done"
+                },
+                "note": "dp[2] = dp[1] + 15: item again"
+              },
+              {
+                "at": "forty-five",
+                "labels": {
+                  "f3": "45"
+                },
+                "nodes": {
+                  "f1": "done",
+                  "f3": "done"
+                },
+                "note": "dp[3] = 45"
+              },
+              {
+                "at": "sixty",
+                "labels": {
+                  "f4": "60"
+                },
+                "nodes": {
+                  "f4": "done"
+                },
+                "note": "dp[4] = 60"
+              },
+              {
+                "at": "packed",
+                "nodes": {
+                  "f1": "queued",
+                  "f2": "queued",
+                  "f3": "queued",
+                  "f4": "queued"
+                },
+                "note": "One item, used 4 times: unbounded"
+              },
+              {
+                "at": "backward",
+                "nodes": {
+                  "lf": "base",
+                  "lb": "active",
+                  "f1": "dim",
+                  "f2": "dim",
+                  "f3": "dim",
+                  "f4": "dim",
+                  "f0": "dim"
+                },
+                "note": "w = 4, 3, 2, 1"
+              },
+              {
+                "at": "still",
+                "labels": {
+                  "b4": "15"
+                },
+                "nodes": {
+                  "b3": "queued",
+                  "b4": "done"
+                },
+                "note": "dp[4] = old dp[3] + 15 = 15"
+              },
+              {
+                "at": "then#3",
+                "labels": {
+                  "b3": "15"
+                },
+                "nodes": {
+                  "b3": "done",
+                  "b2": "queued"
+                },
+                "note": "dp[3] = old dp[2] + 15"
+              },
+              {
+                "at": "then#5",
+                "labels": {
+                  "b2": "15",
+                  "b1": "15"
+                },
+                "nodes": {
+                  "b2": "done",
+                  "b1": "done"
+                },
+                "note": "dp[2], dp[1] read old values"
+              },
+              {
+                "at": "everywhere",
+                "note": "Item used at most once: 0/1"
+              },
+              {
+                "at": "row",
+                "nodes": {
+                  "lb": "done"
+                },
+                "note": "Backward reads = the previous row of the 2D table"
+              }
+            ]
+          }
+        },
+        {
+          "type": "code",
+          "say": "So zero-one knapsack runs the capacity loop from W down to the item's weight. The one-dimensional array is the two-dimensional table, with the rows overwritten in place, and the backward loop keeps each read on the old row. Subset sum, equal partition, and target sum are the same loop, storing a bool or a count instead of a value. O of n times W time, O of W space.",
+          "props": {
+            "title": "Backward = <em>once</em>",
+            "file": "knapsack01.cpp",
+            "tag": "C++",
+            "lang": "cpp",
+            "size": 21,
+            "width": 1250,
+            "code": "int knapsack01(int W, const vector<int>& wt, const vector<int>& val) {\n    vector<int> dp(W + 1, 0);               // dp[w]: best value within capacity w\n    for (int i = 0; i < (int)wt.size(); ++i)\n        for (int w = W; w >= wt[i]; --w)    // backward: dp[w - wt[i]] is still old\n            dp[w] = max(dp[w], dp[w - wt[i]] + val[i]);\n    return dp[W];\n}",
+            "highlights": [
+              {
+                "at": "down",
+                "lines": "4",
+                "note": "Capacity loop runs backward"
+              },
+              {
+                "at": "overwritten",
+                "lines": "2",
+                "note": "One row, overwritten in place"
+              },
+              {
+                "at": "old",
+                "lines": "5",
+                "note": "dp[w − wt] is still the old row"
+              },
+              {
+                "at": "bool",
+                "lines": "3-5",
+                "note": "Subset sum: bool; target sum: count"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Unbounded knapsack",
+      "question": "How does the code for unbounded knapsack differ from 0/1?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. If every item can be used any number of times, what changes in the code? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Unbounded: what <em>changes</em> in the code?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "One thing: the direction. In the backward loop, each read sees the state before this item, so it's used at most once. In the forward loop, each read may already include this item, so it can be used again and again. Take three items: weight one, value fifteen; weight three, value twenty; weight four, value thirty, with capacity four. Zero-one gives thirty-five: the first and the second. Unbounded gives sixty: the first item, four times.",
+          "props": {
+            "title": "Flip the <em>loop</em>",
+            "left": {
+              "at": "backward",
+              "label": "0/1",
+              "title": "Backward: at most once",
+              "code": "for (w = W; w >= wt; --w)",
+              "body": "Reads come from before this item. Example: 35."
+            },
+            "right": {
+              "at": "forward",
+              "label": "Unbounded",
+              "title": "Forward: any number",
+              "tone": "good",
+              "code": "for (w = wt; w <= W; ++w)",
+              "body": "Reads may include this item. Example: 60."
+            },
+            "verdict": {
+              "at": "Take",
+              "text": "Items (1, 15), (3, 20), (4, 30), W = 4: 0/1 → 35, unbounded → 60.",
+              "code": "0/1: items 1 + 2 · unbounded: item 1 ×4"
+            }
+          }
+        },
+        {
+          "type": "code",
+          "say": "Coin change is unbounded knapsack: coins are items you can reuse, and you minimize the count. d p of a is the fewest coins that make a. The forward loop lets coin c appear many times. Start every cell at a large value, but not int max: adding one would overflow. Half of int max is safe.",
+          "props": {
+            "title": "Coin change",
+            "file": "coin_change.cpp",
+            "tag": "C++",
+            "lang": "cpp",
+            "size": 22,
+            "width": 1200,
+            "code": "int coinChange(const vector<int>& coins, int amount) {\n    const int INF = INT_MAX / 2;            // INF + 1 must not overflow\n    vector<int> dp(amount + 1, INF);        // dp[a]: fewest coins for a\n    dp[0] = 0;\n    for (int c : coins)\n        for (int a = c; a <= amount; ++a)   // forward: coin c can repeat\n            dp[a] = min(dp[a], dp[a - c] + 1);\n    return dp[amount] >= INF ? -1 : dp[amount];\n}",
+            "highlights": [
+              {
+                "at": "fewest",
+                "lines": "3-4",
+                "note": "dp[a]: fewest coins for amount a"
+              },
+              {
+                "at": "forward",
+                "lines": "6-7",
+                "note": "Forward: coins repeat"
+              },
+              {
+                "at": "overflow",
+                "lines": "2",
+                "note": "INF + 1 must not overflow"
+              },
+              {
+                "at": "safe",
+                "lines": "8",
+                "note": "Unreachable stays INF"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Combinations or permutations?",
+      "question": "In coin change II, why does the loop order decide whether you count combinations or permutations?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. When you count the ways to make an amount, why does swapping the two loops change the answer? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Count ways: why does <em>loop order</em> matter?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "Coins one and two, amount three. Put the coins in the outer loop, and every way is built in coin order: all the ones, then all the twos. So one plus two is counted once: two ways in total, one-one-one, and one-two. Put the amount in the outer loop, and each step tries every coin as the last one. Now one plus two and two plus one are different sequences: three ways. Combinations: coins outside. Permutations: amount outside.",
+          "props": {
+            "title": "Coins outside, or <em>amount</em> outside",
+            "left": {
+              "at": "outer",
+              "label": "Combinations",
+              "title": "Coins outside",
+              "tone": "good",
+              "code": "for c in coins: for a = c..A: dp[a] += dp[a−c]",
+              "body": "Each multiset once: {1,1,1}, {1,2} → 2."
+            },
+            "right": {
+              "at": "amount#2",
+              "label": "Permutations",
+              "title": "Amount outside",
+              "code": "for a = 1..A: for c in coins: dp[a] += dp[a−c]",
+              "body": "Order matters: 1+1+1, 1+2, 2+1 → 3."
+            },
+            "verdict": {
+              "at": "Combinations",
+              "text": "Coin change II: combinations. Combination sum IV: permutations.",
+              "code": "LeetCode 518 vs 377"
+            }
+          }
+        },
+        {
+          "type": "points",
+          "say": "Most knapsack problems are one of these three shapes. Choose a subset with a capacity: zero-one, backward. Reuse items freely: unbounded, forward. And for counting, decide whether order matters: that picks the loop order. Then pick what a cell holds: a max value, a min count, a bool, or a number of ways.",
+          "props": {
+            "title": "Which <em>knapsack</em>?",
+            "items": [
+              {
+                "at": "subset",
+                "label": "0/1 · backward",
+                "title": "Each item once",
+                "body": "Partition equal subset sum, target sum, ones and zeroes.",
+                "code": "416, 494, 474"
+              },
+              {
+                "at": "Reuse",
+                "label": "Unbounded · forward",
+                "title": "Items repeat",
+                "body": "Coin change, word break.",
+                "code": "322, 139"
+              },
+              {
+                "at": "order",
+                "label": "Counting",
+                "title": "Does order matter?",
+                "body": "Coins outside: combinations. Amount outside: permutations.",
+                "code": "518, 377"
+              },
+              {
+                "at": "cell",
+                "label": "The cell",
+                "title": "max, min, bool, or count",
+                "body": "Same loops, different merge."
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Zero-one knapsack loops capacity backward, so each item is used once. Unbounded loops forward, so items repeat. When counting ways, coins outside count combinations, and amount outside counts permutations. And it's O of n times W, with one row.",
+          "props": {
+            "title": "Knapsack, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "backward",
+                "text": "0/1: capacity loop backward.",
+                "code": "each item once"
+              },
+              {
+                "at": "forward",
+                "text": "Unbounded: forward.",
+                "code": "items repeat"
+              },
+              {
+                "at": "combinations",
+                "text": "Counting: coins outside = combinations.",
+                "code": "amount outside = permutations"
+              },
+              {
+                "at": "row",
+                "text": "O(N·W) time, one row of space.",
+                "code": "dp[0..W]"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

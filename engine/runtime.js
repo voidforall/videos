@@ -7,7 +7,8 @@
   const CAPTION_MAX_WORDS = 7;
   const CAPTION_MAX_CHARS = 44;
   const NUMBER_WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
-    "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty"];
+    "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
+  const TENS = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
 
   const templates = {};
   window.registerTemplate = (type, def) => (templates[type] = def);
@@ -15,11 +16,15 @@
   const params = new URLSearchParams(location.search);
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 
-  // lowercase, trim punctuation, and fold number words to digits so "8" and "eight" match
+  // lowercase, trim punctuation, and fold number words (up to ninety-nine) to digits so "8" and "eight" match
   function normalize(word) {
     const w = word.toLowerCase().replace(/^[^\w+:<*&\[]+|[^\w+]+$/g, "");
     const n = NUMBER_WORDS.indexOf(w);
-    return n >= 0 ? String(n) : w;
+    if (n >= 0) return String(n);
+    const [tens, ones, extra] = w.split("-");   // "forty", "forty-one"
+    const t = TENS.indexOf(tens);
+    const o = ones == null ? 0 : NUMBER_WORDS.indexOf(ones);
+    return t >= 2 && extra == null && (ones == null || (o >= 1 && o <= 9)) ? String(t * 10 + o) : w;
   }
 
   // cue("word"), cue("word#2"), cue("word+0.4"), cue("end"), cue(1.5) → scene-local seconds

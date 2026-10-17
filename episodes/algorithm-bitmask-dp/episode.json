@@ -1,0 +1,807 @@
+{
+  "slug": "algorithm-bitmask-dp",
+  "series": "algorithm",
+  "title": "Bitmask DP",
+  "kicker": "Algorithm · Bitmask DP",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/bitmask-dp.md",
+  "summary": "Sets as integers: subset enumeration, the visit-every-node DP over (mask, last), and why iterating submasks of every mask costs 3^n.",
+  "captionFixes": [
+    {
+      "match": [
+        "Bitmask",
+        "dp"
+      ],
+      "display": "Bitmask DP,"
+    },
+    {
+      "match": [
+        "ans"
+      ],
+      "display": "ands"
+    },
+    {
+      "match": [
+        "The",
+        "end",
+        "throws"
+      ],
+      "display": "The and throws"
+    },
+    {
+      "match": [
+        "1",
+        "0",
+        "1",
+        "1"
+      ],
+      "display": "1011"
+    },
+    {
+      "match": [
+        "empty",
+        "sets"
+      ],
+      "display": "empty set"
+    },
+    {
+      "match": [
+        "dp",
+        "of",
+        "mask",
+        "and",
+        "V",
+        "is"
+      ],
+      "display": "dp[mask][v] is"
+    },
+    {
+      "match": [
+        "V"
+      ],
+      "display": "v",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "2",
+        "to",
+        "the",
+        "n",
+        "times",
+        "n",
+        "squared"
+      ],
+      "display": "O(2^n·n²)"
+    },
+    {
+      "match": [
+        "2",
+        "to",
+        "the",
+        "n",
+        "times",
+        "n",
+        "squared"
+      ],
+      "display": "2^n·n²"
+    },
+    {
+      "match": [
+        "2",
+        "to",
+        "the",
+        "n",
+        "times",
+        "n",
+        "states"
+      ],
+      "display": "2^n·n states"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "2",
+        "to",
+        "the",
+        "n"
+      ],
+      "display": "O(2^n)"
+    },
+    {
+      "match": [
+        "3",
+        "to",
+        "the",
+        "n"
+      ],
+      "display": "3^n"
+    },
+    {
+      "match": [
+        "three",
+        "to",
+        "the",
+        "n"
+      ],
+      "display": "3^n"
+    },
+    {
+      "match": [
+        "4",
+        "to",
+        "the",
+        "n"
+      ],
+      "display": "4^n"
+    },
+    {
+      "match": [
+        "Four",
+        "to",
+        "the",
+        "16"
+      ],
+      "display": "4^16"
+    },
+    {
+      "match": [
+        "dp[m]",
+        "minus",
+        "sub",
+        "plus",
+        "1"
+      ],
+      "display": "dp[m − sub] + 1"
+    },
+    {
+      "match": [
+        "sub",
+        "masks"
+      ],
+      "display": "submasks"
+    },
+    {
+      "match": [
+        "D",
+        "P"
+      ],
+      "display": "DP"
+    },
+    {
+      "match": [
+        "popcount"
+      ],
+      "display": "popcount"
+    },
+    {
+      "match": [
+        "pop",
+        "count"
+      ],
+      "display": "popcount"
+    },
+    {
+      "match": [
+        "n",
+        "factorial"
+      ],
+      "display": "N!"
+    },
+    {
+      "match": [
+        "dp",
+        "of",
+        "m"
+      ],
+      "display": "dp[m]"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "log",
+        "n"
+      ],
+      "display": "O(log N)"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "n",
+        "log",
+        "n"
+      ],
+      "display": "O(N log N)"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "n"
+      ],
+      "display": "O(N)"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "one"
+      ],
+      "display": "O(1)"
+    },
+    {
+      "match": [
+        "O(n)"
+      ],
+      "display": "O(N)"
+    },
+    {
+      "match": [
+        "to",
+        "recap"
+      ],
+      "display": "To recap",
+      "matchCase": true
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Sets as integers",
+      "question": "How do you store a set in an integer, and loop over all its subsets?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Bitmask D P, question one. How do you store a set in an integer, and how do you loop over all of its subsets? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "A set in an <em>integer</em>: how, and how to loop its subsets?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "With n items, n at most about twenty, bit i says whether item i is in the set. Adding item i is an or with one shifted left by i. Testing it is a shift right, and an and with one. Removing it ands with the complement. And popcount gives the size. The full set is one shifted left by n, minus one.",
+          "props": {
+            "title": "Bit i = <em>item i</em>",
+            "items": [
+              {
+                "at": "Adding",
+                "label": "Add",
+                "title": "Set bit i",
+                "body": "",
+                "code": "mask | (1 << i)"
+              },
+              {
+                "at": "Testing",
+                "label": "Test",
+                "title": "Is i in the set?",
+                "body": "",
+                "code": "(mask >> i) & 1"
+              },
+              {
+                "at": "Removing",
+                "label": "Remove",
+                "title": "Clear bit i",
+                "body": "",
+                "code": "mask & ~(1 << i)"
+              },
+              {
+                "at": "popcount",
+                "label": "Size",
+                "title": "Count the bits",
+                "body": "Full set: (1 << n) − 1.",
+                "code": "__builtin_popcount(mask)"
+              }
+            ]
+          }
+        },
+        {
+          "type": "graph",
+          "say": "To visit every subset of a mask, start at the mask itself, and repeat: subtract one, then and with the mask. Subtracting one clears the lowest set bit, and sets every bit below it. The and throws away the bits outside the mask. For one zero one one, that walks through exactly seven subsets, in decreasing order, and never touches a value outside the mask. The loop stops at zero, so handle the empty set separately if you need it.",
+          "props": {
+            "title": "sub = <em>(sub − 1) & mask</em>",
+            "nodes": [
+              {
+                "id": "mask",
+                "label": "mask = 1011",
+                "x": 960,
+                "y": 300,
+                "w": 300,
+                "h": 70
+              },
+              {
+                "id": "s0",
+                "label": "1011",
+                "x": 360,
+                "y": 520,
+                "w": 150,
+                "h": 70,
+                "hidden": true
+              },
+              {
+                "id": "s1",
+                "label": "1010",
+                "x": 560,
+                "y": 520,
+                "w": 150,
+                "h": 70,
+                "hidden": true
+              },
+              {
+                "id": "s2",
+                "label": "1001",
+                "x": 760,
+                "y": 520,
+                "w": 150,
+                "h": 70,
+                "hidden": true
+              },
+              {
+                "id": "s3",
+                "label": "1000",
+                "x": 960,
+                "y": 520,
+                "w": 150,
+                "h": 70,
+                "hidden": true
+              },
+              {
+                "id": "s4",
+                "label": "0011",
+                "x": 1160,
+                "y": 520,
+                "w": 150,
+                "h": 70,
+                "hidden": true
+              },
+              {
+                "id": "s5",
+                "label": "0010",
+                "x": 1360,
+                "y": 520,
+                "w": 150,
+                "h": 70,
+                "hidden": true
+              },
+              {
+                "id": "s6",
+                "label": "0001",
+                "x": 1560,
+                "y": 520,
+                "w": 150,
+                "h": 70,
+                "hidden": true
+              }
+            ],
+            "edges": [],
+            "panels": [],
+            "steps": [
+              {
+                "at": "itself",
+                "nodes": {
+                  "mask": "active"
+                },
+                "note": "for (sub = mask; sub > 0; sub = (sub − 1) & mask)"
+              },
+              {
+                "at": "Subtracting",
+                "note": "sub − 1: clear the lowest set bit, set the bits below"
+              },
+              {
+                "at": "throws",
+                "note": "& mask: drop bits outside the mask"
+              },
+              {
+                "at": "walks",
+                "show": [
+                  "s0"
+                ],
+                "nodes": {
+                  "mask": "base"
+                },
+                "note": "1011"
+              },
+              {
+                "at": "walks+0.6",
+                "show": [
+                  "s1"
+                ],
+                "note": "1011 − 1 = 1010"
+              },
+              {
+                "at": "walks+1.2",
+                "show": [
+                  "s2"
+                ],
+                "note": "1001 & 1011 = 1001"
+              },
+              {
+                "at": "walks+1.8",
+                "show": [
+                  "s3"
+                ],
+                "note": "1000 & 1011 = 1000"
+              },
+              {
+                "at": "walks+2.4",
+                "show": [
+                  "s4"
+                ],
+                "note": "0111 & 1011 = 0011"
+              },
+              {
+                "at": "walks+3.0",
+                "show": [
+                  "s5"
+                ],
+                "note": "0010 & 1011 = 0010"
+              },
+              {
+                "at": "walks+3.6",
+                "show": [
+                  "s6"
+                ],
+                "note": "0001 & 1011 = 0001"
+              },
+              {
+                "at": "stops",
+                "nodes": {
+                  "s0": "done",
+                  "s1": "done",
+                  "s2": "done",
+                  "s3": "done",
+                  "s4": "done",
+                  "s5": "done",
+                  "s6": "done"
+                },
+                "note": "7 non-empty subsets; 0 ends the loop"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Visiting every node",
+      "question": "How do you find the cheapest path that visits every node exactly once?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. How do you find the cheapest path that visits every node exactly once? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "The cheapest path through <em>every node</em>?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Brute force tries every order: n factorial. But what's left to do depends only on which nodes you've visited, and where you are now. The path zero, one, two costs seven. The path one, zero, two costs thirteen. Both have visited the same set, and both end at node two, so every way to continue is the same for both. Keep only the cheaper one: seven. That's one state: the set, as a bitmask, plus the last node. Extend it to node three for two more: nine, the cheapest way to visit all four, ending at three.",
+          "props": {
+            "title": "State = <em>(visited set, last node)</em>",
+            "nodes": [
+              {
+                "id": "0",
+                "x": 300,
+                "y": 300
+              },
+              {
+                "id": "1",
+                "x": 800,
+                "y": 300
+              },
+              {
+                "id": "2",
+                "x": 800,
+                "y": 640
+              },
+              {
+                "id": "3",
+                "x": 300,
+                "y": 640
+              }
+            ],
+            "edges": [
+              {
+                "from": "0",
+                "to": "1",
+                "w": "4"
+              },
+              {
+                "from": "0",
+                "to": "2",
+                "w": "9"
+              },
+              {
+                "from": "1",
+                "to": "2",
+                "w": "3"
+              },
+              {
+                "from": "2",
+                "to": "3",
+                "w": "2"
+              },
+              {
+                "from": "0",
+                "to": "3",
+                "w": "7"
+              }
+            ],
+            "panels": [
+              {
+                "key": "st",
+                "label": "States",
+                "type": "list",
+                "initial": [],
+                "rows": 2
+              }
+            ],
+            "steps": [
+              {
+                "at": "Brute",
+                "note": "Every order: N! paths"
+              },
+              {
+                "at": "where",
+                "note": "The future depends on (visited set, current node)"
+              },
+              {
+                "at": "seven",
+                "nodes": {
+                  "0": "done",
+                  "1": "done",
+                  "2": "active"
+                },
+                "edges": {
+                  "0-1": "relax",
+                  "1-2": "relax"
+                },
+                "panels": {
+                  "st": [
+                    "0 → 1 → 2 = 7"
+                  ]
+                },
+                "note": "0 → 1 → 2: 4 + 3 = 7"
+              },
+              {
+                "at": "thirteen",
+                "edges": {
+                  "0-1": "tree",
+                  "1-2": "base",
+                  "0-2": "relax"
+                },
+                "panels": {
+                  "st": [
+                    "0 → 1 → 2 = 7",
+                    "1 → 0 → 2 = 13"
+                  ]
+                },
+                "note": "1 → 0 → 2: 4 + 9 = 13"
+              },
+              {
+                "at": "same",
+                "nodes": {
+                  "0": "queued",
+                  "1": "queued"
+                },
+                "note": "Same set {0, 1, 2}, same end 2"
+              },
+              {
+                "at": "cheaper",
+                "nodes": {
+                  "0": "done",
+                  "1": "done"
+                },
+                "edges": {
+                  "0-2": "dim",
+                  "0-1": "relax",
+                  "1-2": "relax"
+                },
+                "panels": {
+                  "st": [
+                    "dp[0111][2] = 7"
+                  ]
+                },
+                "note": "Keep the cheaper: dp[0111][2] = 7"
+              },
+              {
+                "at": "bitmask",
+                "note": "mask 0111 = {0, 1, 2}, last = 2"
+              },
+              {
+                "at": "Extend",
+                "nodes": {
+                  "2": "done",
+                  "3": "active"
+                },
+                "edges": {
+                  "2-3": "relax"
+                },
+                "panels": {
+                  "st": [
+                    "dp[0111][2] = 7",
+                    "dp[1111][3] = 9"
+                  ]
+                },
+                "note": "+ cost(2, 3) = 2 → 9"
+              },
+              {
+                "at": "ending",
+                "nodes": {
+                  "3": "done"
+                },
+                "note": "dp[1111][3] = 9"
+              }
+            ],
+            "directed": false
+          }
+        },
+        {
+          "type": "code",
+          "say": "d p of mask and v is the cheapest path that visits exactly the nodes in mask, and ends at v. Every single node is a free start. Masks only grow, so looping masks in increasing order computes each state before it's read. From each state, extend to any unvisited node. The answer is the best over the full mask. That's two to the n times n states, each with n moves: O of two to the n, times n squared. Fine up to about twenty nodes, where n factorial is hopeless.",
+          "props": {
+            "title": "dp[mask][v]",
+            "file": "visit_all.cpp",
+            "tag": "C++",
+            "lang": "cpp",
+            "size": 19,
+            "width": 1300,
+            "code": "int shortestPath(int n, const vector<vector<int>>& cost) {\n    const int INF = 1e9, full = (1 << n) - 1;\n    // dp[mask][v]: cheapest path visiting exactly mask, ending at v\n    vector<vector<int>> dp(1 << n, vector<int>(n, INF));\n    for (int v = 0; v < n; ++v) dp[1 << v][v] = 0;    // start anywhere\n    for (int mask = 1; mask <= full; ++mask)\n        for (int v = 0; v < n; ++v) {\n            if (!(mask >> v & 1) || dp[mask][v] == INF) continue;\n            for (int u = 0; u < n; ++u) {\n                if (mask >> u & 1) continue;              // already visited\n                int next = mask | 1 << u;\n                dp[next][u] = min(dp[next][u], dp[mask][v] + cost[v][u]);\n            }\n        }\n    return *min_element(dp[full].begin(), dp[full].end());\n}",
+            "highlights": [
+              {
+                "at": "exactly",
+                "lines": "3",
+                "note": "State: (visited set, last node)"
+              },
+              {
+                "at": "free",
+                "lines": "5",
+                "note": "Base: start anywhere"
+              },
+              {
+                "at": "increasing",
+                "lines": "6",
+                "note": "Masks only grow: increasing order works"
+              },
+              {
+                "at": "unvisited",
+                "lines": "9-12",
+                "note": "Extend to an unvisited node"
+              },
+              {
+                "at": "full",
+                "lines": "15",
+                "note": "Answer: all visited, any end"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Why O(3^n)?",
+      "question": "Looping over every submask of every mask: why is that 3^n and not 4^n?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. Looping over every submask of every mask: why does that cost three to the n, and not four to the n? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Every submask of every mask: why <em>3<sup>n</sup></em>?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Count the pairs, mask and sub, element by element. Each element is in both, in the mask only, or in neither. It can't be in the sub without the mask. Three choices per element, independently, so three to the n pairs in total. For sixteen elements, that's forty-three million: fine. Four to the sixteen would be four billion.",
+          "props": {
+            "title": "Three choices per <em>element</em>",
+            "items": [
+              {
+                "at": "both",
+                "label": "Both",
+                "title": "In mask and in sub",
+                "body": "",
+                "code": "mask 1, sub 1"
+              },
+              {
+                "at": "only",
+                "label": "Mask only",
+                "title": "In mask, not in sub",
+                "body": "",
+                "code": "mask 1, sub 0"
+              },
+              {
+                "at": "neither",
+                "label": "Neither",
+                "title": "In neither",
+                "body": "Never in sub without mask.",
+                "code": "mask 0, sub 0"
+              },
+              {
+                "at": "sixteen",
+                "label": "n = 16",
+                "title": "3<sup>16</sup> ≈ 43 million",
+                "body": "4<sup>16</sup> ≈ 4.3 billion."
+              }
+            ]
+          }
+        },
+        {
+          "type": "code",
+          "say": "That's the cost of partition problems. Here: split tasks into the fewest work sessions, each no longer than a limit. First, precompute each subset's total load, in O of two to the n: a mask's load is its lowest task, plus the load of the rest. Then d p of m is the fewest sessions for the tasks in m. Try every submask as one session: if it fits, the rest is d p of m minus sub, plus one. Three to the n overall.",
+          "props": {
+            "title": "Fewest <em>sessions</em>",
+            "file": "sessions.cpp",
+            "tag": "C++",
+            "lang": "cpp",
+            "size": 20,
+            "width": 1250,
+            "code": "int minSessions(const vector<int>& tasks, int limit) {\n    int n = tasks.size(), full = (1 << n) - 1;\n    vector<int> load(1 << n, 0);                  // total time of each subset\n    for (int m = 1; m <= full; ++m)\n        load[m] = load[m & (m - 1)] + tasks[__builtin_ctz(m)];\n    vector<int> dp(1 << n, INT_MAX);              // dp[m]: fewest sessions for m\n    dp[0] = 0;\n    for (int m = 1; m <= full; ++m)\n        for (int sub = m; sub > 0; sub = (sub - 1) & m)   // non-empty sub of m\n            if (load[sub] <= limit && dp[m ^ sub] != INT_MAX)\n                dp[m] = min(dp[m], dp[m ^ sub] + 1);  // sub is one session\n    return dp[full];\n}",
+            "highlights": [
+              {
+                "at": "First",
+                "lines": "3-5",
+                "note": "Load of every subset, O(2<sup>n</sup>)"
+              },
+              {
+                "at": "fewest",
+                "lines": "6-7",
+                "note": "dp[m]: fewest sessions for m"
+              },
+              {
+                "at": "submask",
+                "lines": "9",
+                "note": "Every submask = one session"
+              },
+              {
+                "at": "rest#2",
+                "lines": "10-11",
+                "note": "If it fits: 1 + dp[rest]"
+              },
+              {
+                "at": "overall",
+                "lines": "12",
+                "note": "O(3<sup>n</sup>) total"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Bit i stores whether item i is in the set. Sub equals sub minus one, and mask, walks every subset. A state of mask and last node turns n factorial into two to the n times n squared. And all submasks of all masks cost three to the n.",
+          "props": {
+            "title": "Bitmask DP, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "stores",
+                "text": "Bit i = item i; n ≲ 20.",
+                "code": "mask | (1 << i)"
+              },
+              {
+                "at": "walks",
+                "text": "Submasks: sub = (sub − 1) & mask.",
+                "code": "decreasing order"
+              },
+              {
+                "at": "turns",
+                "text": "(mask, last): N! → 2<sup>n</sup>·n<sup>2</sup>.",
+                "code": "visit every node"
+              },
+              {
+                "at": "submasks",
+                "text": "All submasks of all masks: 3<sup>n</sup>.",
+                "code": "partition problems"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

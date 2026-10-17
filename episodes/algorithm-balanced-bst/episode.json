@@ -1,0 +1,1145 @@
+{
+  "slug": "algorithm-balanced-bst",
+  "series": "algorithm",
+  "title": "AVL and red-black trees",
+  "kicker": "Algorithm · Balanced BSTs",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/balanced-bst.md",
+  "summary": "Why plain BSTs degrade, how rotations fix them, the four AVL cases, the red-black rules and insert fix-up, and why std::map is a red-black tree.",
+  "captionFixes": [
+    {
+      "match": [
+        "Balance",
+        "trees",
+        "question",
+        "1"
+      ],
+      "display": "Balanced trees, question 1."
+    },
+    {
+      "match": [
+        "It's",
+        "left",
+        "child"
+      ],
+      "display": "Its left child"
+    },
+    {
+      "match": [
+        "Z"
+      ],
+      "display": "z",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "Y"
+      ],
+      "display": "y",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "Z's"
+      ],
+      "display": "z's",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "Y's"
+      ],
+      "display": "y's",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "oh",
+        "of",
+        "log",
+        "n"
+      ],
+      "display": "O(log N)"
+    },
+    {
+      "match": [
+        "log-in"
+      ],
+      "display": "log n"
+    },
+    {
+      "match": [
+        "standard",
+        "mapper"
+      ],
+      "display": "std::map a"
+    },
+    {
+      "match": [
+        "SDDMAP"
+      ],
+      "display": "std::map"
+    },
+    {
+      "match": [
+        "Next",
+        "recolor"
+      ],
+      "display": "Just recolor"
+    },
+    {
+      "match": [
+        "It's",
+        "black",
+        "height"
+      ],
+      "display": "its black height"
+    },
+    {
+      "match": [
+        "Zig",
+        "zags"
+      ],
+      "display": "Zigzags"
+    },
+    {
+      "match": [
+        "left",
+        "left",
+        "or",
+        "right",
+        "right"
+      ],
+      "display": "left-left or right-right"
+    },
+    {
+      "match": [
+        "left",
+        "right",
+        "or",
+        "right",
+        "left"
+      ],
+      "display": "left-right or right-left"
+    },
+    {
+      "match": [
+        "left",
+        "heavy"
+      ],
+      "display": "left-heavy"
+    },
+    {
+      "match": [
+        "Right",
+        "heavy"
+      ],
+      "display": "Right-heavy"
+    },
+    {
+      "match": [
+        "to",
+        "recap"
+      ],
+      "display": "To recap",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "log",
+        "n"
+      ],
+      "display": "O(log N)"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "n",
+        "log",
+        "n"
+      ],
+      "display": "O(N log N)"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "n"
+      ],
+      "display": "O(N)"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "one"
+      ],
+      "display": "O(1)"
+    },
+    {
+      "match": [
+        "standard",
+        "map"
+      ],
+      "display": "std::map"
+    },
+    {
+      "match": [
+        "std",
+        "map"
+      ],
+      "display": "std::map"
+    },
+    {
+      "match": [
+        "T",
+        "three"
+      ],
+      "display": "T3"
+    },
+    {
+      "match": [
+        "T",
+        "one"
+      ],
+      "display": "T1"
+    },
+    {
+      "match": [
+        "T",
+        "four"
+      ],
+      "display": "T4"
+    },
+    {
+      "match": [
+        "AVL"
+      ],
+      "display": "AVL"
+    },
+    {
+      "match": [
+        "Tree",
+        "map"
+      ],
+      "display": "TreeMap"
+    },
+    {
+      "match": [
+        "RB",
+        "tree"
+      ],
+      "display": "rbtree"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "Rotations",
+      "question": "Why does a plain binary search tree degrade, and what does a rotation do?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Balanced trees, question one. Why does a plain binary search tree degrade? And what does a rotation do? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Why do plain BSTs <em>degrade</em>, and what's a rotation?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Insert ten, twenty, and thirty, in sorted order. Each new key is the largest so far, so it always goes right. The tree is a linked list: height n, and search is O of n. A rotation fixes this locally. Rotate left at ten: twenty moves up, and ten becomes its left child. The sorted sequence is still ten, twenty, thirty, so it's still a valid search tree. But the height dropped from three to two.",
+          "props": {
+            "title": "Sorted inserts make a <em>list</em>",
+            "nodes": [
+              {
+                "id": "10",
+                "x": 710,
+                "y": 290
+              },
+              {
+                "id": "20",
+                "x": 960,
+                "y": 440,
+                "hidden": true
+              },
+              {
+                "id": "30",
+                "x": 1210,
+                "y": 590,
+                "hidden": true
+              }
+            ],
+            "edges": [],
+            "panels": [],
+            "steps": [
+              {
+                "at": "Insert",
+                "nodes": {
+                  "10": "active"
+                },
+                "note": "insert 10"
+              },
+              {
+                "at": "twenty",
+                "show": [
+                  "20"
+                ],
+                "add": [
+                  {
+                    "from": "10",
+                    "to": "20"
+                  }
+                ],
+                "nodes": {
+                  "10": "base",
+                  "20": "active"
+                },
+                "note": "insert 20: larger, go right"
+              },
+              {
+                "at": "thirty",
+                "show": [
+                  "30"
+                ],
+                "add": [
+                  {
+                    "from": "20",
+                    "to": "30"
+                  }
+                ],
+                "nodes": {
+                  "20": "base",
+                  "30": "active"
+                },
+                "note": "insert 30: right again"
+              },
+              {
+                "at": "list",
+                "nodes": {
+                  "30": "base",
+                  "10": "queued",
+                  "20": "queued"
+                },
+                "note": "A linked list: height N, search O(N)"
+              },
+              {
+                "at": "Rotate",
+                "nodes": {
+                  "10": "base",
+                  "20": "active"
+                },
+                "remove": [
+                  "10-20"
+                ],
+                "add": [
+                  {
+                    "from": "20",
+                    "to": "10"
+                  }
+                ],
+                "move": {
+                  "20": [
+                    960,
+                    290
+                  ],
+                  "10": [
+                    710,
+                    440
+                  ],
+                  "30": [
+                    1210,
+                    440
+                  ]
+                },
+                "note": "rotateLeft(10): 20 moves up"
+              },
+              {
+                "at": "sequence",
+                "nodes": {
+                  "20": "base"
+                },
+                "note": "In-order still 10, 20, 30"
+              },
+              {
+                "at": "dropped",
+                "nodes": {
+                  "10": "done",
+                  "20": "done",
+                  "30": "done"
+                },
+                "note": "Height 3 → 2"
+              }
+            ],
+            "directed": false
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Here's a right rotation in general. z is too heavy on the left. Its left child y moves up, and z moves down to y's right. One subtree changes parent: T three, y's old right subtree, becomes z's left. Everything in T three is greater than y and less than z, so the order still holds. T one and T four stay where they were. It's three pointer changes: O of one.",
+          "props": {
+            "title": "rotateRight(<em>z</em>)",
+            "nodes": [
+              {
+                "id": "z",
+                "x": 1048,
+                "y": 280
+              },
+              {
+                "id": "y",
+                "x": 772,
+                "y": 420
+              },
+              {
+                "id": "T4",
+                "label": "T4",
+                "x": 1322,
+                "y": 420,
+                "w": 110,
+                "h": 64
+              },
+              {
+                "id": "T1",
+                "label": "T1",
+                "x": 598,
+                "y": 570,
+                "w": 110,
+                "h": 64
+              },
+              {
+                "id": "T3",
+                "label": "T3",
+                "x": 948,
+                "y": 570,
+                "w": 110,
+                "h": 64
+              }
+            ],
+            "edges": [
+              {
+                "from": "z",
+                "to": "y"
+              },
+              {
+                "from": "z",
+                "to": "T4"
+              },
+              {
+                "from": "y",
+                "to": "T1"
+              },
+              {
+                "from": "y",
+                "to": "T3"
+              }
+            ],
+            "panels": [],
+            "steps": [
+              {
+                "at": "heavy",
+                "nodes": {
+                  "z": "queued"
+                },
+                "note": "z: left subtree two levels taller"
+              },
+              {
+                "at": "moves",
+                "nodes": {
+                  "z": "base",
+                  "y": "active"
+                },
+                "remove": [
+                  "z-y",
+                  "y-T3"
+                ],
+                "add": [
+                  {
+                    "from": "y",
+                    "to": "z"
+                  }
+                ],
+                "move": {
+                  "y": [
+                    1048,
+                    280
+                  ],
+                  "z": [
+                    1322,
+                    420
+                  ],
+                  "T1": [
+                    772,
+                    570
+                  ],
+                  "T4": [
+                    1498,
+                    570
+                  ],
+                  "T3": [
+                    1148,
+                    570
+                  ]
+                },
+                "note": "y up, z down to the right"
+              },
+              {
+                "at": "changes",
+                "nodes": {
+                  "y": "base"
+                },
+                "add": [
+                  {
+                    "from": "z",
+                    "to": "T3"
+                  }
+                ],
+                "edges": {
+                  "z-T3": "relax"
+                },
+                "note": "T3: y's right → z's left"
+              },
+              {
+                "at": "greater",
+                "nodes": {
+                  "T3": "active"
+                },
+                "note": "y < T3 < z: order holds"
+              },
+              {
+                "at": "stay",
+                "nodes": {
+                  "T3": "base",
+                  "T1": "done",
+                  "T4": "done"
+                },
+                "edges": {
+                  "z-T3": "base"
+                },
+                "note": "T1 and T4 keep their parents"
+              },
+              {
+                "at": "pointer",
+                "nodes": {
+                  "T1": "base",
+                  "T4": "base",
+                  "y": "done",
+                  "z": "done"
+                },
+                "note": "3 pointer changes: O(1)"
+              }
+            ],
+            "directed": false
+          }
+        },
+        {
+          "type": "code",
+          "say": "In code, that's the whole rotation. Save y and T three. Make z y's right child, and T three z's left. Then update the heights: z first, because it's now below y. Return y, so the caller can link the new subtree root. Rotate left is the mirror image.",
+          "props": {
+            "title": "The <em>code</em>",
+            "file": "rotate.cpp",
+            "tag": "C++",
+            "lang": "cpp",
+            "size": 26,
+            "width": 1150,
+            "code": "Node* rotateRight(Node* z) {     // z is left-heavy\n    Node* y  = z->left;\n    Node* T3 = y->right;\n    y->right = z;                   // z moves down, right\n    z->left  = T3;                  // T3 changes parent\n    update(z);                      // z first: it's lower now\n    update(y);\n    return y;                       // the new subtree root\n}",
+            "highlights": [
+              {
+                "at": "Save",
+                "lines": "2-3",
+                "note": "y moves up; T3 will change parent"
+              },
+              {
+                "at": "right",
+                "lines": "4-5",
+                "note": "Two pointer writes"
+              },
+              {
+                "at": "heights",
+                "lines": "6-7",
+                "note": "Heights: z first, it's lower now"
+              },
+              {
+                "at": "Return",
+                "lines": "8",
+                "note": "The caller links the new root"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "The four AVL cases",
+      "question": "When does an AVL tree rotate, and which rotation does it use?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. When does an AVL tree rotate, and how does it pick the rotation? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "When does an AVL tree rotate, and <em>which</em> rotation?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "An AVL tree keeps one rule: at every node, the two subtree heights differ by at most one. The balance factor is left height minus right height, so it must stay between minus one and one. That bounds the height at about one point four four log n. After an insert, walk back up. The first node that hits plus or minus two is fixed by one of four cases. Straight lines, left-left or right-right, take one rotation. Zigzags, left-right or right-left, take two.",
+          "props": {
+            "title": "Balance factor in <em>{−1, 0, +1}</em>",
+            "items": [
+              {
+                "at": "rule",
+                "label": "Invariant",
+                "title": "Heights differ by ≤ 1",
+                "body": "bf = height(left) − height(right).",
+                "code": "h ≤ 1.44 log₂ N"
+              },
+              {
+                "at": "Straight",
+                "label": "LL / RR",
+                "title": "One rotation",
+                "body": "bf ±2 and the child leans the same way.",
+                "code": "rotateRight / rotateLeft"
+              },
+              {
+                "at": "Zigzags",
+                "label": "LR / RL",
+                "title": "Two rotations",
+                "body": "The child leans the other way: straighten it first.",
+                "code": "rotate child, then node"
+              }
+            ]
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Here's the zigzag. Insert twenty-five. It goes right of twenty, left of forty, then left of thirty. Now twenty's right side is two levels taller: balance minus two. But its right child, forty, leans left. A single left rotation at twenty would just make a mirror-image zigzag. So first rotate right at forty: thirty comes up, and the zigzag becomes a straight line. Then rotate left at twenty: thirty becomes the root. Every balance factor is back within one.",
+          "props": {
+            "title": "The right-left <em>case</em>",
+            "nodes": [
+              {
+                "id": "20",
+                "x": 885,
+                "y": 280
+              },
+              {
+                "id": "10",
+                "x": 585,
+                "y": 420
+              },
+              {
+                "id": "40",
+                "x": 1185,
+                "y": 420
+              },
+              {
+                "id": "30",
+                "x": 1035,
+                "y": 560
+              },
+              {
+                "id": "50",
+                "x": 1335,
+                "y": 560
+              },
+              {
+                "id": "25",
+                "x": 910,
+                "y": 690,
+                "hidden": true
+              }
+            ],
+            "edges": [
+              {
+                "from": "20",
+                "to": "10"
+              },
+              {
+                "from": "20",
+                "to": "40"
+              },
+              {
+                "from": "40",
+                "to": "30"
+              },
+              {
+                "from": "40",
+                "to": "50"
+              }
+            ],
+            "panels": [],
+            "steps": [
+              {
+                "at": "Insert",
+                "show": [
+                  "25"
+                ],
+                "nodes": {
+                  "25": "active"
+                },
+                "note": "insert 25"
+              },
+              {
+                "at": "left#2",
+                "add": [
+                  {
+                    "from": "30",
+                    "to": "25"
+                  }
+                ],
+                "nodes": {
+                  "25": "base"
+                },
+                "note": "> 20, < 40, < 30"
+              },
+              {
+                "at": "taller",
+                "nodes": {
+                  "20": "queued"
+                },
+                "note": "bf(20) = 1 − 3 = −2"
+              },
+              {
+                "at": "leans",
+                "nodes": {
+                  "40": "queued"
+                },
+                "note": "bf(40) = +1: leans left → RL case"
+              },
+              {
+                "at": "single",
+                "note": "One left rotation would leave a zigzag"
+              },
+              {
+                "at": "first",
+                "nodes": {
+                  "40": "base",
+                  "30": "active"
+                },
+                "remove": [
+                  "20-40",
+                  "40-30"
+                ],
+                "add": [
+                  {
+                    "from": "20",
+                    "to": "30"
+                  },
+                  {
+                    "from": "30",
+                    "to": "40"
+                  }
+                ],
+                "move": {
+                  "30": [
+                    1185,
+                    420
+                  ],
+                  "40": [
+                    1335,
+                    560
+                  ],
+                  "50": [
+                    1485,
+                    690
+                  ],
+                  "25": [
+                    1035,
+                    560
+                  ]
+                },
+                "note": "rotateRight(40): now a straight line"
+              },
+              {
+                "at": "Then#2",
+                "nodes": {
+                  "20": "base"
+                },
+                "remove": [
+                  "20-30",
+                  "30-25"
+                ],
+                "add": [
+                  {
+                    "from": "30",
+                    "to": "20"
+                  },
+                  {
+                    "from": "20",
+                    "to": "25"
+                  }
+                ],
+                "move": {
+                  "30": [
+                    885,
+                    280
+                  ],
+                  "20": [
+                    585,
+                    420
+                  ],
+                  "10": [
+                    435,
+                    560
+                  ],
+                  "25": [
+                    735,
+                    560
+                  ],
+                  "40": [
+                    1185,
+                    420
+                  ],
+                  "50": [
+                    1335,
+                    560
+                  ]
+                },
+                "note": "rotateLeft(20): 30 is the root"
+              },
+              {
+                "at": "within",
+                "nodes": {
+                  "30": "done",
+                  "20": "done",
+                  "10": "done",
+                  "25": "done",
+                  "40": "done",
+                  "50": "done"
+                },
+                "note": "All balance factors in {−1, 0, +1}"
+              }
+            ],
+            "directed": false
+          }
+        },
+        {
+          "type": "code",
+          "say": "Insert is a normal search tree insert, plus rebalance on the way back up. Rebalance updates the height and checks the balance factor. When it's left-heavy, and the left child leans right, rotate it left first, then rotate right. Right-heavy is the mirror. An insert needs at most one of these fixes. A delete can need one at every level, O of log n rotations.",
+          "props": {
+            "title": "rebalance()",
+            "file": "avl.cpp",
+            "tag": "C++",
+            "lang": "cpp",
+            "size": 20,
+            "width": 1250,
+            "code": "Node* rebalance(Node* n) {\n    update(n);\n    int b = bf(n);                                // height(left) - height(right)\n    if (b > 1) {                                  // left-heavy\n        if (bf(n->left) < 0)                      // LR: zigzag\n            n->left = rotateLeft(n->left);\n        return rotateRight(n);                    // LL\n    }\n    if (b < -1) {                                 // right-heavy\n        if (bf(n->right) > 0)                     // RL: zigzag\n            n->right = rotateRight(n->right);\n        return rotateLeft(n);                     // RR\n    }\n    return n;\n}\nNode* insert(Node* n, int v) {\n    if (!n) return new Node(v);\n    if (v < n->val)      n->left  = insert(n->left, v);\n    else if (v > n->val) n->right = insert(n->right, v);\n    return rebalance(n);                          // on the way back up\n}",
+            "highlights": [
+              {
+                "at": "Insert",
+                "lines": "16-20",
+                "note": "BST insert, rebalance on the way up"
+              },
+              {
+                "at": "checks",
+                "lines": "2-3",
+                "note": "Balance factor"
+              },
+              {
+                "at": "leans",
+                "lines": "4-7",
+                "note": "LR: straighten, then LL"
+              },
+              {
+                "at": "mirror",
+                "lines": "9-12",
+                "note": "RL and RR: the mirror"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Red-black rules",
+      "question": "What are the red-black rules, and how does an insert restore them?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. What are the red-black tree rules, and how does an insert restore them? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "What are the <em>red-black</em> rules?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Every node is red or black, and the root is black. A red node can't have a red child. And every path from a node down to an empty leaf passes the same number of black nodes: its black height. Together, these bound the height. The shortest path is all black. The longest alternates red and black, so it's at most twice as long. That gives a height of at most two log of n plus one.",
+          "props": {
+            "title": "Three rules, <em>2× height</em>",
+            "items": [
+              {
+                "at": "root",
+                "label": "Colors",
+                "title": "Red or black; root black",
+                "body": "Empty leaves count as black."
+              },
+              {
+                "at": "child",
+                "label": "No red-red",
+                "title": "A red node has black children",
+                "body": "Reds can't stack up."
+              },
+              {
+                "at": "passes",
+                "label": "Black height",
+                "title": "Same count on every path",
+                "body": "Every downward path to a leaf."
+              },
+              {
+                "at": "twice",
+                "label": "Height",
+                "title": "Longest ≤ 2 × shortest",
+                "body": "Reds only interleave blacks.",
+                "code": "h ≤ 2 log₂(N + 1)"
+              }
+            ]
+          }
+        },
+        {
+          "type": "graph",
+          "say": "A new node is always red, so black heights never change, and the only possible problem is red under red. Insert ten: it's the root, so color it black. Twenty is red, under a black parent: fine. Thirty is red under red. Its uncle is empty, which counts as black. So rotate left at ten, and swap colors: twenty black, ten red. Now insert fifteen, under ten: red under red again. This time the uncle, thirty, is red. Just recolor: parent and uncle turn black, and the grandparent turns red. Twenty is the root, so it goes back to black. Recoloring can push the problem up, but an insert never needs more than two rotations.",
+          "props": {
+            "title": "Insert <em>fix-up</em>",
+            "nodes": [
+              {
+                "id": "10",
+                "x": 710,
+                "y": 290,
+                "hidden": true
+              },
+              {
+                "id": "20",
+                "x": 960,
+                "y": 430,
+                "hidden": true
+              },
+              {
+                "id": "30",
+                "x": 1210,
+                "y": 570,
+                "hidden": true
+              },
+              {
+                "id": "15",
+                "x": 835,
+                "y": 570,
+                "hidden": true
+              }
+            ],
+            "edges": [],
+            "panels": [],
+            "steps": [
+              {
+                "at": "Insert",
+                "show": [
+                  "10"
+                ],
+                "nodes": {
+                  "10": "red"
+                },
+                "note": "New nodes are red"
+              },
+              {
+                "at": "root",
+                "nodes": {
+                  "10": "black"
+                },
+                "note": "Root: color it black"
+              },
+              {
+                "at": "Twenty",
+                "show": [
+                  "20"
+                ],
+                "add": [
+                  {
+                    "from": "10",
+                    "to": "20"
+                  }
+                ],
+                "nodes": {
+                  "20": "red"
+                },
+                "note": "20: red under black, fine"
+              },
+              {
+                "at": "Thirty",
+                "show": [
+                  "30"
+                ],
+                "add": [
+                  {
+                    "from": "20",
+                    "to": "30"
+                  }
+                ],
+                "nodes": {
+                  "30": "red"
+                },
+                "note": "30: red under red"
+              },
+              {
+                "at": "uncle",
+                "note": "Uncle is empty: black → rotate"
+              },
+              {
+                "at": "rotate",
+                "remove": [
+                  "10-20"
+                ],
+                "add": [
+                  {
+                    "from": "20",
+                    "to": "10"
+                  }
+                ],
+                "move": {
+                  "20": [
+                    960,
+                    290
+                  ],
+                  "10": [
+                    710,
+                    430
+                  ],
+                  "30": [
+                    1210,
+                    430
+                  ]
+                },
+                "note": "rotateLeft(10)"
+              },
+              {
+                "at": "swap",
+                "nodes": {
+                  "20": "black",
+                  "10": "red"
+                },
+                "note": "Swap colors: 20 black, 10 red"
+              },
+              {
+                "at": "fifteen",
+                "show": [
+                  "15"
+                ],
+                "add": [
+                  {
+                    "from": "10",
+                    "to": "15"
+                  }
+                ],
+                "nodes": {
+                  "15": "red"
+                },
+                "note": "15 under 10: red under red"
+              },
+              {
+                "at": "uncle#2",
+                "nodes": {
+                  "30": "red"
+                },
+                "note": "Uncle 30 is red → recolor"
+              },
+              {
+                "at": "recolor",
+                "nodes": {
+                  "10": "black",
+                  "30": "black",
+                  "20": "red"
+                },
+                "note": "Parent, uncle black; grandparent red"
+              },
+              {
+                "at": "back",
+                "nodes": {
+                  "20": "black"
+                },
+                "note": "Root back to black"
+              },
+              {
+                "at": "two",
+                "note": "≤ 2 rotations per insert"
+              }
+            ],
+            "directed": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "04",
+      "title": "AVL or red-black?",
+      "question": "Why is std::map a red-black tree rather than an AVL tree?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question four. Why is standard map a red-black tree, and not an AVL tree? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Why is <em>std::map</em> a red-black tree?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "An AVL tree is more strictly balanced: about one point four four log n tall, against two log n for red-black. So lookups touch slightly fewer nodes. But keeping that balance costs more on writes. A delete can rotate at every level, and an AVL tree updates heights all the way up. A red-black tree does at most two rotations per insert, and three per delete, and much of the rest is recoloring. That's why most standard libraries use red-black trees: std map and set, Java's TreeMap, and the Linux kernel's rbtree.",
+          "props": {
+            "title": "Tighter, or <em>cheaper</em> to fix",
+            "left": {
+              "at": "strictly",
+              "label": "AVL",
+              "title": "Shorter tree",
+              "code": "h ≤ 1.44 log₂ N",
+              "body": "Fewer nodes per lookup; delete may rotate at every level."
+            },
+            "right": {
+              "at": "most",
+              "label": "Red-black",
+              "title": "Cheaper writes",
+              "tone": "good",
+              "code": "≤ 2 rotations insert, ≤ 3 delete",
+              "body": "Looser balance, mostly recoloring."
+            },
+            "verdict": {
+              "at": "kernel's",
+              "text": "std::map / std::set, Java TreeMap, Linux rbtree: red-black.",
+              "code": "mixed reads and writes"
+            }
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Sorted inserts turn a plain search tree into a list. A rotation reshapes the tree in O of one, and keeps the order. AVL trees keep heights within one, with four rotation cases. And red-black trees keep looser rules, so writes are cheaper: that's what std map uses.",
+          "props": {
+            "title": "Balanced trees, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "list",
+                "text": "Plain BST + sorted inserts = a list.",
+                "code": "O(N) search"
+              },
+              {
+                "at": "reshapes",
+                "text": "Rotation: O(1), keeps in-order.",
+                "code": "3 pointer changes"
+              },
+              {
+                "at": "four",
+                "text": "AVL: |bf| ≤ 1, four cases.",
+                "code": "LL, RR, LR, RL"
+              },
+              {
+                "at": "looser",
+                "text": "Red-black: looser, cheaper writes.",
+                "code": "std::map"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

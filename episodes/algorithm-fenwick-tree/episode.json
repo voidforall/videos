@@ -1,0 +1,1075 @@
+{
+  "slug": "algorithm-fenwick-tree",
+  "series": "algorithm",
+  "title": "Fenwick tree",
+  "kicker": "Algorithm · Fenwick tree",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/binary-indexed-tree.md",
+  "summary": "The binary indexed tree: what each slot covers, prefix sums and updates by the lowest set bit, range updates with two trees, and when a segment tree is the better choice.",
+  "captionFixes": [
+    {
+      "match": [
+        "T(i)"
+      ],
+      "display": "t[i]"
+    },
+    {
+      "match": [
+        "Take",
+        "6",
+        "0",
+        "1",
+        "1",
+        "0"
+      ],
+      "display": "Take 6: 0110."
+    },
+    {
+      "match": [
+        "gives",
+        "1",
+        "0",
+        "0",
+        "1"
+      ],
+      "display": "gives 1001,"
+    },
+    {
+      "match": [
+        "bit",
+        "1",
+        "0",
+        "1",
+        "0"
+      ],
+      "display": "bit: 1010."
+    },
+    {
+      "match": [
+        "computer",
+        "prefix"
+      ],
+      "display": "compute a prefix"
+    },
+    {
+      "match": [
+        "Arrange",
+        "sum"
+      ],
+      "display": "A range sum"
+    },
+    {
+      "match": [
+        "subtracted",
+        "to",
+        "build"
+      ],
+      "display": "subtracted. To build"
+    },
+    {
+      "match": [
+        "called",
+        "add"
+      ],
+      "display": "call add"
+    },
+    {
+      "match": [
+        "D",
+        "of",
+        "i",
+        "is",
+        "of",
+        "i",
+        "minus",
+        "of",
+        "i",
+        "minus",
+        "1"
+      ],
+      "display": "d[i] is a[i] − a[i−1]."
+    },
+    {
+      "match": [
+        "And",
+        "of",
+        "i",
+        "is"
+      ],
+      "display": "And a[i] is"
+    },
+    {
+      "match": [
+        "dj"
+      ],
+      "display": "d[j]"
+    },
+    {
+      "match": [
+        "D"
+      ],
+      "display": "d",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "L"
+      ],
+      "display": "l",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "R"
+      ],
+      "display": "r",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "here",
+        "it",
+        "is"
+      ],
+      "display": "Here it is",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "range",
+        "add",
+        "does"
+      ],
+      "display": "Range add does",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "then",
+        "prefix"
+      ],
+      "display": "Then prefix",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "i",
+        "checked"
+      ],
+      "display": "I checked",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "no",
+        "mismatches"
+      ],
+      "display": "No mismatches",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "zaw"
+      ],
+      "display": "XOR"
+    },
+    {
+      "match": [
+        "counts",
+        "smaller",
+        "numbers"
+      ],
+      "display": "count smaller numbers"
+    },
+    {
+      "match": [
+        "I's"
+      ],
+      "display": "i's",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "to",
+        "sum",
+        "the",
+        "first"
+      ],
+      "display": "To sum the first",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "log",
+        "n"
+      ],
+      "display": "O(log N)"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "n",
+        "log",
+        "n"
+      ],
+      "display": "O(N log N)"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "n"
+      ],
+      "display": "O(N)"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "one"
+      ],
+      "display": "O(1)"
+    },
+    {
+      "match": [
+        "T",
+        "of",
+        "I"
+      ],
+      "display": "t[i]"
+    },
+    {
+      "match": [
+        "t",
+        "of",
+        "seven"
+      ],
+      "display": "t[7]"
+    },
+    {
+      "match": [
+        "B",
+        "one"
+      ],
+      "display": "b1"
+    },
+    {
+      "match": [
+        "B",
+        "two"
+      ],
+      "display": "b2"
+    },
+    {
+      "match": [
+        "Fenwick"
+      ],
+      "display": "Fenwick"
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "The lowbit trick",
+      "question": "In a Fenwick tree, which elements does t[i] cover?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Fenwick tree, question one. A Fenwick tree is a single array, t. Which elements does t of i cover? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Which elements does <em>t[i]</em> cover?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Here are eight values. Each slot, t of i, holds the sum of a block that ends at i, and the block's length is the lowest set bit of i. Odd indices end in a one bit, so they cover just one element. Two and six end in one zero: their lowest bit is two, so they cover two elements each. Four is one zero zero: it covers four elements, one through four. And eight covers all eight. Every prefix splits into at most log n of these blocks.",
+          "props": {
+            "title": "Blocks sized by the <em>lowest set bit</em>",
+            "nodes": [
+              {
+                "id": "a1",
+                "label": "a1=3",
+                "x": 251,
+                "y": 690,
+                "w": 124,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "a2",
+                "label": "a2=2",
+                "x": 454,
+                "y": 690,
+                "w": 124,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "a3",
+                "label": "a3=-1",
+                "x": 656,
+                "y": 690,
+                "w": 124,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "a4",
+                "label": "a4=6",
+                "x": 859,
+                "y": 690,
+                "w": 124,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "a5",
+                "label": "a5=5",
+                "x": 1061,
+                "y": 690,
+                "w": 124,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "a6",
+                "label": "a6=4",
+                "x": 1264,
+                "y": 690,
+                "w": 124,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "a7",
+                "label": "a7=-3",
+                "x": 1466,
+                "y": 690,
+                "w": 124,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "a8",
+                "label": "a8=3",
+                "x": 1669,
+                "y": 690,
+                "w": 124,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "t1",
+                "label": "t[1]\n3",
+                "x": 251,
+                "y": 600,
+                "w": 188,
+                "h": 76,
+                "hidden": true
+              },
+              {
+                "id": "t2",
+                "label": "t[2]\n5",
+                "x": 352,
+                "y": 490,
+                "w": 391,
+                "h": 76,
+                "hidden": true
+              },
+              {
+                "id": "t3",
+                "label": "t[3]\n-1",
+                "x": 656,
+                "y": 600,
+                "w": 188,
+                "h": 76,
+                "hidden": true
+              },
+              {
+                "id": "t4",
+                "label": "t[4]\n10",
+                "x": 554,
+                "y": 380,
+                "w": 796,
+                "h": 76,
+                "hidden": true
+              },
+              {
+                "id": "t5",
+                "label": "t[5]\n5",
+                "x": 1061,
+                "y": 600,
+                "w": 188,
+                "h": 76,
+                "hidden": true
+              },
+              {
+                "id": "t6",
+                "label": "t[6]\n9",
+                "x": 1162,
+                "y": 490,
+                "w": 391,
+                "h": 76,
+                "hidden": true
+              },
+              {
+                "id": "t7",
+                "label": "t[7]\n-3",
+                "x": 1466,
+                "y": 600,
+                "w": 188,
+                "h": 76,
+                "hidden": true
+              },
+              {
+                "id": "t8",
+                "label": "t[8]\n19",
+                "x": 959,
+                "y": 270,
+                "w": 1606,
+                "h": 76,
+                "hidden": true
+              }
+            ],
+            "edges": [],
+            "panels": [],
+            "steps": [
+              {
+                "at": "values",
+                "note": "a[1..8], 1-indexed"
+              },
+              {
+                "at": "block",
+                "note": "t[i] = sum of a block that ends at i"
+              },
+              {
+                "at": "Odd",
+                "show": [
+                  "t1",
+                  "t3",
+                  "t5",
+                  "t7"
+                ],
+                "note": "Odd i: lowest bit 1 → one element"
+              },
+              {
+                "at": "six",
+                "show": [
+                  "t2",
+                  "t6"
+                ],
+                "note": "2 = 10₂, 6 = 110₂: lowest bit 2 → two elements"
+              },
+              {
+                "at": "Four",
+                "show": [
+                  "t4"
+                ],
+                "note": "4 = 100₂: covers a[1..4]"
+              },
+              {
+                "at": "eight#2",
+                "show": [
+                  "t8"
+                ],
+                "note": "8 = 1000₂: covers a[1..8]"
+              },
+              {
+                "at": "prefix",
+                "nodes": {
+                  "t7": "active",
+                  "t6": "active",
+                  "t4": "active"
+                },
+                "note": "a[1..7] = t[7] + t[6] + t[4]"
+              }
+            ]
+          }
+        },
+        {
+          "type": "points",
+          "say": "The lowest set bit is one expression: i and minus i. In two's complement, minus i is not i plus one. Take six: zero one one zero. Flipping gives one zero zero one, and adding one carries up to the lowest set bit: one zero one zero. Every bit above it differs from six, so i and minus i keeps only that bit: two.",
+          "props": {
+            "title": "lowbit(i) = <em>i & -i</em>",
+            "items": [
+              {
+                "at": "six",
+                "label": "Start",
+                "title": "6 = 0110",
+                "body": "The value whose lowest set bit we want."
+              },
+              {
+                "at": "Flipping",
+                "label": "Negate",
+                "title": "−6 = 1001 + 1 = 1010",
+                "body": "The carry stops at the lowest set bit."
+              },
+              {
+                "at": "keeps",
+                "label": "And",
+                "title": "6 & −6 = 0010 = 2",
+                "body": "Only the lowest set bit survives.",
+                "code": "t[6] covers a[5..6]"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Query and update",
+      "question": "How does a Fenwick tree compute a prefix sum, and how does it update one element?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. How does a Fenwick tree compute a prefix sum? And how does it update one element? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How do <em>prefix</em> and <em>add</em> walk the array?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "To sum the first seven, start at seven and strip the lowest bit each time. t of seven covers seven alone: minus three. Seven minus one is six, which covers five and six: nine. Six minus two is four, which covers one through four: ten. Four minus four is zero, so stop. Sixteen, from three slots. To add four at index three, go the other way: add the lowest bit. First slot three, then slot four, then slot eight: exactly the slots whose blocks contain index three. Each one grows by four.",
+          "props": {
+            "title": "prefix(7), then <em>add(3, +4)</em>",
+            "nodes": [
+              {
+                "id": "a1",
+                "label": "a1=3",
+                "x": 147,
+                "y": 690,
+                "w": 124,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "a2",
+                "label": "a2=2",
+                "x": 282,
+                "y": 690,
+                "w": 124,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "a3",
+                "label": "a3=-1",
+                "x": 417,
+                "y": 690,
+                "w": 124,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "a4",
+                "label": "a4=6",
+                "x": 552,
+                "y": 690,
+                "w": 124,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "a5",
+                "label": "a5=5",
+                "x": 687,
+                "y": 690,
+                "w": 124,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "a6",
+                "label": "a6=4",
+                "x": 822,
+                "y": 690,
+                "w": 124,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "a7",
+                "label": "a7=-3",
+                "x": 957,
+                "y": 690,
+                "w": 124,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "a8",
+                "label": "a8=3",
+                "x": 1092,
+                "y": 690,
+                "w": 124,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "t1",
+                "label": "t[1]\n3",
+                "x": 147,
+                "y": 600,
+                "w": 121,
+                "h": 76,
+                "hidden": false
+              },
+              {
+                "id": "t2",
+                "label": "t[2]\n5",
+                "x": 214,
+                "y": 490,
+                "w": 256,
+                "h": 76,
+                "hidden": false
+              },
+              {
+                "id": "t3",
+                "label": "t[3]\n-1",
+                "x": 417,
+                "y": 600,
+                "w": 121,
+                "h": 76,
+                "hidden": false
+              },
+              {
+                "id": "t4",
+                "label": "t[4]\n10",
+                "x": 349,
+                "y": 380,
+                "w": 526,
+                "h": 76,
+                "hidden": false
+              },
+              {
+                "id": "t5",
+                "label": "t[5]\n5",
+                "x": 687,
+                "y": 600,
+                "w": 121,
+                "h": 76,
+                "hidden": false
+              },
+              {
+                "id": "t6",
+                "label": "t[6]\n9",
+                "x": 754,
+                "y": 490,
+                "w": 256,
+                "h": 76,
+                "hidden": false
+              },
+              {
+                "id": "t7",
+                "label": "t[7]\n-3",
+                "x": 957,
+                "y": 600,
+                "w": 121,
+                "h": 76,
+                "hidden": false
+              },
+              {
+                "id": "t8",
+                "label": "t[8]\n19",
+                "x": 619,
+                "y": 270,
+                "w": 1066,
+                "h": 76,
+                "hidden": false
+              }
+            ],
+            "edges": [],
+            "panels": [
+              {
+                "key": "sum",
+                "label": "prefix(7)",
+                "type": "list",
+                "initial": []
+              }
+            ],
+            "steps": [
+              {
+                "at": "sum",
+                "note": "prefix(7)"
+              },
+              {
+                "at": "alone",
+                "nodes": {
+                  "t7": "active"
+                },
+                "panels": {
+                  "sum": [
+                    "-3"
+                  ]
+                },
+                "note": "i = 7 (111₂): take t[7]"
+              },
+              {
+                "at": "six",
+                "nodes": {
+                  "t6": "active"
+                },
+                "add": [
+                  {
+                    "from": "t7",
+                    "to": "t6"
+                  }
+                ],
+                "panels": {
+                  "sum": [
+                    "-3",
+                    "9"
+                  ]
+                },
+                "note": "7 − 1 = 6 (110₂): take t[6]"
+              },
+              {
+                "at": "four",
+                "nodes": {
+                  "t4": "active"
+                },
+                "add": [
+                  {
+                    "from": "t6",
+                    "to": "t4"
+                  }
+                ],
+                "panels": {
+                  "sum": [
+                    "-3",
+                    "9",
+                    "10"
+                  ]
+                },
+                "note": "6 − 2 = 4 (100₂): take t[4]"
+              },
+              {
+                "at": "stop",
+                "note": "4 − 4 = 0: stop"
+              },
+              {
+                "at": "Sixteen",
+                "nodes": {
+                  "t7": "done",
+                  "t6": "done",
+                  "t4": "done"
+                },
+                "panels": {
+                  "sum": [
+                    "-3",
+                    "9",
+                    "10",
+                    "= 16"
+                  ]
+                },
+                "note": "a[1..7] = 16"
+              },
+              {
+                "at": "other",
+                "nodes": {
+                  "t7": "base",
+                  "t6": "base",
+                  "t4": "base"
+                },
+                "remove": [
+                  "t7-t6",
+                  "t6-t4"
+                ],
+                "panels": {
+                  "sum": []
+                },
+                "note": "add(3, +4): climb by adding the low bit"
+              },
+              {
+                "at": "First#2",
+                "nodes": {
+                  "t3": "active"
+                },
+                "labels": {
+                  "t3": "t[3]\n3"
+                },
+                "note": "i = 3: t[3] += 4"
+              },
+              {
+                "at": "slot#2",
+                "nodes": {
+                  "t4": "active"
+                },
+                "add": [
+                  {
+                    "from": "t3",
+                    "to": "t4"
+                  }
+                ],
+                "labels": {
+                  "t4": "t[4]\n14"
+                },
+                "note": "3 + 1 = 4: t[4] += 4"
+              },
+              {
+                "at": "slot#3",
+                "nodes": {
+                  "t8": "active"
+                },
+                "add": [
+                  {
+                    "from": "t4",
+                    "to": "t8"
+                  }
+                ],
+                "labels": {
+                  "t8": "t[8]\n23"
+                },
+                "note": "4 + 4 = 8: t[8] += 4"
+              },
+              {
+                "at": "contain",
+                "nodes": {
+                  "t3": "done",
+                  "t4": "done",
+                  "t8": "done"
+                },
+                "note": "Exactly the blocks containing index 3"
+              }
+            ]
+          }
+        },
+        {
+          "type": "code",
+          "say": "That's the whole structure, about fifteen lines. Add climbs by adding the low bit. Prefix descends by stripping it. Both loops run at most log n times, because each step changes the lowest set bit's position. A range sum is two prefix sums subtracted. To build from an array, call add n times, O of n log n.",
+          "props": {
+            "title": "The <em>code</em>",
+            "file": "fenwick.cpp",
+            "tag": "C++",
+            "lang": "cpp",
+            "size": 21,
+            "width": 1150,
+            "code": "struct Fenwick {\n    int n;\n    vector<long long> t;                  // 1-indexed: t[0] unused\n    Fenwick(int n) : n(n), t(n + 1) {}\n    void add(int i, long long d) {        // a[i] += d\n        for (; i <= n; i += i & -i)       // climb: add the low bit\n            t[i] += d;\n    }\n    long long prefix(int i) const {       // a[1] + ... + a[i]\n        long long s = 0;\n        for (; i > 0; i -= i & -i)        // descend: strip the low bit\n            s += t[i];\n        return s;\n    }\n    long long sum(int l, int r) const {   // a[l..r]\n        return prefix(r) - prefix(l - 1);\n    }\n};",
+            "highlights": [
+              {
+                "at": "structure",
+                "lines": "3",
+                "note": "One array, 1-indexed"
+              },
+              {
+                "at": "climbs",
+                "lines": "5-7",
+                "note": "add: climb by the low bit"
+              },
+              {
+                "at": "descends",
+                "lines": "9-13",
+                "note": "prefix: strip the low bit"
+              },
+              {
+                "at": "subtracted",
+                "lines": "16",
+                "note": "Range sum = two prefixes"
+              },
+              {
+                "at": "build",
+                "lines": "4",
+                "note": "Build: n adds, O(N log N)"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Range add, range sum",
+      "question": "How can a Fenwick tree add to a whole range and still answer range sums in O(log N)?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. How can a Fenwick tree add a value to a whole range, and still answer range sums, in O of log n? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Range add <em>and</em> range sum, both O(log N)?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Start with the difference array: d of i is a of i, minus a of i minus one. Adding x to a whole range only changes two entries of d: plus x at l, and minus x just past r. And a of i is a prefix sum of d. So one Fenwick tree over d gives range add, and point query. For range sums, you need the sum of those prefix sums. That expands into i times the sum of d, minus the sum of d j times j minus one. Two Fenwick trees, one for each sum.",
+          "props": {
+            "title": "Store the <em>differences</em>",
+            "items": [
+              {
+                "at": "difference",
+                "label": "Difference array",
+                "title": "d[i] = a[i] − a[i−1]",
+                "body": "a[i] is the prefix sum of d."
+              },
+              {
+                "at": "changes",
+                "label": "Range add",
+                "title": "Two point updates",
+                "body": "d[l] += x, d[r+1] −= x.",
+                "code": "O(log N)"
+              },
+              {
+                "at": "expands",
+                "label": "Range sum",
+                "title": "Sum of prefix sums",
+                "body": "prefix(i) = i·Σd[j] − Σd[j]·(j−1)",
+                "code": "two trees: b1, b2"
+              }
+            ]
+          }
+        },
+        {
+          "type": "code",
+          "say": "Here it is. Range add does two updates in each tree. b one stores d. b two stores d times j minus one, which corrects for the elements before l. Then prefix of i is b one's prefix times i, minus b two's prefix. I checked it against a brute-force array on two thousand random cases: no mismatches.",
+          "props": {
+            "title": "Two trees, <em>range sums</em>",
+            "file": "range_fenwick.cpp",
+            "tag": "C++",
+            "lang": "cpp",
+            "size": 22,
+            "width": 1150,
+            "code": "struct RangeFenwick {          // range add, range sum\n    Fenwick b1, b2;\n    RangeFenwick(int n) : b1(n), b2(n) {}\n    void rangeAdd(int l, int r, long long d) {\n        b1.add(l, d);           b1.add(r + 1, -d);\n        b2.add(l, d * (l - 1)); b2.add(r + 1, -d * r);\n    }\n    long long prefix(int i) const {\n        return b1.prefix(i) * i - b2.prefix(i);\n    }\n    long long sum(int l, int r) const {\n        return prefix(r) - prefix(l - 1);\n    }\n};",
+            "highlights": [
+              {
+                "at": "Range",
+                "lines": "4-6",
+                "note": "Range add: two updates per tree"
+              },
+              {
+                "at": "stores",
+                "lines": "5",
+                "note": "b1 holds the differences"
+              },
+              {
+                "at": "corrects",
+                "lines": "6",
+                "note": "b2 holds d·(j−1)"
+              },
+              {
+                "at": "Then",
+                "lines": "9",
+                "note": "prefix(i) = b1·i − b2"
+              },
+              {
+                "at": "checked",
+                "lines": "11",
+                "note": "Verified against brute force"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "04",
+      "title": "Fenwick or segment tree?",
+      "question": "When can't you use a Fenwick tree, and what's the classic problem it solves?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question four. When can't you use a Fenwick tree? And what's the classic interview problem it solves? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "When does a Fenwick tree <em>not</em> work?"
+          }
+        },
+        {
+          "type": "compare",
+          "say": "A Fenwick tree gets a range by subtracting two prefixes. That only works if the operation can be undone: sums, and XOR. Minimum can't: knowing the min of the first seven, and of the first three, tells you nothing about the min of four to seven. A segment tree merges real ranges, so it handles min, max, range assignment, and lazy updates. Use Fenwick when the operation is invertible: it's ten lines, and fast. Otherwise, use a segment tree.",
+          "props": {
+            "title": "It needs an <em>inverse</em>",
+            "left": {
+              "at": "subtracting",
+              "label": "Fenwick tree",
+              "title": "Prefixes, subtracted",
+              "tone": "good",
+              "code": "sum(l, r) = prefix(r) − prefix(l−1)",
+              "body": "Sum, XOR, counts: anything you can undo. About ten lines."
+            },
+            "right": {
+              "at": "merges",
+              "label": "Segment tree",
+              "title": "Real ranges, merged",
+              "code": "min, max, gcd, assign",
+              "body": "Any associative merge, plus lazy range updates."
+            },
+            "verdict": {
+              "at": "invertible",
+              "text": "Invertible operation: Fenwick. Otherwise: segment tree.",
+              "code": "min(1..7) and min(1..3) ⇏ min(4..7)"
+            }
+          }
+        },
+        {
+          "type": "code",
+          "say": "The classic use: count smaller numbers after each element. Compress the values to ranks one to m. Walk from the right, keeping a Fenwick tree of counts per rank. For each element, the prefix sum below its rank counts the smaller values already seen, which are exactly the later ones. Then add it. O of n log n. Inversion counts, and reverse pairs, work the same way.",
+          "props": {
+            "title": "Counting <em>smaller after self</em>",
+            "file": "count_smaller.cpp",
+            "tag": "C++",
+            "lang": "cpp",
+            "size": 20,
+            "width": 1250,
+            "code": "// LeetCode 315: for each i, how many later elements are smaller?\nvector<int> countSmaller(const vector<int>& nums) {\n    vector<int> vals(nums);                      // compress values to 1..m\n    sort(vals.begin(), vals.end());\n    vals.erase(unique(vals.begin(), vals.end()), vals.end());\n    Fenwick seen(vals.size());                   // counts per value\n    vector<int> out(nums.size());\n    for (int i = (int)nums.size() - 1; i >= 0; --i) {\n        int v = lower_bound(vals.begin(), vals.end(), nums[i]) - vals.begin() + 1;\n        out[i] = seen.prefix(v - 1);             // later values < nums[i]\n        seen.add(v, 1);\n    }\n    return out;\n}",
+            "highlights": [
+              {
+                "at": "Compress",
+                "lines": "3-5",
+                "note": "Compress values to ranks 1..m"
+              },
+              {
+                "at": "right",
+                "lines": "8",
+                "note": "Walk from the right"
+              },
+              {
+                "at": "below",
+                "lines": "10",
+                "note": "Count seen values below this rank"
+              },
+              {
+                "at": "add",
+                "lines": "11",
+                "note": "Then record this one"
+              }
+            ]
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. t of i covers a block whose length is i's lowest set bit. Prefix sums strip that bit, and updates add it, so both are O of log n. Two trees give range add with range sum. And it needs an invertible operation: for min or max, use a segment tree.",
+          "props": {
+            "title": "Fenwick tree, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "covers",
+                "text": "t[i] covers a block of length i & −i.",
+                "code": "lowbit"
+              },
+              {
+                "at": "strip",
+                "text": "prefix strips the low bit; add adds it.",
+                "code": "O(log N) each"
+              },
+              {
+                "at": "Two",
+                "text": "Range add + range sum: two trees.",
+                "code": "b1·i − b2"
+              },
+              {
+                "at": "invertible",
+                "text": "Invertible operations only; else a segment tree.",
+                "code": "sum, XOR, counts"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

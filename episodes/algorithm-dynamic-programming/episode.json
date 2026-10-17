@@ -1,0 +1,1341 @@
+{
+  "slug": "algorithm-dynamic-programming",
+  "series": "algorithm",
+  "title": "Dynamic programming",
+  "kicker": "Algorithm · Dynamic programming",
+  "source": "https://github.com/voidforall/ai-docs/blob/main/algorithm/dynamic-programming.md",
+  "summary": "Designing a DP from its state and transition, then three shapes interviews love: a 2D table (edit distance), intervals (burst balloons), and trees.",
+  "captionFixes": [
+    {
+      "match": [
+        "code",
+        "pause"
+      ],
+      "display": "code? Pause"
+    },
+    {
+      "match": [
+        "dp(i)"
+      ],
+      "display": "dp[i]"
+    },
+    {
+      "match": [
+        "dp",
+        "of",
+        "i",
+        "minus",
+        "one"
+      ],
+      "display": "dp[i−1]"
+    },
+    {
+      "match": [
+        "dp",
+        "of",
+        "i",
+        "minus",
+        "two"
+      ],
+      "display": "dp[i−2]"
+    },
+    {
+      "match": [
+        "Top",
+        "down"
+      ],
+      "display": "Top-down"
+    },
+    {
+      "match": [
+        "Bottom",
+        "up"
+      ],
+      "display": "Bottom-up"
+    },
+    {
+      "match": [
+        "dp",
+        "of",
+        "i",
+        "minus",
+        "1",
+        "j",
+        "minus",
+        "1"
+      ],
+      "display": "dp[i−1][j−1]"
+    },
+    {
+      "match": [
+        "Horse",
+        "into",
+        "Ross"
+      ],
+      "display": "horse into ros"
+    },
+    {
+      "match": [
+        "S",
+        "H"
+      ],
+      "display": "h"
+    },
+    {
+      "match": [
+        "H"
+      ],
+      "display": "h",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "R"
+      ],
+      "display": "r",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "E"
+      ],
+      "display": "e",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "I"
+      ],
+      "display": "i",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "J"
+      ],
+      "display": "j",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "O",
+        "against",
+        "O"
+      ],
+      "display": "o against o",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "1",
+        "replace"
+      ],
+      "display": "1: replace"
+    },
+    {
+      "match": [
+        "dp",
+        "of",
+        "i",
+        "k",
+        "plus",
+        "i",
+        "times",
+        "k",
+        "times",
+        "j",
+        "plus",
+        "dp",
+        "of",
+        "k",
+        "j"
+      ],
+      "display": "dp[i][k] + i·k·j + dp[k][j]"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "n",
+        "cubed"
+      ],
+      "display": "O(N³)"
+    },
+    {
+      "match": [
+        "1",
+        "post",
+        "order",
+        "pass"
+      ],
+      "display": "One post-order pass"
+    },
+    {
+      "match": [
+        "Two",
+        "string"
+      ],
+      "display": "Two-string"
+    },
+    {
+      "match": [
+        "D",
+        "P"
+      ],
+      "display": "DP"
+    },
+    {
+      "match": [
+        "dp",
+        "of",
+        "i,",
+        "j"
+      ],
+      "display": "dp[i][j]"
+    },
+    {
+      "match": [
+        "dp",
+        "of",
+        "i"
+      ],
+      "display": "dp[i]"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "log",
+        "n"
+      ],
+      "display": "O(log N)"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "n",
+        "log",
+        "n"
+      ],
+      "display": "O(N log N)"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "n"
+      ],
+      "display": "O(N)"
+    },
+    {
+      "match": [
+        "O",
+        "of",
+        "one"
+      ],
+      "display": "O(1)"
+    },
+    {
+      "match": [
+        "O(n)"
+      ],
+      "display": "O(N)"
+    },
+    {
+      "match": [
+        "to",
+        "recap"
+      ],
+      "display": "To recap",
+      "matchCase": true
+    },
+    {
+      "match": [
+        "d",
+        "p"
+      ],
+      "display": "dp"
+    },
+    {
+      "match": [
+        "DP"
+      ],
+      "display": "dp",
+      "matchCase": true
+    }
+  ],
+  "clips": [
+    {
+      "id": "01",
+      "title": "State and transition",
+      "question": "How do you design a dynamic programming solution: what do you write down first?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Dynamic programming, question one. How do you design a D P solution? What do you write down before any code? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Designing a DP: what do you write down <em>first</em>?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Write down four things. The state: what d p of i means, in one precise sentence. The transition: how a state is built from smaller ones, usually by trying each choice for the last step. The base cases: the smallest states, answered directly. And the order: compute each state after every state it reads. If you can't say the state in one sentence, you don't have one yet.",
+          "props": {
+            "title": "Four things, <em>before code</em>",
+            "items": [
+              {
+                "at": "state",
+                "label": "State",
+                "title": "What dp[i] means",
+                "body": "One precise sentence."
+              },
+              {
+                "at": "transition",
+                "label": "Transition",
+                "title": "Built from smaller states",
+                "body": "Try each choice for the last step."
+              },
+              {
+                "at": "base",
+                "label": "Base cases",
+                "title": "The smallest states",
+                "body": "Answered directly."
+              },
+              {
+                "at": "order",
+                "label": "Order",
+                "title": "Readers after writers",
+                "body": "Compute what a state reads first."
+              }
+            ]
+          }
+        },
+        {
+          "type": "graph",
+          "say": "House robber: take the most money from a row of houses, never two neighbors. State: d p of i is the best total from houses zero through i. At house i, either skip it, and keep d p of i minus one, or rob it, and add its value to d p of i minus two. The first house alone gives two. The first two give the better of two and seven: seven. At index two, skipping keeps seven, robbing gives two plus nine: eleven. At index three, skipping keeps eleven, and robbing gives seven plus three, only ten. At the last house, eleven plus one: twelve. Each state reads only the two before it, so two variables replace the table.",
+          "props": {
+            "title": "House robber: <em>skip or rob</em>",
+            "nodes": [
+              {
+                "id": "hn",
+                "label": "nums",
+                "x": 450,
+                "y": 400,
+                "w": 140,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "hd",
+                "label": "dp",
+                "x": 450,
+                "y": 580,
+                "w": 140,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "n0",
+                "label": "2",
+                "x": 660,
+                "y": 400,
+                "w": 120,
+                "h": 70
+              },
+              {
+                "id": "n1",
+                "label": "7",
+                "x": 830,
+                "y": 400,
+                "w": 120,
+                "h": 70
+              },
+              {
+                "id": "n2",
+                "label": "9",
+                "x": 1000,
+                "y": 400,
+                "w": 120,
+                "h": 70
+              },
+              {
+                "id": "n3",
+                "label": "3",
+                "x": 1170,
+                "y": 400,
+                "w": 120,
+                "h": 70
+              },
+              {
+                "id": "n4",
+                "label": "1",
+                "x": 1340,
+                "y": 400,
+                "w": 120,
+                "h": 70
+              },
+              {
+                "id": "d0",
+                "label": "",
+                "x": 660,
+                "y": 580,
+                "w": 120,
+                "h": 70
+              },
+              {
+                "id": "d1",
+                "label": "",
+                "x": 830,
+                "y": 580,
+                "w": 120,
+                "h": 70
+              },
+              {
+                "id": "d2",
+                "label": "",
+                "x": 1000,
+                "y": 580,
+                "w": 120,
+                "h": 70
+              },
+              {
+                "id": "d3",
+                "label": "",
+                "x": 1170,
+                "y": 580,
+                "w": 120,
+                "h": 70
+              },
+              {
+                "id": "d4",
+                "label": "",
+                "x": 1340,
+                "y": 580,
+                "w": 120,
+                "h": 70
+              },
+              {
+                "id": "i0",
+                "label": "i=0",
+                "x": 660,
+                "y": 290,
+                "w": 120,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "i1",
+                "label": "i=1",
+                "x": 830,
+                "y": 290,
+                "w": 120,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "i2",
+                "label": "i=2",
+                "x": 1000,
+                "y": 290,
+                "w": 120,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "i3",
+                "label": "i=3",
+                "x": 1170,
+                "y": 290,
+                "w": 120,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "i4",
+                "label": "i=4",
+                "x": 1340,
+                "y": 290,
+                "w": 120,
+                "h": 44,
+                "plain": true
+              }
+            ],
+            "edges": [],
+            "panels": [],
+            "steps": [
+              {
+                "at": "houses",
+                "note": "Never rob two adjacent houses"
+              },
+              {
+                "at": "State",
+                "nodes": {
+                  "hd": "active"
+                },
+                "note": "dp[i]: best total from houses 0..i"
+              },
+              {
+                "at": "skip",
+                "nodes": {
+                  "hd": "base"
+                },
+                "note": "dp[i] = max(dp[i−1], dp[i−2] + nums[i])"
+              },
+              {
+                "at": "alone",
+                "labels": {
+                  "d0": "2"
+                },
+                "nodes": {
+                  "d0": "done"
+                },
+                "note": "dp[0] = 2"
+              },
+              {
+                "at": "better",
+                "labels": {
+                  "d1": "7"
+                },
+                "nodes": {
+                  "d1": "done"
+                },
+                "note": "dp[1] = max(2, 7) = 7"
+              },
+              {
+                "at": "robbing",
+                "nodes": {
+                  "d0": "queued",
+                  "d1": "queued",
+                  "n2": "active"
+                },
+                "note": "Skip: 7. Rob: 2 + 9"
+              },
+              {
+                "at": "eleven",
+                "labels": {
+                  "d2": "11"
+                },
+                "nodes": {
+                  "d0": "done",
+                  "d1": "done",
+                  "n2": "base",
+                  "d2": "done"
+                },
+                "note": "dp[2] = max(7, 11) = 11"
+              },
+              {
+                "at": "ten",
+                "labels": {
+                  "d3": "11"
+                },
+                "nodes": {
+                  "d3": "done"
+                },
+                "note": "dp[3] = max(11, 7 + 3) = 11"
+              },
+              {
+                "at": "twelve",
+                "labels": {
+                  "d4": "12"
+                },
+                "nodes": {
+                  "d4": "active"
+                },
+                "note": "dp[4] = max(11, 11 + 1) = 12"
+              },
+              {
+                "at": "variables",
+                "nodes": {
+                  "d0": "dim",
+                  "d1": "dim",
+                  "d2": "dim",
+                  "d3": "queued",
+                  "d4": "queued"
+                },
+                "note": "Only dp[i−1] and dp[i−2] are read: O(1) space"
+              }
+            ]
+          }
+        },
+        {
+          "type": "compare",
+          "say": "You can run the same recurrence two ways. Top-down: write the recursion, and cache each answer the first time you compute it. It's the easiest to get right, and it only visits states you need. Bottom-up: fill a table in order, with no recursion. No stack depth limit, and it's easier to shrink to a few variables. Same states, same complexity.",
+          "props": {
+            "title": "Memo, or <em>table</em>",
+            "left": {
+              "at": "Top-down",
+              "label": "Top-down",
+              "title": "Recursion + memo",
+              "code": "if (memo[i]) return memo[i];",
+              "body": "Easiest to write; visits only the states it needs."
+            },
+            "right": {
+              "at": "Bottom-up",
+              "label": "Bottom-up",
+              "title": "Fill a table in order",
+              "tone": "good",
+              "code": "for (i = 0; i < n; ++i) dp[i] = …",
+              "body": "No recursion depth; easy to shrink to O(1) space."
+            },
+            "verdict": {
+              "at": "Same",
+              "text": "Same states, same transitions, same complexity.",
+              "code": "states × work per state"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Edit distance",
+      "question": "How do you compute the edit distance between two strings?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question two. How do you compute the edit distance between two strings: the fewest inserts, deletes, and replacements? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "How do you compute <em>edit distance</em>?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "The state takes two indices: d p of i, j is the fewest edits to turn the first i characters of one word into the first j of the other. Look at the last characters. If they match, they cost nothing: take the diagonal, d p of i minus one, j minus one. Otherwise, pay one, plus the cheapest of three moves: delete, from the cell above. Insert, from the cell to the left. Or replace, from the diagonal.",
+          "props": {
+            "title": "dp[i][j]: <em>prefix to prefix</em>",
+            "items": [
+              {
+                "at": "indices",
+                "label": "State",
+                "title": "First i chars → first j chars",
+                "body": "Fewest edits between the two prefixes.",
+                "code": "dp[i][j]"
+              },
+              {
+                "at": "match",
+                "label": "Last chars match",
+                "title": "Free: take the diagonal",
+                "body": "",
+                "code": "dp[i−1][j−1]"
+              },
+              {
+                "at": "Otherwise",
+                "label": "They differ",
+                "title": "1 + the cheapest move",
+                "body": "Delete: above. Insert: left. Replace: diagonal.",
+                "code": "1 + min(↑, ←, ↖)"
+              }
+            ]
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Horse into ross. The first row and column are free: turning a prefix into nothing takes i deletes, and building a prefix from nothing takes j inserts. Now h against r: they differ, so one plus the smallest neighbor, zero on the diagonal. One: replace h with r. Next, o against o: they match, so copy the diagonal, one. The rest of the table fills the same way, row by row, each cell reading three finished neighbors. The bottom-right cell is the answer: three. Replace h with r, delete r, delete e.",
+          "props": {
+            "title": "horse → <em>ros</em>",
+            "nodes": [
+              {
+                "id": "c0",
+                "label": "∅",
+                "x": 790,
+                "y": 254,
+                "w": 130,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "c1",
+                "label": "r",
+                "x": 940,
+                "y": 254,
+                "w": 130,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "c2",
+                "label": "o",
+                "x": 1090,
+                "y": 254,
+                "w": 130,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "c3",
+                "label": "s",
+                "x": 1240,
+                "y": 254,
+                "w": 130,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "r0",
+                "label": "∅",
+                "x": 640,
+                "y": 322,
+                "w": 80,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "r1",
+                "label": "h",
+                "x": 640,
+                "y": 394,
+                "w": 80,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "r2",
+                "label": "o",
+                "x": 640,
+                "y": 466,
+                "w": 80,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "r3",
+                "label": "r",
+                "x": 640,
+                "y": 538,
+                "w": 80,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "r4",
+                "label": "s",
+                "x": 640,
+                "y": 610,
+                "w": 80,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "r5",
+                "label": "e",
+                "x": 640,
+                "y": 682,
+                "w": 80,
+                "h": 44,
+                "plain": true
+              },
+              {
+                "id": "e00",
+                "label": "",
+                "x": 790,
+                "y": 322,
+                "w": 130,
+                "h": 62
+              },
+              {
+                "id": "e01",
+                "label": "",
+                "x": 940,
+                "y": 322,
+                "w": 130,
+                "h": 62
+              },
+              {
+                "id": "e02",
+                "label": "",
+                "x": 1090,
+                "y": 322,
+                "w": 130,
+                "h": 62
+              },
+              {
+                "id": "e03",
+                "label": "",
+                "x": 1240,
+                "y": 322,
+                "w": 130,
+                "h": 62
+              },
+              {
+                "id": "e10",
+                "label": "",
+                "x": 790,
+                "y": 394,
+                "w": 130,
+                "h": 62
+              },
+              {
+                "id": "e11",
+                "label": "",
+                "x": 940,
+                "y": 394,
+                "w": 130,
+                "h": 62
+              },
+              {
+                "id": "e12",
+                "label": "",
+                "x": 1090,
+                "y": 394,
+                "w": 130,
+                "h": 62
+              },
+              {
+                "id": "e13",
+                "label": "",
+                "x": 1240,
+                "y": 394,
+                "w": 130,
+                "h": 62
+              },
+              {
+                "id": "e20",
+                "label": "",
+                "x": 790,
+                "y": 466,
+                "w": 130,
+                "h": 62
+              },
+              {
+                "id": "e21",
+                "label": "",
+                "x": 940,
+                "y": 466,
+                "w": 130,
+                "h": 62
+              },
+              {
+                "id": "e22",
+                "label": "",
+                "x": 1090,
+                "y": 466,
+                "w": 130,
+                "h": 62
+              },
+              {
+                "id": "e23",
+                "label": "",
+                "x": 1240,
+                "y": 466,
+                "w": 130,
+                "h": 62
+              },
+              {
+                "id": "e30",
+                "label": "",
+                "x": 790,
+                "y": 538,
+                "w": 130,
+                "h": 62
+              },
+              {
+                "id": "e31",
+                "label": "",
+                "x": 940,
+                "y": 538,
+                "w": 130,
+                "h": 62
+              },
+              {
+                "id": "e32",
+                "label": "",
+                "x": 1090,
+                "y": 538,
+                "w": 130,
+                "h": 62
+              },
+              {
+                "id": "e33",
+                "label": "",
+                "x": 1240,
+                "y": 538,
+                "w": 130,
+                "h": 62
+              },
+              {
+                "id": "e40",
+                "label": "",
+                "x": 790,
+                "y": 610,
+                "w": 130,
+                "h": 62
+              },
+              {
+                "id": "e41",
+                "label": "",
+                "x": 940,
+                "y": 610,
+                "w": 130,
+                "h": 62
+              },
+              {
+                "id": "e42",
+                "label": "",
+                "x": 1090,
+                "y": 610,
+                "w": 130,
+                "h": 62
+              },
+              {
+                "id": "e43",
+                "label": "",
+                "x": 1240,
+                "y": 610,
+                "w": 130,
+                "h": 62
+              },
+              {
+                "id": "e50",
+                "label": "",
+                "x": 790,
+                "y": 682,
+                "w": 130,
+                "h": 62
+              },
+              {
+                "id": "e51",
+                "label": "",
+                "x": 940,
+                "y": 682,
+                "w": 130,
+                "h": 62
+              },
+              {
+                "id": "e52",
+                "label": "",
+                "x": 1090,
+                "y": 682,
+                "w": 130,
+                "h": 62
+              },
+              {
+                "id": "e53",
+                "label": "",
+                "x": 1240,
+                "y": 682,
+                "w": 130,
+                "h": 62
+              }
+            ],
+            "edges": [],
+            "panels": [],
+            "steps": [
+              {
+                "at": "free",
+                "labels": {
+                  "e00": "0",
+                  "e01": "1",
+                  "e02": "2",
+                  "e03": "3",
+                  "e10": "1",
+                  "e20": "2",
+                  "e30": "3",
+                  "e40": "4",
+                  "e50": "5"
+                },
+                "nodes": {
+                  "e00": "done",
+                  "e01": "done",
+                  "e02": "done",
+                  "e03": "done",
+                  "e10": "done",
+                  "e20": "done",
+                  "e30": "done",
+                  "e40": "done",
+                  "e50": "done"
+                },
+                "note": "Row 0 and column 0: j inserts, i deletes"
+              },
+              {
+                "at": "against",
+                "nodes": {
+                  "e11": "active",
+                  "e00": "queued",
+                  "e01": "queued",
+                  "e10": "queued"
+                },
+                "note": "h ≠ r: 1 + min(0, 1, 1)"
+              },
+              {
+                "at": "replace",
+                "labels": {
+                  "e11": "1"
+                },
+                "nodes": {
+                  "e00": "done",
+                  "e01": "done",
+                  "e10": "done",
+                  "e11": "done"
+                },
+                "note": "dp[1][1] = 1: replace h with r"
+              },
+              {
+                "at": "match",
+                "nodes": {
+                  "e22": "active",
+                  "e11": "queued"
+                },
+                "note": "o = o: copy the diagonal"
+              },
+              {
+                "at": "diagonal#2",
+                "labels": {
+                  "e22": "1"
+                },
+                "nodes": {
+                  "e11": "done",
+                  "e22": "done"
+                },
+                "note": "dp[2][2] = dp[1][1] = 1"
+              },
+              {
+                "at": "rest",
+                "labels": {
+                  "e12": "2",
+                  "e13": "3",
+                  "e21": "2",
+                  "e23": "2",
+                  "e31": "2",
+                  "e32": "2",
+                  "e33": "2",
+                  "e41": "3",
+                  "e42": "3",
+                  "e43": "2",
+                  "e51": "4",
+                  "e52": "4",
+                  "e53": "3"
+                },
+                "nodes": {
+                  "e12": "done",
+                  "e13": "done",
+                  "e21": "done",
+                  "e23": "done",
+                  "e31": "done",
+                  "e32": "done",
+                  "e33": "done",
+                  "e41": "done",
+                  "e42": "done",
+                  "e43": "done",
+                  "e51": "done",
+                  "e52": "done",
+                  "e53": "done"
+                },
+                "note": "Row by row: each cell reads ↖, ↑, ←"
+              },
+              {
+                "at": "answer",
+                "nodes": {
+                  "e53": "active"
+                },
+                "note": "dp[5][3] = 3"
+              },
+              {
+                "at": "replace#2",
+                "nodes": {
+                  "e11": "queued",
+                  "e32": "queued",
+                  "e42": "queued",
+                  "e53": "queued"
+                },
+                "note": "horse → rorse → rose → ros"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Interval DP",
+      "question": "In burst balloons, why do you choose the last balloon to burst, not the first?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question three. In burst balloons, why do you choose the last balloon to burst in a range, and not the first? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "Burst balloons: why choose the <em>last</em> balloon?"
+          }
+        },
+        {
+          "type": "points",
+          "say": "Bursting a balloon earns its value times its current left and right neighbors. If you choose the first balloon to burst, its neighbors become adjacent, so the left part and the right part keep affecting each other: no clean subproblems. Choose the last one instead. When k bursts last in the range between i and j, everything between them is already gone, so its neighbors are exactly i and j. And the two sides were solved independently. That gives d p of i, j: the best of d p of i, k, plus i times k times j, plus d p of k, j.",
+          "props": {
+            "title": "Pick the <em>last</em> to burst",
+            "items": [
+              {
+                "at": "first",
+                "label": "First to burst",
+                "title": "Sides stay coupled",
+                "body": "Its neighbors become adjacent; the halves interact."
+              },
+              {
+                "at": "instead",
+                "label": "Last to burst",
+                "title": "Neighbors are i and j",
+                "body": "Everything between is already gone."
+              },
+              {
+                "at": "gives",
+                "label": "Recurrence",
+                "title": "Split at k",
+                "body": "Two independent sides, plus burst(k) = n[i]·n[k]·n[j].",
+                "code": "dp[i][k] + burst(k) + dp[k][j]"
+              }
+            ]
+          }
+        },
+        {
+          "type": "code",
+          "say": "Pad the array with a one at each end, so the boundaries are real. d p of i, j covers the balloons strictly between i and j. The outer loop runs over the interval length, short to long, because each interval reads shorter ones. Then try every k as the last balloon. For three, one, five, eight, it returns one hundred sixty-seven. O of n cubed time.",
+          "props": {
+            "title": "Short intervals <em>first</em>",
+            "file": "burst.cpp",
+            "tag": "C++",
+            "lang": "cpp",
+            "size": 21,
+            "width": 1200,
+            "code": "int maxCoins(vector<int> nums) {\n    nums.insert(nums.begin(), 1);           // virtual 1s at both ends\n    nums.push_back(1);\n    int n = nums.size();\n    // dp[i][j]: best for the balloons strictly between i and j\n    vector<vector<int>> dp(n, vector<int>(n, 0));\n    for (int len = 2; len < n; ++len)       // short intervals first\n        for (int i = 0; i + len < n; ++i) {\n            int j = i + len;\n            for (int k = i + 1; k < j; ++k)  // k: the LAST balloon to burst\n                dp[i][j] = max(dp[i][j],\n                    dp[i][k] + nums[i] * nums[k] * nums[j] + dp[k][j]);\n        }\n    return dp[0][n - 1];\n}",
+            "highlights": [
+              {
+                "at": "Pad",
+                "lines": "2-3",
+                "note": "Virtual 1s make the ends real"
+              },
+              {
+                "at": "strictly",
+                "lines": "5",
+                "note": "Open interval (i, j)"
+              },
+              {
+                "at": "length",
+                "lines": "7",
+                "note": "Shorter intervals first"
+              },
+              {
+                "at": "every",
+                "lines": "10-12",
+                "note": "k bursts last"
+              },
+              {
+                "at": "returns",
+                "lines": "14",
+                "note": "[3, 1, 5, 8] → 167"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "04",
+      "title": "DP on trees",
+      "question": "How do you rob houses arranged as a binary tree, never taking a parent and its child?",
+      "scenes": [
+        {
+          "type": "question",
+          "say": "Question four. The houses form a binary tree, and you can't rob a parent and its child together. How do you find the best total? Pause and answer out loud.",
+          "pauseAfter": 3,
+          "props": {
+            "question": "House robber on a <em>tree</em>?"
+          }
+        },
+        {
+          "type": "graph",
+          "say": "Each node returns a pair: the best total for its subtree if you skip it, and if you take it. Start at the bottom. The leaf with three returns zero, or three. The leaf with one returns zero, or one. Move up to the node with two. Taking it means its child must be skipped: two plus zero. Skipping it lets the child choose its best: three. So the pair is three and two. Its sibling, the other three, gets one, or three. Finally, the root. Take it: three, plus both children's skip values, three and one: seven. Skip it: each child's best, three plus three: six. The answer is the larger: seven. One post-order pass, O of n.",
+          "props": {
+            "title": "(skip, <em>take</em>) per node",
+            "nodes": [
+              {
+                "id": "r",
+                "label": "3\n( · , · )",
+                "x": 960,
+                "y": 290,
+                "w": 170,
+                "h": 84
+              },
+              {
+                "id": "a",
+                "label": "2\n( · , · )",
+                "x": 740,
+                "y": 440,
+                "w": 170,
+                "h": 84
+              },
+              {
+                "id": "b",
+                "label": "3\n( · , · )",
+                "x": 1180,
+                "y": 440,
+                "w": 170,
+                "h": 84
+              },
+              {
+                "id": "c",
+                "label": "3\n( · , · )",
+                "x": 860,
+                "y": 600,
+                "w": 170,
+                "h": 84
+              },
+              {
+                "id": "d",
+                "label": "1\n( · , · )",
+                "x": 1300,
+                "y": 600,
+                "w": 170,
+                "h": 84
+              }
+            ],
+            "edges": [
+              {
+                "from": "r",
+                "to": "a"
+              },
+              {
+                "from": "r",
+                "to": "b"
+              },
+              {
+                "from": "a",
+                "to": "c"
+              },
+              {
+                "from": "b",
+                "to": "d"
+              }
+            ],
+            "panels": [],
+            "steps": [
+              {
+                "at": "pair",
+                "note": "Each node returns (skip, take)"
+              },
+              {
+                "at": "bottom",
+                "nodes": {
+                  "c": "active",
+                  "d": "active"
+                },
+                "note": "Post-order: children first"
+              },
+              {
+                "at": "leaf",
+                "labels": {
+                  "c": "3\n(0, 3)"
+                },
+                "nodes": {
+                  "c": "done"
+                },
+                "note": "Leaf 3: (0, 3)"
+              },
+              {
+                "at": "leaf#2",
+                "labels": {
+                  "d": "1\n(0, 1)"
+                },
+                "nodes": {
+                  "d": "done"
+                },
+                "note": "Leaf 1: (0, 1)"
+              },
+              {
+                "at": "Move",
+                "nodes": {
+                  "a": "active"
+                },
+                "note": "Node 2"
+              },
+              {
+                "at": "Taking",
+                "note": "take = 2 + child's skip 0 = 2"
+              },
+              {
+                "at": "Skipping",
+                "note": "skip = child's best max(0, 3) = 3"
+              },
+              {
+                "at": "So",
+                "labels": {
+                  "a": "2\n(3, 2)"
+                },
+                "nodes": {
+                  "a": "done"
+                },
+                "note": "Node 2: (3, 2)"
+              },
+              {
+                "at": "sibling",
+                "labels": {
+                  "b": "3\n(1, 3)"
+                },
+                "nodes": {
+                  "b": "done"
+                },
+                "note": "Node 3: (max(0, 1), 3 + 0) = (1, 3)"
+              },
+              {
+                "at": "Finally",
+                "nodes": {
+                  "r": "active"
+                },
+                "note": "Root"
+              },
+              {
+                "at": "seven",
+                "note": "take = 3 + 3 + 1 = 7"
+              },
+              {
+                "at": "six",
+                "labels": {
+                  "r": "3\n(6, 7)"
+                },
+                "note": "skip = max(3, 2) + max(1, 3) = 6"
+              },
+              {
+                "at": "larger",
+                "nodes": {
+                  "r": "done"
+                },
+                "note": "Answer: max(6, 7) = 7"
+              }
+            ],
+            "directed": false
+          }
+        },
+        {
+          "type": "recap",
+          "say": "To recap. Write the state, the transition, the base cases, and the order, before any code. Two-string problems use a table indexed by both prefixes. Interval problems split at the last action, and fill short intervals first. And on trees, each node returns a small tuple to its parent.",
+          "props": {
+            "title": "DP, <em>in four lines</em>",
+            "items": [
+              {
+                "at": "state",
+                "text": "State, transition, base cases, order.",
+                "code": "one-sentence state"
+              },
+              {
+                "at": "Two-string",
+                "text": "Two strings: dp[i][j] over both prefixes.",
+                "code": "↖, ↑, ←"
+              },
+              {
+                "at": "Interval",
+                "text": "Intervals: split at the last action, short first.",
+                "code": "dp[i][k] + … + dp[k][j]"
+              },
+              {
+                "at": "tuple",
+                "text": "Trees: return a tuple per node, post-order.",
+                "code": "(skip, take)"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
